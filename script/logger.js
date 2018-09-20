@@ -2,7 +2,6 @@
  * Logger object that wraps the default console so that
  * debug messages are only printed if Logger.isDebug()
  * returns true.
- * Last edited: 9/19/2018 by Drakonkinst
  * */
 
 var Logger = {

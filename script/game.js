@@ -1,64 +1,83 @@
 /*
- *  Visual design heavily based on A Dark Room
- *  by Doublespeak Games. (https://adarkroom.doublespeakgames.com)
- *  - influenced by Cookie Clicker by Orteil
- *    (https://orteil.dashnet.org/cookieclicker)
- *  - and Candy Box 2 by aniwey (https://candybox2.github.io)
- *  - and Drowning in Problems by Notch (http://game.notch.net/drowning/)
- *  - inspired by my old AP Comp Sci EC final semester
- *    project, this time in JavaScript (and better!)
- *  ~ by Drakonkinst 2018
- * TODO: rewrite this
+ * All this code is copyright Drakonkinst & (add name here), 2018.
+ * - visual design based on A Dark Room by Doublespeak Games (https://adarkroom.doublespeakgames.com)
+ * - a bunch of snippets, help, and influence from:
+ *   - Cookie Clicker by Orteil (https://orteil.dashnet.org/cookieclicker)
+ *   - Candy Box 2 by aniwey (https://candybox2.github.io)
+ *   - Drowning in Problems by Notch (http://game.notch.net/drowning/)
+ * - inspired by Drakonkinst's old Comp Sci A project
+ * 
+ * Spoilers ahead.
+ * https://drakonkinst.github.io/cat-simulation/
  */
 
+ /*
+  * Game engine, central object that runs
+  * the world and gives the program wings
+  * */
 var Game = {
-    //holds all version details
+    /* ====== Variables and Presets ====== */
     version: {
-        alpha: true,  //whether in alpha phase, mutually exclusive with beta
-        beta: false,  //whether in beta phase, mutually exclusive with alpha
+        alpha: true,  //alpha phase, mutually exclusive with beta
+        beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  1,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
         build:    1,  //increments for every unstable build tested, resets on every release
     },
 
-    //holds all available options, some cheaty some not
+    //cheaty options! no non-cheaty options yet.
     options: {
-        debug: true,           //print debug messages
+        debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
-        fastButtons: false,    //speed up button cooldowns greatly
+        fastButtons: false,     //speed up button cooldowns greatly
     },
 
-    //parses Game.version into a readable string
+    //parses Game.version into a legible string
     getVersionString: function() {
         var prefix = Game.version.alpha ? "alpha" : Game.version.beta ? "beta" : "";
         Logger.warnIf(Game.version.alpha && Game.version.beta, "This build is marked as both alpha and beta!");
         return prefix + " v" + Game.version.major + "." + Game.version.minor + "." + Game.version.release + "." + Game.version.build;
     },
 
-    //returns current time - is this needed?
+    /*
+    //returns current time - not used yet
     now: function() {
         return new Date().getTime();
     },
+    */
 
-    /* ====== FRAME HANDLING ====== */
+    /* ====== Modules ====== */
+    //keymap of a module's name and its associated module object
     modules: {},
 
     activeModule: null,
 
-    travelTo: function(module) {
+    travelTo: function(moduleName) {
+        var module = Game.getModule(moduleName);
         if(Game.activeModule == module) {
             return;
         }
 
         Game.activeModule = module;
+        //module.onArrival(diff);
+        Notifications.printQueue(moduleName);
     },
 
-    registerModule: function(name, module) {
-        this.modules[name] = module;
+    registerModule: function(module) {
+        var name = module.getName();
+        if(name && !(name in this.modules)) {
+            this.modules[name] = module;
+        } else {
+            Logger.warn("Tried to register a module but it failed!");
+        }
     },
 
-    /* ====== EQUIPMENT ====== */
+    getModule: function(name) {
+        return this.modules[name];
+    },
+
+    /* ====== Equipment ====== */
     //keymap of all values in player's inventory
     equipment: {},
 
@@ -111,7 +130,7 @@ var Game = {
         }
     },
 
-    /* ====== HEADER STUFF ===== */
+    /* ====== Header ====== */
     canTravel: function() {
         return $("#header").find(".headerButton").length > 1;
     },
@@ -127,7 +146,7 @@ var Game = {
     },
 
 
-    /* ====== GAME INITIALIZATION ===== */
+    /* ====== Game Initialization ====== */
     Init: function() {
         /* LAYOUT */
         $("#main").html("");
@@ -140,13 +159,13 @@ var Game = {
 
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version").text(Game.getVersionString()).click(function() { Logger.log("Github link coming beta!"); }))
+            .append($("<span>").addClass("version").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
             .appendTo("body");
 
-        this.registerModule("room", Room);
+        this.registerModule(Room);
     },
 
-    /* ====== PREPARE FOR LAUNCH! ===== */
+    /* ====== Prepare For Launch! ===== */
     Launch: function() {
         Logger.log("Game initialized!");
 

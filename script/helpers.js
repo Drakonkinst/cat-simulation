@@ -1,6 +1,5 @@
 /*
  * Miscellaneous helper functions.
- * Last edited: 9/19/2018 by Drakonkinst
  * */
 
 //returns whether a variable's type matches the requested type
