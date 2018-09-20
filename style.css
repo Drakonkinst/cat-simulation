@@ -1,0 +1,222 @@
+/* Base */
+html {
+	height: 100%;
+}
+div {
+	display: block;
+}
+body {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 16px;
+	font-weight: normal;
+	line-height: normal;
+	letter-spacing: normal;
+	/*margin: 15px;*/
+	padding: 0;
+	border: 0;
+}
+#wrapper {
+	margin: auto;
+	width: 700px;
+	padding: 20px 0 0 220px;
+	position: relative;
+}
+
+/* Layout */
+#main {
+	height: 700px;
+	position: relative;
+}
+
+#header {
+	font-size: 18px;
+	float: left;
+	text-decoration: underline;
+	padding-bottom: 20px;
+	height: 20px;
+	width: 700px;
+}
+
+#panel_room {
+	position: relative;
+	float: left;
+	margin-left: 20px;
+	width: 700px;
+}
+
+#footer {
+	position: fixed;
+	right: 30px;
+	bottom: 10px;
+	color: #666;
+	z-index: 10;
+}
+#footer span {
+	cursor: pointer;
+	float: right;
+	margin-left: 20px;
+}
+#footer span:hover {
+	text-decoration: underline;
+}
+.version {
+	font-weight: bold;
+}
+
+.clear {
+	clear: both;
+}
+
+/* Notifications */
+#notifications {
+	height: 700px;
+	width: 200px;
+	position: absolute;
+	overflow: hidden;
+	top: 20px;
+	left: 0px;
+	margin-bottom: 10px;
+}
+#notify-gradient {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	background-color: white;
+	background: -webkit-linear-gradient(
+		rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%
+	);
+	background: linear-gradient(
+		rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%
+	);
+	filter: alpha(
+		Opacity=0, FinishOpacity=100, Style=1, StartX=0, StartY=0, FinishX=0, FinishY=500
+	);
+}
+.notification {
+	margin-bottom: 10px;
+}
+
+/* Buttons */
+.button {
+	position: relative;
+	text-align: center;
+	border: 1px solid black;
+	width: 100px;
+	margin-bottom: 5px;
+	padding: 5px 10px;
+	cursor: pointer;
+	/*webkit-touch-callout: none;*/
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.button:hover {
+	text-decoration: underline;
+}
+div.button.disabled,
+div.button.disabled:hover {
+	cursor: default;
+	border-color: #b2b2b2;
+	color: #b2b2b2;
+	text-decoration: none;
+}
+.button .cooldown {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: -1;
+	height: 100%;
+	background-color: #DDDDDD;
+}
+
+/* Tooltips */
+div.tooltip {
+	display: none;
+	text-align: left;
+	padding: 2px 5px;
+	border: 1px solid black;
+	position: absolute;
+	box-shadow: -1px 3px 2px #666;
+	background: white;
+	z-index: 999;
+}
+
+.tooltip.bottom {
+	top: 30px;
+}
+
+.tooltip.right {
+	right: 0px;
+}
+
+.tooltip.left {
+	left: 2px;
+}
+
+.tooltip.top {
+	bottom: 20px;
+}
+
+*:hover > div.tooltip {
+	display: block;
+}
+
+div.tooltip:hover {
+	display: none !important;
+}
+
+.disabled:hover > div.tooltip, .button.free:hover > div.tooltip {
+	display: none;
+}
+
+#event .button.disabled:hover > div.tooltip {
+	display: block;
+}
+
+/* Problems */
+.problem {
+	margin-bottom: 12px;
+}
+.problem-solve {
+	margin-top: -25px;
+	margin-left: 300px;
+}
+
+/* Equipment */
+#equipment-container {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+#equipment::before {
+	position: absolute;
+	background: white;
+	content: attr(data-legend);
+	left: 8px;
+	top: -13px;
+}
+#equipment {
+	position: relative;
+	z-index:10;
+	border: 1px solid black;
+	cursor: default;
+	padding: 5px 10px;
+	width: 200px;
+}
+.equipmentItem {
+	position: relative;
+}
+.row {
+	position: relative;
+}
+.row_key {
+	clear: both;
+	float: left;
+}
+.row_val {
+	float: right;
+}
