@@ -1,35 +1,61 @@
+/*
+ * Notifications object that manages the sidescroll of
+ * messages on the left side of each module. Notifications
+ * fade as new ones are added, and each module has its own
+ * notification list.
+ * 
+ * TODO: should it save notifications while moving between
+ * panels? leaning on no
+ * */
 var Notifications = {
 
-    notifyQueue: {},    //list of all visible notifications
+    /*
+     * Keymap of each module's name and the array of visible notifications
+     * associated with it.
+     * */
+    notifyQueue: {},
 
-    //unshifts a notitification message to the Game.notifyQueue stack
-    notify: function(module, text, activeOnly) {
-        text = text || "";
+    /*
+     * Adds a message to a module's notifications if that module
+     * is currently active. If activeOnly is false and the module
+     * is inactive, then saves the message to that module's notifyQueue.
+     * */
+    notify: function(moduleName, message, activeOnly) {
+        moduleName = moduleName.toLowerCase();
+        message = message || "";
 
-        if(text.length > 0 && text.slice(-1) != ".") {
-            text += ".";
+        //adds a period to the end of the message if one does not exist
+        if(message.length > 0 && message.slice(-1) != ".") {
+            message += ".";
         }
 
-        if(module != null && Game.activeModule != module) {
+        if(moduleName != null && !isUndefined(Game.getModule(moduleName)) && Game.activeModule != Game.getModule(moduleName)) {
             if(!activeOnly) {
-                if(!(module in this.notifyQueue)) {
-                    this.notifyQueue[module] = [];
+
+                //creates key in notifyQueue if it does not exist
+                if(!(moduleName in this.notifyQueue)) {
+                    this.notifyQueue[moduleName] = [];
                 }
-                this.notifyQueue[module].push(text);
+
+                //adds message to notifyQueue in module
+                this.notifyQueue[moduleName].push(message);
             }
         } else {
-            Notifications.printMessage(text);
+            //requested module is active, so print message directly
+            Notifications.printMessage(message);
         }
     },
 
-    printMessage: function(text) {
-        var elem = $("<div>").addClass("notification").css("opacity", 0).text(text).prependTo('#notifications');
+    //prints a message to the active module's notifications
+    printMessage: function(message) {
+        var elem = $("<div>").addClass("notification").css("opacity", 0).text(message).prependTo('#notifications');
         elem.animate({opacity: 1}, 500, "linear", function() {
+            //removes invisible messages
             Notifications.clearHidden();
         });
     },
 
-    //clears all notifications that are out of sight
+    //clears all notifications that are invisible
     clearHidden: function() {
         var bottom = $('#notify-gradient').position().top + $('#notify-gradient').outerHeight(true);
         $('.notification').each(function() {
@@ -39,6 +65,14 @@ var Notifications = {
         });
     },
 
+    //empties notifyQueue in module and prints all of the messages to the active panel
+    printQueue: function(moduleName) {
+        if(!isUndefined(Game.getModule(moduleName))) {
+            while(this.notifyQueue[moduleName].length > 0) {
+                Notifications.printMessage(this.notifyQueue[moduleName].shift());
+            }
+        }
+    },
 
     Init: function() {
         $("<div>").attr("id", "notifications").append($("<div>").attr("id", "notify-gradient")).appendTo("#wrapper");
