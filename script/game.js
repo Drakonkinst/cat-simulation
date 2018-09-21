@@ -47,6 +47,8 @@ var Game = {
     },
     */
 
+    //setTimeout: function(callback, timeout, skipDouble)
+
     /* ====== Modules ====== */
     //keymap of a module's name and its associated module object
     modules: {},
@@ -65,7 +67,7 @@ var Game = {
     },
 
     registerModule: function(module) {
-        var name = module.getName();
+        var name = module.name;
         if(name && !(name in this.modules)) {
             this.modules[name] = module;
         } else {
@@ -163,6 +165,9 @@ var Game = {
             .appendTo("body");
 
         this.registerModule(Room);
+
+        Events.Init();
+        World.Init();
     },
 
     /* ====== Prepare For Launch! ===== */
@@ -176,10 +181,16 @@ var Game = {
         //test button!
         new Button({
             id: "test",
-            text: "press me plz",
-            cooldown: 4000,
-            tooltip: new Tooltip().append($("<div>").text("pretty please!")),
-        }).getElement().appendTo("#panel_room");
+            text: "open door",
+            cooldown: 2000,
+            tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
+            onClick: function() {
+                Notifications.notify(null, "an event's about to happen, get ready!")
+            },
+            onFinish: function() {
+                Events.startEvent(Room.events[0]);
+            }
+        }).appendTo("#panel_room");
 
         Logger.log("Version is " + Game.getVersionString());
     }
