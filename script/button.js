@@ -7,7 +7,7 @@
  * properties:
  * - String id: button's id (default "btn_undefined")
  * - String text: text inside button element (default "press me")
- * - int cooldown: cooldown of button in milliseconds (default 1000)
+ * - int cooldown: cooldown of button in milliseconds (default 0)
  * - Function onClick: function that runs when the button is clicked (default empty)
  * - Function onFinish: function that runs when the button finished cooling down (default empty)
  * - (optional) Tooltip tooltip: button tooltip
@@ -15,7 +15,7 @@
  * */
 function Button(properties) {
     this.id = properties.id || "btn_undefined";
-    this.cooldown = properties.cooldown || 1000;
+    this.cooldown = properties.cooldown || 0;
     this.onCooldown = false;
     var text = properties.text || "press me";
 
@@ -75,6 +75,7 @@ Button.prototype = {
         }
 
         if(cooldown <= 2) {
+            this.onFinish();
             return;
         }
 
@@ -116,9 +117,9 @@ Button.prototype = {
         this.cooldown = cooldown;
     },
 
-    //gets button element
-    getElement: function() {
-        return this.element;
+    appendTo: function(element) {
+        this.element.appendTo(element);
+        //return this;
     }
 };
 
