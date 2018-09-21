@@ -28,15 +28,22 @@ function chooseRandom(array) {
  * their individual chance. This percentage-based probability
  * makes it easy to create trees of probability without
  * massive calculations, since all of the values are relative.
+ * 
+ * If a property is specified, then uses that choice's property as
+ * weight instead of the choice's value itself.
  * */
-function chooseWeighted(choiceMap) {
+function chooseWeighted(choiceMap, property) {
 
     //first, find the sum of all the values in choiceMap
     var totalWeight = 0;
     
     for(var i in choiceMap) {
         if(choiceMap.hasOwnProperty(i)) {
-            totalWeight += parseFloat(choiceMap[i]);
+            if(!isUndefined(property)) {
+                totalWeight += parseFloat(choiceMap[i][property]);
+            } else {
+                totalWeight += parseFloat(choiceMap[i]);
+            }
         }
     }
 
@@ -51,7 +58,11 @@ function chooseWeighted(choiceMap) {
     var weightSum = 0;
 
     for(i in choiceMap) {
-        weightSum += parseFloat(choiceMap[i]);
+        if(!isUndefined(property)) {
+            weightSum += parseFloat(choiceMap[i][property]);
+        } else {
+            weightSum += parseFloat(choiceMap[i]);
+        }
         if(rand < weightSum) {
             return i;
         }
