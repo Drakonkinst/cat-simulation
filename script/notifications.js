@@ -21,11 +21,13 @@ var Notifications = {
      * is inactive, then saves the message to that module's notifyQueue.
      * */
     notify: function(moduleName, message, activeOnly) {
-        moduleName = moduleName.toLowerCase();
+        if(moduleName) {
+            moduleName = moduleName.toLowerCase();
+        }
         message = message || "";
 
-        //adds a period to the end of the message if one does not exist
-        if(message.length > 0 && message.slice(-1) != ".") {
+        //adds a period to the end of the message if one is needed
+        if(message.length > 0 && ".!? ".indexOf(message.slice(-1)) == -1) {
             message += ".";
         }
 
