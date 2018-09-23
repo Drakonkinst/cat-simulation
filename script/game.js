@@ -170,7 +170,11 @@ var Game = {
         World.Init();
 
         //modules
+<<<<<<< HEAD
         House.Init();
+=======
+        //Room.Init();
+>>>>>>> c637a26eb633df6547ab754a6bdcddb7056e0a9c
 
         //final module init
         Events.Init();
