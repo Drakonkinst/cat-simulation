@@ -20,6 +20,28 @@ function chooseRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
 
+//returns boolean given the chance to be true (range [0, 1])
+function chance(chance) {
+    return Math.random() < chance;
+}
+
+/*
+ * Returns a list of all the key names in an object.
+ * 
+ * Example:
+ * keysAsList({a: 1, b: 1, c: 3, d: 1}) -> ["a", "b", "c", "d"]
+ * 
+ * */
+function keysAsList(object) {
+    var keys = [];
+    for(var key in object) {
+        if(object.hasOwnProperty(key)) {
+            keys.push(key);
+        }
+    }
+    return keys;
+}
+
 /*
  * Returns an object based on its weight in the given keymap.
  * 
