@@ -79,7 +79,7 @@ function chooseWeighted(choiceMap, property) {
     var rand = randNum(0, totalWeight);
     var weightSum = 0;
 
-    for(i in choiceMap) {
+    for(var i in choiceMap) {
         if(!isUndefined(property)) {
             weightSum += parseFloat(choiceMap[i][property]);
         } else {

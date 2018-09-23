@@ -40,10 +40,8 @@ function Button(properties) {
 
 
     //adds tooltip if it exists
-    if(!isUndefined(properties.tooltip)) {
-        if(properties.tooltip.exists()) {
-            properties.tooltip.appendTo(this.element);
-        }
+    if(!isUndefined(properties.tooltip) && properties.tooltip.exists()) {
+        properties.tooltip.appendTo(this.element);
     }
 
     //modifies width if special width exists
@@ -103,7 +101,7 @@ Button.prototype = {
         if(!disabled && !this.onCooldown) {
             this.element.removeClass("disabled");
         } else if(disabled) {
-            this.element.addClass("disabled")
+            this.element.addClass("disabled");
         }
     },
 
