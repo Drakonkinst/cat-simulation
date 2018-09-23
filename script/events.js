@@ -303,7 +303,7 @@ var Events = {
 
     Init: function() {
         //build the event pool
-        Events.EventPool = [];
+        Events.EventPool = [].concat(World.events);
         for(var module in Game.modules) {
             Events.EventPool = Events.EventPool.concat(Game.modules[module].events);
         }
