@@ -2,7 +2,12 @@
  * Miscellaneous helper functions.
  * */
 
-//returns whether a variable's type matches the requested type
+/*
+ * Returns if the variable's type matches the requested type.
+ * 
+ * accepted values for "type": undefined, null, boolean, number,
+ * string, object, array.
+ * */
 function isType(variable, type) {
     if(type === "array") {
         return Array.isArray(variable);
@@ -10,7 +15,10 @@ function isType(variable, type) {
     return typeof variable === type;
 }
 
-//returns a random number between min and max
+/*
+ * Returns a number between min and max, non-inclusive.
+ * For integers, just do Math.floor(randNum(min, max))
+ * */
 function randNum(min, max) {
     return Math.random() * (max - min) + min;
 }
@@ -26,7 +34,7 @@ function chance(chance) {
 }
 
 /*
- * Returns a list of all the key names in an object.
+ * Returns an array of all the property names in an object.
  * 
  * Example:
  * keysAsList({a: 1, b: 1, c: 3, d: 1}) -> ["a", "b", "c", "d"]
@@ -47,7 +55,7 @@ function keysAsList(object) {
  * 
  * For example, in keymap {a: 1, b: 1, c: 3, d: 1} a, b, and d
  * have the same chance of being selected, while c has triple of
- * their individual chance. This percentage-based probability
+ * their individual chance. This dynamic probability
  * makes it easy to create trees of probability without
  * massive calculations, since all of the values are relative.
  * 
@@ -104,7 +112,12 @@ function isEmpty(object) {
 	return true;
 }
 
-//returns if the object is undefined, useful for checking if a boolean exists
+/*
+ * Returns if a variable is not defined.
+ * This will return true if the variable is undefined or null,
+ * but will return false if the variable is a boolean false--
+ * which if(variable) does not support.
+ * */
 function isUndefined(variable) {
     return typeof variable === "undefined" || variable === null;
 }

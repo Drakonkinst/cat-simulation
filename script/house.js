@@ -1,10 +1,10 @@
 var House = {
     name: "house",
-    newCats: [],
-    cats: [],
+    newCats: null,
+    cats: null,
 
     events: [
-        {
+        {   //Noises Outside - gain stuff
             title: "Noises",
             isAvailable: function() {
                 return Game.activeModule == House;
@@ -29,7 +29,7 @@ var House = {
                 },
                 "stuff": {
                     text: [
-                        "a bag full of warm bread sits on the doorstep.",
+                        "a basket full of warm bread sits on the doorstep.",
                         "the streets are silent."
                     ],
                     buttons: {
@@ -46,19 +46,21 @@ var House = {
 
     addCat: function(cat) {
         if(Game.activeModule == House) {
-            Notifications.notify(cat.name + " sniffs around. seems to like this place");
+            Notifications.notify(cat.name + " sniffs around, seems to like this place");
         } else {
             House.newCats.push(cat);
         }
         
         House.cats.push(cat);
-        Logger.log(House.cats);
         House.updateTitle();
+        Logger.log(House.cats);
     },
 
     onArrival: function() {
+        House.updateTitle();
+
         for(var i = 0; i < House.newCats.length; i++) {
-            Notifications.notify(House.newCats[i].name + " sniffs around. seems to like this place");
+            Notifications.notify(House.newCats[i].name + " sniffs around, seems to like this place");
             House.newCats.splice(i, 1);
         }
     },
@@ -83,7 +85,10 @@ var House = {
     },
 
     Init: function() {
-        Game.registerModule(this);
-        Game.addLocation("house", "A Lonely House", House);
+        this.tab = Game.addLocation("house", "A Lonely House", House);
+        this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
+        Game.updateSlider();
+        House.newCats = [new Cat()];
+        House.cats = [];
     }
 }

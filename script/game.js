@@ -23,7 +23,7 @@ var Game = {
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  3,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    2,  //increments for every unstable build tested, resets on every release
+        build:    3,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -51,33 +51,40 @@ var Game = {
     //setTimeout: function(callback, timeout, skipDouble)
 
     /* ====== Modules ====== */
-    //keymap of a module's name and its associated module object
-    modules: {},
-
     activeModule: null,
 
-    travelTo: function(moduleName) {
-        var module = Game.getModule(moduleName);
+    travelTo: function(module) {
         if(Game.activeModule == module) {
             return;
         }
 
+        $(".headerButton").removeClass("selected");
+        module.tab.addClass("selected");
+
         Game.activeModule = module;
+        module.onArrival();
         //module.onArrival(diff);
-        Notifications.printQueue(moduleName);
+        Notifications.printQueue(module);
     },
 
-    registerModule: function(module) {
-        var name = module.name;
-        if(name && !(name in this.modules)) {
-            this.modules[name] = module;
-        } else {
-            Logger.warn("Tried to register a module but it failed!");
-        }
+    updateSlider: function() {
+        var slider = $("#location-slider");
+        slider.width((slider.children().length * 700) + "px");
     },
 
-    getModule: function(name) {
-        return this.modules[name];
+    /* ====== Header ====== */
+    canTravel: function() {
+        return $("#header").find(".header-button").length > 1;
+    },
+
+    addLocation: function(id, text, module) {
+        return $("<div>").attr("id", "location_" + id)
+            .addClass("header-button")
+            .text(text).click(function() {
+                if(Game.canTravel()) {
+                    Game.travelTo(module);
+                }  
+            }).appendTo($("#header"));
     },
 
     /* ====== Equipment ====== */
@@ -133,48 +140,71 @@ var Game = {
         }
     },
 
-    /* ====== Header ====== */
-    canTravel: function() {
-        return $("#header").find(".headerButton").length > 1;
+    /* ====== Browser Checks ===== */
+    //thanks, doublespeakgames!
+    browserValid: function() {
+        return (location.search.indexOf("ignorebrowser=true") >= 0 || (isUndefined(Storage) && !oldIE));
     },
 
-    addLocation: function(id, text, module) {
-        return $("<div>").attr("id", "location_" + id)
-            .addClass("headerButton")
-            .text(text).click(function() {
-                if(Game.canTravel()) {
-                    Game.travelTo(module);
-                }  
-            }).appendTo($("#header"));
+    isMobile: function() {
+        return (location.search.indexOf("ignorebrowser=true") < 0 && /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
     },
 
+    /* ====== Document Modifiers? ====== */
+    disableSelection: function() {
+        document.onselectstart = Game.eventNullifier; // this is for IE
+		document.onmousedown = Game.eventNullifier; // this is for the rest
+    },
+
+    enableSelection: function() {
+        document.onselectstart = function() {
+            return true;
+        };
+        document.onmousedown = function() {
+            return true;
+        };
+    },
+
+    eventNullifier: function(e) {
+        $(e.target).hasClass("menu-btn");
+    },
 
     /* ====== Game Initialization ====== */
     Init: function() {
+        if(!Game.browserValid()) {
+            //window.location = //set to browser warning window
+        }
+
+        if(Game.isMobile()) {
+            //window.location = //set to mobile warning window
+        }
+
+        Game.disableSelection();
+
+        //Game.loadGame()
+
         /* LAYOUT */
         $("#main").html("");
 
         $("<div>").attr("id", "header").appendTo("#main");
-        $("<div>").attr("id", "panel_room").appendTo("#main");
-
-        Notifications.Init();
-        $("<div>").attr("id", "equipment-container").prependTo("#panel_room")
+        $("<div>").attr("id", "location-slider").appendTo("#main");
 
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
+            .append($("<span>").addClass("version").addClass("menu-btn").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
             .appendTo("body");
 
+       
+        //$("<div>").attr("id", "panel_room").appendTo("#main");
 
+        $("<div>").attr("id", "equipment-container").appendTo("#main")
         
+        Notifications.Init();
         World.Init();
 
         //modules
-        House.Init();
-        //Room.Init();
-
-        //final module init
         Events.Init();
+        House.Init();
     },
 
     /* ====== Prepare For Launch! ===== */
@@ -182,9 +212,7 @@ var Game = {
         Logger.log("Game initialized!");
 
         Game.Init();
-
-        Game.activeModule = House;
-        Game.activeModule.updateTitle();
+        Game.travelTo(House);
         Game.updateEquipment();
 
         //test button!
@@ -197,11 +225,11 @@ var Game = {
                 if(World.events[0].isAvailable()) {
                     Events.startEvent(World.events[0]);
                 } else {
-                    Notifications.notify("probably shouldn't open the door right now")
+                    Notifications.notify("probably shouldn't open the door right now");
                     return false;
                 }
             }
-        }).appendTo("#panel_room");
+        }).appendTo("#house-panel");
 
         /*for(var i = 0; i < 10; i++) {
             var c = new Cat();  

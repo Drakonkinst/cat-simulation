@@ -76,8 +76,8 @@ var Events = {
         Events.eventStack.unshift(event);
 
         //create event panel
-        event.eventPanel = $("<div>").attr("id", "event").addClass("eventPanel").css("opacity", 0)
-            .append($("<div>").addClass("eventTitle").text(Events.activeEvent().title))
+        event.eventPanel = $("<div>").attr("id", "event").addClass("event-panel").css("opacity", 0)
+            .append($("<div>").addClass("event-title").text(Events.activeEvent().title))
             .append($("<div>").attr("id", "description"))
             .append($("<div>").attr("id", "buttons"));
         if(!isUndefined(properties) && !isUndefined(properties.width)) {
@@ -150,7 +150,7 @@ var Events = {
         }
 
         if(!isUndefined(scene.eventTitle)) {
-            $(".eventTitle", Events.eventPanel()).text(scene.eventTitle);
+            $(".event-title", Events.eventPanel()).text(scene.eventTitle);
         }
 
         //clear event panel for new scene
@@ -174,6 +174,7 @@ var Events = {
         }
 
         if(!isUndefined(scene.input)) {
+            Game.enableSelection();
             var input = $("<input>").attr({
                 "type": "text",
                 "name": "input",
@@ -190,14 +191,14 @@ var Events = {
         }
 
         //by exit, we just mean that it switches to another scene - should this divide be made?
-        var exitBtns = $("<div>").attr("id", "exitButtons").appendTo($("#buttons", Events.eventPanel()));
+        var exitBtns = $("<div>").attr("id", "exit-buttons").appendTo($("#buttons", Events.eventPanel()));
         Events.drawButtons(scene);
         exitBtns.append($("<div>").addClass("clear"));
     },
 
     //draws buttons to event panel
     drawButtons: function(scene) {
-        var btns = $("#exitButtons", Events.eventPanel());
+        var btns = $("#exit-buttons", Events.eventPanel());
         var btnList = [];
         for(var id in scene.buttons) {
             var info = scene.buttons[id];
@@ -258,6 +259,8 @@ var Events = {
                 }
                 return;
             }
+
+            Game.disableSelection();
         }
         if(!isUndefined(info.notification)) {
             Notifications.notify(info.notification);
@@ -303,10 +306,10 @@ var Events = {
 
     Init: function() {
         //build the event pool
-        Events.EventPool = [].concat(World.events);
-        for(var module in Game.modules) {
-            Events.EventPool = Events.EventPool.concat(Game.modules[module].events);
-        }
+        Events.EventPool = [].concat(
+            World.events,
+            House.events
+        );
 
         Events.Task = new Task("random event", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
         Events.Task.scheduleNext();

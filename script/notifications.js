@@ -22,7 +22,7 @@ var Notifications = {
      * is currently active. If activeOnly is false and the module
      * is inactive, then saves the message to that module's notifyQueue.
      * */
-    notify: function(message, moduleName, activeOnly) {
+    notify: function(message, moduleName, noQueue) {
         if(moduleName) {
             moduleName = moduleName.toLowerCase();
         }
@@ -34,7 +34,7 @@ var Notifications = {
         }
 
         if(moduleName != null && !isUndefined(Game.getModule(moduleName)) && Game.activeModule != Game.getModule(moduleName)) {
-            if(!activeOnly) {
+            if(!noQueue) {
 
                 //creates key in notifyQueue if it does not exist
                 if(!(moduleName in this.notifyQueue)) {
@@ -70,10 +70,10 @@ var Notifications = {
     },
 
     //empties notifyQueue in module and prints all of the messages to the active panel
-    printQueue: function(moduleName) {
-        if(!isUndefined(Game.getModule(moduleName))) {
-            while(this.notifyQueue[moduleName].length > 0) {
-                Notifications.printMessage(this.notifyQueue[moduleName].shift());
+    printQueue: function(module) {
+        if(!isUndefined(this.notifyQueue[module.name])) {
+            while(this.notifyQueue[module.name].length > 0) {
+                Notifications.printMessage(this.notifyQueue[module.name].shift());
             }
         }
     },

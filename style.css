@@ -1,5 +1,5 @@
 /* Base */
-html {
+html, body {
 	height: 100%;
 }
 div {
@@ -11,7 +11,7 @@ body {
 	font-weight: normal;
 	line-height: normal;
 	letter-spacing: normal;
-	/*margin: 15px;*/
+	margin: 0;
 	padding: 0;
 	border: 0;
 }
@@ -22,22 +22,79 @@ body {
 	position: relative;
 }
 
+::selection {
+	background-color: transparent;
+}
+
+::-moz-selection {
+	background-color: transparent;
+}
+
+#description input::selection {
+	background-color: gray;
+}
+
+#description input::-moz-selection {
+	background-color: gray;
+}
+
+#description input:focus {
+	outline-color: gray;
+}
+
 /* Layout */
-#main {
-	height: 700px;
+#content {
 	position: relative;
+	overflow: hidden;
+	height: 700px;
+}
+
+#outer-slider {
+	position: absolute;
+}
+
+#outer-slider > div {
+	position: relative;
+	float: left;
+	width: 700px;
+	height: 700px;
+	overflow: hidden;
+}
+
+#location-slider {
+	position: absolute;
 }
 
 #header {
-	font-size: 18px;
-	float: left;
-	text-decoration: underline;
 	padding-bottom: 20px;
 	height: 20px;
-	width: 700px;
 }
 
-#panel_room {
+.header-button {
+	font-size: 18px;
+	cursor: pointer;
+	float: left;
+	border-left: 1px solid black;
+	margin-left: 10px;
+	padding-left: 10px;
+}
+
+.header-button:hover {
+	text-decoration: underline;
+}
+
+.header-button:first-child {
+	border-left: none;
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+.header-button.selected, .header-button.selected:hover {
+	cursor: default;
+	text-decoration: underline;
+}
+
+.location { /*previously #panel_room*/
 	position: relative;
 	float: left;
 	/*margin-left: 20px;*/
@@ -178,7 +235,7 @@ div.tooltip:hover {
 }
 
 /* Events */
-.eventPanel {
+.event-panel {
 	background: none repeat scroll 0 0 white;
 	border: 2px solid transparent;
 	left: 250px;
@@ -189,11 +246,11 @@ div.tooltip:hover {
 	z-index: 20;
 }
 
-body.noMask .eventPanel {
+body.noMask .event-panel {
 	background-color: black;
 }
 
-.eventPanel:before {
+.event-panel:before {
 	background-color:white;
 	opacity: 0.6;
 	content: " ";
@@ -205,11 +262,11 @@ body.noMask .eventPanel {
 	z-index: -2;
 }
 
-body.noMask .eventPanel:before {
+body.noMask .event-panel:before {
 	opacity: 0;
 }
 
-.eventPanel:after {
+.event-panel:after {
 	position: absolute;
 	top: -2px;
 	left: -2px;
@@ -221,32 +278,32 @@ body.noMask .eventPanel:before {
 	z-index: -2;
 }
 
-body.noMask .eventPanel:after {
+body.noMask .event-panel:after {
 	border-color: white;
 }
 
-.eventPanel .button {
+.event-panel .button {
 	float:left;
 	margin-right: 20px;
 }
 
-body.noMask .eventPanel .button {
+body.noMask .event-panel .button {
 	border-color: white;
 	color: white;
 }
 
-.eventTitle {
+.event-title {
 	display: inline-block;
 	font-weight: bold;
 	position: absolute;
 	top: -12px;
 }
 
-body.noMask .eventTitle {
+body.noMask .event-title {
 	color: white;
 }
 
-.eventTitle:after {
+.event-title:after {
 	background-color: white;
 	bottom: 32%;
 	content: " ";
@@ -257,7 +314,7 @@ body.noMask .eventTitle {
 	z-index: -1;
 }
 
-body.noMask .eventTitle:after {
+body.noMask .event-title:after {
 	background-color: black;
 }
 
@@ -319,7 +376,7 @@ body.noMask #description {
 	padding: 5px 10px;
 	width: 200px;
 }
-.equipmentItem {
+.equipment-item {
 	position: relative;
 }
 .row {
