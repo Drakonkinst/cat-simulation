@@ -8,14 +8,8 @@
  * - element: Tooltip element, for text added before the object was constructed (may be
  *            easier to use .append())
  * */
-function Tooltip(element, position) {
-    position = position || "bottom left";
-    this.element = $("<div>");
-    if(!isUndefined(element)) {
-        this.element.append(element);
-    }
-
-    this.element.addClass("tooltip " + position);
+function Tooltip(position) {
+    this.element = $("<div>").addClass("tooltip " + (position || "bottom left"));
 }
 Tooltip.prototype = {
     //appends an element to the Tooltip, then returns itself for method chaining

@@ -9,8 +9,9 @@ var Events = {
     RANDOM_EVENT_INTERVAL: [3, 6],
     PANEL_FADE: 200,
 
-    activeScene: null,      //name of current event
-    eventStack: [],         //event queue, useful for encounters with multiple events
+    activeScene: null,          //name of current event
+    activeEventContext: null,   //current event's context
+    eventStack: [],             //event queue, useful for encounters with multiple events
 
     //returns the current event object
     activeEvent: function() {
@@ -84,6 +85,13 @@ var Events = {
             Events.eventPanel().css("width", properties.width);
         }
 
+        //load context
+        if(isType(event.getContext, "function")) {
+            Events.activeEventContext = event.getContext();
+        } else {
+            Events.activeEventContext = {};
+        }
+
         //begins with the start scene
         Events.loadScene("start");
 
@@ -104,7 +112,8 @@ var Events = {
     endEvent: function() {
         Events.eventPanel().animate({opacity: 0}, Events.PANEL_FADE, 'linear', function() {
 			Events.eventPanel().remove();
-			Events.activeEvent().eventPanel = null;
+            Events.activeEvent().eventPanel = null;
+            Events.activeEventContext = null;
             Events.eventStack.shift();
             Logger.log(Events.eventStack.length + " events remaining");
 
@@ -127,8 +136,9 @@ var Events = {
         //sets active scene and grabs scene object from the event
         Logger.log("Loading scene: " + name);
         Events.activeScene = name;
-        var scene = Events.activeEvent().scenes[name];
-
+        var scene = Events.getScene(name);
+        
+        //Logger.log(scene);
         //run on load actions
         if(!isUndefined(scene.onLoad)) {
             scene.onLoad();
@@ -148,11 +158,11 @@ var Events = {
         $('#buttons', Events.eventPanel()).empty();
         
         //if there are multiple types of scenes, decide which one to use here
-        if(!isUndefined(scene.prompt)) {
-            Events.startPrompt(scene);
-        } else {
+        //if(!isUndefined(scene.prompt)) {
+            //Events.startPrompt(scene);
+        //} else {
             Events.startStory(scene);
-        }
+        //}
         
     },
 
@@ -163,13 +173,27 @@ var Events = {
             desc.append($("<div>").text(scene.text[line]));
         }
 
+        if(!isUndefined(scene.input)) {
+            var input = $("<input>").attr({
+                "type": "text",
+                "name": "input",
+                "spellcheck": false,
+                "placeholder": scene.input
+            }).appendTo(desc);
+
+            if(!isUndefined(scene.maxinput)) {
+                input.attr("maxlength", scene.maxinput);
+            }
+
+            $("<div>").attr("id", "input-result").css("opacity", 0).appendTo(desc);
+            $("#description input").focus().select();
+        }
+
         //by exit, we just mean that it switches to another scene - should this divide be made?
         var exitBtns = $("<div>").attr("id", "exitButtons").appendTo($("#buttons", Events.eventPanel()));
         Events.drawButtons(scene);
         exitBtns.append($("<div>").addClass("clear"));
     },
-
-    //startInput
 
     //draws buttons to event panel
     drawButtons: function(scene) {
@@ -180,6 +204,7 @@ var Events = {
             var button = new Button({
                 id: id,
                 text: info.text,
+                tooltip: info.tooltip || null,
                 onClick: function() {
                     Events.buttonClick(this);
                 },
@@ -213,8 +238,27 @@ var Events = {
     //handles when the player clicks a button, changes scene or ends event
     buttonClick: function(button) {
         //extract button object
-        var info = Events.activeEvent().scenes[Events.activeScene].buttons[button.id];
+        var scene = Events.getScene(Events.activeScene);
+        if(isType(scene, "function")) {
+            scene = scene(Events.activeEvent().getContext());
+        }
 
+        var info = scene.buttons[button.id];
+
+        if(info.checkValid && isType(scene.valid, "function") && !isUndefined(scene.input)) {
+            var text = Events.eventPanel().find("input").val();
+            var result = scene.valid(text);
+
+            if(!isType(result, "boolean") || !result) {
+                if(isType(result, "string") && Events.eventPanel().find("#input-result").css("opacity") == 0) {
+                    if(result.length > 0 && ".!? ".indexOf(result.slice(-1)) == -1) {
+                        result += ".";
+                    }
+                    Events.eventPanel().find("#input-result").text(result).css("opacity", 1).animate({opacity: 0}, 1500, "linear");
+                }
+                return;
+            }
+        }
         if(!isUndefined(info.notification)) {
             Notifications.notify(info.notification);
         }
@@ -225,6 +269,7 @@ var Events = {
 
         if(!isUndefined(info.nextScene)) {
             if(info.nextScene == "end") {
+                button.setDisabled(true);
                 Events.endEvent();
             } else {
                 var nextScene = chooseWeighted(info.nextScene);
@@ -236,6 +281,24 @@ var Events = {
                 Events.endEvent();
             }
         }
+    },
+
+    getScene: function(name) {
+        /*
+         * My favorite piece of code in this whole damn thing.
+         * If scene is a function, that means it's a context-based scene and has
+         * a function(context) argument, so it calls the scene fuction with getContext()
+         * as an argument.
+         * 
+         * This redefines scene as an object - which it otherwise should be if
+         * it wasn't a function. So all the code below
+         * will work perfectly either way.
+         * */
+        var scene = Events.activeEvent().scenes[name];
+        if(isType(scene, "function")) {
+            scene = scene(Events.activeEventContext);
+        }
+        return scene;
     },
 
     Init: function() {
