@@ -27,18 +27,18 @@ var World = {
             greeting: "the curtains open to lazy clouds, floating across the sky",
             causes: {
                 "sunny": {
-                    weight: 12,
+                    weight: 6,
                     notification: "a ray of light breaks the clouded skies. soon, the yellow sun shines anew."
                 },
                 "cloudy": {
-                    weight: 75
+                    weight: 38
                 },
                 "rain": {
-                    weight: 11,
+                    weight: 6,
                     notification: "a sea of dark clouds rolls in like the tide. raindrops patter softly above."
                 },
                 "snow": {
-                    weight: 2,
+                    weight: 1,
                     notification: "the winds grow colder. crystals of ice flutter from the sky."
                 }
             }
