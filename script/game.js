@@ -22,8 +22,8 @@ var Game = {
         beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  1,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    1,  //increments for every unstable build tested, resets on every release
+        release:  2,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        build:    3,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -31,6 +31,7 @@ var Game = {
         debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
+        fastEvents: true,       //scheduled tasks happen much more quickly
     },
 
     //parses Game.version into a legible string
@@ -164,17 +165,21 @@ var Game = {
             .append($("<span>").addClass("version").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
             .appendTo("body");
 
-        this.registerModule(Room);
 
-        Events.Init();
+        
         World.Init();
+
+        //modules
+        Room.Init();
+
+        //final module init
+        Events.Init();
     },
 
     /* ====== Prepare For Launch! ===== */
     Launch: function() {
         Logger.log("Game initialized!");
 
-        Game.activeModule = Room;
         Game.Init();
         Game.updateEquipment();
 
@@ -182,10 +187,10 @@ var Game = {
         new Button({
             id: "test",
             text: "open door",
-            cooldown: 2000,
+            cooldown: 1000,
             tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
             onClick: function() {
-                Notifications.notify(null, "an event's about to happen, get ready!")
+                Notifications.notify("an event's about to happen, get ready!")
             },
             onFinish: function() {
                 Events.startEvent(Room.events[0]);
