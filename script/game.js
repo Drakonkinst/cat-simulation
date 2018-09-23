@@ -1,5 +1,5 @@
 /*
- * All this code is copyright Drakonkinst & (add name here), 2018.
+ * All this code is copyright Drakonkinst & ctZN4, 2018.
  * - visual design based on A Dark Room by Doublespeak Games (https://adarkroom.doublespeakgames.com)
  * - a bunch of snippets, help, and influence from:
  *   - Cookie Clicker by Orteil (https://orteil.dashnet.org/cookieclicker)
@@ -170,11 +170,8 @@ var Game = {
         World.Init();
 
         //modules
-<<<<<<< HEAD
         House.Init();
-=======
         //Room.Init();
->>>>>>> c637a26eb633df6547ab754a6bdcddb7056e0a9c
 
         //final module init
         Events.Init();
