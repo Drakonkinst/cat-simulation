@@ -9,6 +9,8 @@
  * */
 var Notifications = {
 
+    MESSAGE_FADE: 500,  //time in milliseconds it takes for a notification to turns completely visible
+
     /*
      * Keymap of each module's name and the array of visible notifications
      * associated with it.
@@ -20,7 +22,7 @@ var Notifications = {
      * is currently active. If activeOnly is false and the module
      * is inactive, then saves the message to that module's notifyQueue.
      * */
-    notify: function(moduleName, message, activeOnly) {
+    notify: function(message, moduleName, activeOnly) {
         if(moduleName) {
             moduleName = moduleName.toLowerCase();
         }
@@ -51,7 +53,7 @@ var Notifications = {
     //prints a message to the active module's notifications
     printMessage: function(message) {
         var elem = $("<div>").addClass("notification").css("opacity", 0).text(message).prependTo('#notifications');
-        elem.animate({opacity: 1}, 500, "linear", function() {
+        elem.animate({opacity: 1}, Notifications.MESSAGE_FADE, "linear", function() {
             //removes invisible messages
             Notifications.clearHidden();
         });

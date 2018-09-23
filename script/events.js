@@ -6,6 +6,9 @@
  * */
 var Events = {
 
+    RANDOM_EVENT_INTERVAL: [3, 6],
+    PANEL_FADE: 200,
+
     activeScene: null,      //name of current event
     eventStack: [],         //event queue, useful for encounters with multiple events
 
@@ -86,7 +89,7 @@ var Events = {
 
         //draw event panel
         $("#wrapper").append(Events.eventPanel());
-        Events.eventPanel().animate({opacity: 1}, 200, 'linear');
+        Events.eventPanel().animate({opacity: 1}, Events.PANEL_FADE, 'linear');
         
         /*
 		var currentSceneInformation = Events.activeEvent().scenes[Events.activeScene];
@@ -99,7 +102,7 @@ var Events = {
 
     //ends event and clears the event panel
     endEvent: function() {
-        Events.eventPanel().animate({opacity:0}, 200, 'linear', function() {
+        Events.eventPanel().animate({opacity: 0}, Events.PANEL_FADE, 'linear', function() {
 			Events.eventPanel().remove();
 			Events.activeEvent().eventPanel = null;
             Events.eventStack.shift();
@@ -133,7 +136,11 @@ var Events = {
 
         //notify scene change
         if(!isUndefined(scene.notification)) {
-            Notifications.notify(null, scene.notification);
+            Notifications.notify(scene.notification);
+        }
+
+        if(!isUndefined(scene.eventTitle)) {
+            $(".eventTitle", Events.eventPanel()).text(scene.eventTitle);
         }
 
         //clear event panel for new scene
@@ -141,7 +148,12 @@ var Events = {
         $('#buttons', Events.eventPanel()).empty();
         
         //if there are multiple types of scenes, decide which one to use here
-        Events.startStory(scene);
+        if(!isUndefined(scene.prompt)) {
+            Events.startPrompt(scene);
+        } else {
+            Events.startStory(scene);
+        }
+        
     },
 
     //starts a story scene
@@ -204,7 +216,7 @@ var Events = {
         var info = Events.activeEvent().scenes[Events.activeScene].buttons[button.id];
 
         if(!isUndefined(info.notification)) {
-            Notifications.notify(null, info.notification);
+            Notifications.notify(info.notification);
         }
 
         if(!(isUndefined(info.click))) {
@@ -229,11 +241,11 @@ var Events = {
     Init: function() {
         //build the event pool
         Events.EventPool = [];
-        for(var i in Game.modules) {
-            Events.EventPool = Events.EventPool.concat(Game.modules[i].events);
+        for(var module in Game.modules) {
+            Events.EventPool = Events.EventPool.concat(Game.modules[module].events);
         }
 
-        Events.Task = new Task("random event", Events.randomEvent, 3, 6);
+        Events.Task = new Task("random event", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
         Events.Task.scheduleNext();
     }
 }
