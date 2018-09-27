@@ -1,7 +1,11 @@
+/*
+ * House module that represent's the player's house.
+ * */
 var House = {
     name: "house",
-    newCats: null,
-    cats: null,
+
+    newCats: null,  //cats that have not been introduced to the house
+    cats: null,     //all cats in the house
 
     events: [
         {   //Noises Outside - gain stuff
@@ -16,6 +20,7 @@ var House = {
                         "something's out there."
                     ],
                     notification: "something's scratching outside",
+                    blink: true,
                     buttons: {
                         "investigate": {
                             text: "investigate",
@@ -45,6 +50,7 @@ var House = {
     ],
 
     addCat: function(cat) {
+        cat = cat || new Cat();
         if(Game.activeModule == House) {
             Notifications.notify(cat.name + " sniffs around, seems to like this place");
         } else {
@@ -56,13 +62,21 @@ var House = {
         Logger.log(House.cats);
     },
 
-    onArrival: function() {
+    onArrival: function(diff) {
         House.updateTitle();
 
         for(var i = 0; i < House.newCats.length; i++) {
-            Notifications.notify(House.newCats[i].name + " sniffs around, seems to like this place");
-            House.newCats.splice(i, 1);
+            var catName = House.newCats[i].name;
+            var currentPos = i;
+            Game.setTimeout(function() {
+                if(Game.activeModule == House) {
+                    Notifications.notify(catName + " sniffs around, seems to like this place");
+                    House.newCats.splice(currentPos, 1);
+                }
+            }, randNum(500, 1000));
         }
+
+        //Game.moveStoresView(null, diff);
     },
 
     /*hasCatName: function(name) {
@@ -88,7 +102,10 @@ var House = {
         this.tab = Game.addLocation("house", "A Lonely House", House);
         this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
         Game.updateSlider();
+
         House.newCats = [new Cat()];
-        House.cats = [];
+        House.cats = House.newCats.slice();
+
+        $("<div>").attr("id", "equipment-container").prependTo("#house-panel");
     }
 }
