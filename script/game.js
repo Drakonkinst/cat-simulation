@@ -345,6 +345,7 @@ var Game = {
             var c = new Cat();  
             c.meow();
         }*/
+        $("<div>").text("Coming soon!").appendTo("#outside-panel");
 
         Logger.log("Version is " + Game.getVersionString());
     }
