@@ -23,6 +23,6 @@ Task.prototype = {
         }
         Logger.log("Next " + this.name + " scheduled in " + interval + " minutes");
         
-        this._eventTimeout = setTimeout(this.task, interval * 60 * 1000);
+        this._eventTimeout = Game.setTimeout(this.task, interval * 60 * 1000);
     }
 }
