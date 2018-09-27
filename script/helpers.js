@@ -3,19 +3,6 @@
  * */
 
 /*
- * Returns if the variable's type matches the requested type.
- * 
- * accepted values for "type": undefined, null, boolean, number,
- * string, object, array.
- * */
-function isType(variable, type) {
-    if(type === "array") {
-        return Array.isArray(variable);
-    }
-    return typeof variable === type;
-}
-
-/*
  * Returns a number between min and max, non-inclusive.
  * For integers, just do Math.floor(randNum(min, max))
  * */
@@ -87,14 +74,16 @@ function chooseWeighted(choiceMap, property) {
     var rand = randNum(0, totalWeight);
     var weightSum = 0;
 
-    for(var i in choiceMap) {
-        if(!isUndefined(property)) {
-            weightSum += parseFloat(choiceMap[i][property]);
-        } else {
-            weightSum += parseFloat(choiceMap[i]);
-        }
-        if(rand < weightSum) {
-            return i;
+    for(i in choiceMap) {
+        if(choiceMap.hasOwnProperty(i)) {
+            if(!isUndefined(property)) {
+                weightSum += parseFloat(choiceMap[i][property]);
+            } else {
+                weightSum += parseFloat(choiceMap[i]);
+            }
+            if(rand < weightSum) {
+                return i;
+            }
         }
     }
 
