@@ -154,9 +154,18 @@ var World = {
                     "house": function() {
                         context.start.notification = "a stray cat arrives, looking for a home";
                         context.start.intro = "a stray cat scratches at the door";
-                        context.start.request = "seems to want to come inside";
+                        context.start.request = "seems to want to come inside"; 
                         context.flee.location = "down the sidewalk";
                         context.flee.goodbye = "go back inside";
+                        context.request.adopt = "take it inside";
+                    },
+                    "outside": function() {
+                        context.start.notification = "a stray cat walks by",
+                        context.start.intro = "a stray cat slinks into view",
+                        context.start.request = "seems to like you";
+                        context.flee.location = "into a dark alleyway";
+                        context.flee.goodbye = "continue";
+                        context.request.adopt = "adopt it";
                     },
                     "default": function() {
                         Logger.warn("modules could not find a value");
@@ -171,11 +180,11 @@ var World = {
                     },
                     "cloudy": function() {
                         context.start.weather = "the wind is biting";
-                        context.request.weather = ", is shivering"
+                        context.request.weather = ", is shivering";
                     },
                     "snow": function() {
                         context.start.weather = "a trail of pawprints in the snow lead off into the distance";
-                        context.request.weather = ", is shivering"
+                        context.request.weather = ", is shivering";
                     },
                     "default": function() {
                         Logger.warn("weather could not find a value");
@@ -196,7 +205,7 @@ var World = {
                 if(cat.hunger > 10) {
                     context.request.status = "doesn't seem to have eaten for days";
                 } else {
-                    context.request.status = "seems healthy enough"
+                    context.request.status = "seems healthy enough";
                 }
     
                 //Logger.log(context);
@@ -212,6 +221,7 @@ var World = {
                             context.request + "."
                         ],
                         notification: context.notification,
+                        blink: true,
                         buttons: {
                             "getCloser": {
                                 text: "get closer",
@@ -261,7 +271,8 @@ var World = {
                         ],
                         buttons: {
                             "adopt": {
-                                text: "take it inside",
+                                //CHANGE THIS TO CONTEXT
+                                text: context.adopt,
                                 nextScene: {"adoptNamed": 2, "adoptNameless": 1}
                             },
                             "abandon": {
