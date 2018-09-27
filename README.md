@@ -1,4 +1,5 @@
-# cat-simulation
-A game with a bunch of simulated cats.
+# Cat Simulation
 
-Play here: https://drakonkinst.github.io/cat-simulation/
+a simulated cat adventure game for your browser
+
+[Click to play](https://drakonkinst.github.io/cat-simulation/)
