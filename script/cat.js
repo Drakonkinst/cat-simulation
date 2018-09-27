@@ -63,7 +63,7 @@ Cat.prototype = {
 };
 
 var Cats = {
-    DEFAULT_NAMES: [ "Miso", "Tara", "Garfield", "Nala", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Coco", "Mistie", "Misty", "Edgar", "Lolcat", "Sox", "Ollie", "Tasha", "Raven", "Leo", "Unagi", "Valencia", "Snickers", "Sesame", "Cherry", "Avocado", "Mango", "Oreo", "Princess", "Charcoal", "Prince", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Toby", "Mikesch", "Buddy", "Lucky", "Loki", "Romeo", "Momo", "Gavin", "Mittens", "Angel", "Emma", "Belle", "Dakota", "Chloe", "Ginger", "Poppy", "Tippy" ],
+    DEFAULT_NAMES: [ "Miso", "Tara", "Garfield", "Nala", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Coco", "Mistie", "Misty", "Edgar", "Lolcat", "Sox", "Ollie", "Tasha", "Raven", "Leo", "Unagi", "Valencia", "Snickers", "Sesame", "Cherry", "Avocado", "Mango", "Oreo", "Princess", "Charcoal", "Prince", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Toby", "Mikesch", "Buddy", "Lucky", "Loki", "Romeo", "Momo", "Gavin", "Mittens", "Angel", "Emma", "Belle", "Dakota", "Chloe", "Ginger", "Poppy", "Tippy", "Snickers", "Fish" ],
     //http://www.catbreedslist.com/all-cat-breeds/
     BREEDS: {
         "american shorthair": {
