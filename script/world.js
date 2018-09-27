@@ -311,10 +311,10 @@ var World = {
                         maxinput: 20,
                         valid: function(text) {
                             if(text.length === 0 || /^[\s\'\-\_]+$/g.test(text)) {
-                                return "can't be nothing"
+                                return "can't be nothing";
                             }
                             if(text.replace(/[\-\'\s\_]/g, "_").indexOf("__") > -1 || !/^[a-z0-9\-\'\_\s]+$/i.test(text)) {
-                                return "cat doesn't seem to recognize that"
+                                return "cat doesn't seem to recognize that";
                             }
                             return true;
                         },
