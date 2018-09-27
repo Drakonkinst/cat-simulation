@@ -46,7 +46,7 @@ function Button(properties) {
 
     //modifies width if special width exists
     if(!isUndefined(properties.width)) {
-        this.element.css("width", properties.width);
+        this.element.css("width", properties.width)
     }
 
     //every button should do something on click, so warns console if nothing happens
