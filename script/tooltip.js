@@ -21,6 +21,7 @@ Tooltip.prototype = {
     //appends Tooltip to element
     appendTo: function(element) {
         this.element.appendTo(element);
+        return this;
     },
 
     //returns whether the Tooltip has any text to show
