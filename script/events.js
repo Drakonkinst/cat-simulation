@@ -1,17 +1,15 @@
 /*
  * Events engine that manages and runs events.
- * 
- * TODO:
- * - Scene type that allows for user input (names, etc.)
  * */
 var Events = {
 
-    RANDOM_EVENT_INTERVAL: [3, 6],
-    PANEL_FADE: 200,
+    RANDOM_EVENT_INTERVAL: [3, 6],  //interval until a random event should occur, in minutes
+    PANEL_FADE: 200,                //milliseconds it takes to fade in or out an event
 
     activeScene: null,          //name of current event
     activeEventContext: null,   //current event's context
     eventStack: [],             //event queue, useful for encounters with multiple events
+    blinkInterval: null,        //ID of the current blink interval timer
 
     //returns the current event object
     activeEvent: function() {
@@ -28,11 +26,12 @@ var Events = {
 
     //triggers a random event, possibilities based on current state
     randomEvent: function() {
+        //can only trigger new event if one is not currently active
         if(isUndefined(Events.activeEvent())) {
 
-            //find all possible events
+            //get a list of all possible events
             var possibleEvents = [];
-            for(var i in Events.EventPool) {
+            for(var i = 0; i < Events.EventPool.length; i++) {
                 var event = Events.EventPool[i];
                 if(event.isAvailable()) {
                     possibleEvents.push(event);
@@ -43,13 +42,13 @@ var Events = {
                 //choose random event from possibilities
                 Events.startEvent(chooseRandom(possibleEvents));
             } else {
-                //no possible event found, try again sooner
+                //no possible event found, sets shorter timeout for next check
                 Events.Task.scheduleNext(0.5);
                 return;
             }
         }
 
-        //sets timeout for next random event to trigger
+        //sets default timeout for next random event to trigger
         Events.Task.scheduleNext();
     },
 
@@ -65,12 +64,9 @@ var Events = {
             return;
         }
 
-        /*
-        Engine.event('game event', 'event');
-		Engine.keyLock = true;
-		Engine.tabNavigation = false;
-        Button.saveCooldown = false;
-        */
+        //prevents user from using keyboard navigation during event
+        Game.keyLock = true;
+        Game.tabNavigation = false;
 
         //adds to beginning of event stack
         Events.eventStack.unshift(event);
@@ -80,13 +76,14 @@ var Events = {
             .append($("<div>").addClass("event-title").text(Events.activeEvent().title))
             .append($("<div>").attr("id", "description"))
             .append($("<div>").attr("id", "buttons"));
+
         if(!isUndefined(properties) && !isUndefined(properties.width)) {
             //sets custom width
             Events.eventPanel().css("width", properties.width);
         }
 
-        //load context
-        if(isType(event.getContext, "function")) {
+        //create context object based on the instant this function is called
+        if(typeof event.getContext === "function") {
             Events.activeEventContext = event.getContext();
         } else {
             Events.activeEventContext = {};
@@ -97,34 +94,33 @@ var Events = {
 
         //draw event panel
         $("#wrapper").append(Events.eventPanel());
-        Events.eventPanel().animate({opacity: 1}, Events.PANEL_FADE, 'linear');
+        Events.eventPanel().animate({opacity: 1}, Events.PANEL_FADE, "linear");
         
-        /*
-		var currentSceneInformation = Events.activeEvent().scenes[Events.activeScene];
-		if (currentSceneInformation.blink) {
+        var currentSceneInfo = Events.getScene(Events.activeScene);
+		if(currentSceneInfo.blink) {
+            //blinks title to notify AFK players for duration of event
 			Events.blinkTitle();
         }
-        */
 
     },
 
     //ends event and clears the event panel
     endEvent: function() {
-        Events.eventPanel().animate({opacity: 0}, Events.PANEL_FADE, 'linear', function() {
+        Events.eventPanel().animate({opacity: 0}, Events.PANEL_FADE, "linear", function() {
+            //clear all variables
 			Events.eventPanel().remove();
             Events.activeEvent().eventPanel = null;
             Events.activeEventContext = null;
             Events.eventStack.shift();
-            Logger.log(Events.eventStack.length + " events remaining");
+            Logger.logIf(Events.eventStack.length > 0, Events.eventStack.length + " events remaining");
 
-			/*
-			Engine.keyLock = false;
-			Engine.tabNavigation = true;
-			Button.saveCooldown = true;
-			if (Events.BLINK_INTERVAL) {
-				Events.stopTitleBlink();
-			}
-            */
+            //re-enables keyboard input
+            Game.keyLock = false;
+            Game.tabNavigation = true;
+
+            if(!isUndefined(Events.blinkInterval)) {
+                Events.stopTitleBlink();
+            }
 
             //forces refocus on the body for IE
             $("body").focus();
@@ -138,43 +134,42 @@ var Events = {
         Events.activeScene = name;
         var scene = Events.getScene(name);
         
-        //Logger.log(scene);
-        //run on load actions
-        if(!isUndefined(scene.onLoad)) {
+        if(typeof scene.onLoad === "function") {
+            //run on load actions
             scene.onLoad();
         }
 
-        //notify scene change
         if(!isUndefined(scene.notification)) {
+            //notify scene change
             Notifications.notify(scene.notification);
         }
 
         if(!isUndefined(scene.eventTitle)) {
+            //set title
             $(".event-title", Events.eventPanel()).text(scene.eventTitle);
         }
 
         //clear event panel for new scene
-        $('#description', Events.eventPanel()).empty();
-        $('#buttons', Events.eventPanel()).empty();
+        $("#description", Events.eventPanel()).empty();
+        $("#buttons", Events.eventPanel()).empty();
         
         //if there are multiple types of scenes, decide which one to use here
-        //if(!isUndefined(scene.prompt)) {
-            //Events.startPrompt(scene);
-        //} else {
-            Events.startStory(scene);
-        //}
-        
+        Events.startStory(scene);
     },
 
     //starts a story scene
     startStory: function(scene) {
+        //sets description
         var desc = $("#description", Events.eventPanel());
-        for(var line in scene.text) {
+        for(var line = 0; line < scene.text.length; line++) {
             desc.append($("<div>").text(scene.text[line]));
         }
 
         if(!isUndefined(scene.input)) {
+            //scene has an input, so enable selection of input box
             Game.enableSelection();
+
+            //create input element using scene.input as a placeholder prompt
             var input = $("<input>").attr({
                 "type": "text",
                 "name": "input",
@@ -183,43 +178,57 @@ var Events = {
             }).appendTo(desc);
 
             if(!isUndefined(scene.maxinput)) {
+                //sets max character input
                 input.attr("maxlength", scene.maxinput);
             }
 
+            //create result element for validity messages
             $("<div>").attr("id", "input-result").css("opacity", 0).appendTo(desc);
-            $("#description input").focus().select();
+
+            desc.find("input").focus().select();
         }
 
-        //by exit, we just mean that it switches to another scene - should this divide be made?
+        //exit buttons let the player respond to the scene
         var exitBtns = $("<div>").attr("id", "exit-buttons").appendTo($("#buttons", Events.eventPanel()));
-        Events.drawButtons(scene);
+
+        if(scene.buttons) {
+            //draw the buttons to exitBtn
+            Events.drawButtons(scene);
+        }
+
         exitBtns.append($("<div>").addClass("clear"));
     },
 
     //draws buttons to event panel
     drawButtons: function(scene) {
         var btns = $("#exit-buttons", Events.eventPanel());
-        var btnList = [];
+        //var btnList = [];
+
+        //adds buttons
         for(var id in scene.buttons) {
             var info = scene.buttons[id];
+
+            //create Button object based on button info
             var button = new Button({
                 id: id,
                 text: info.text,
                 tooltip: info.tooltip || null,
                 onClick: function() {
+                    //runs buttonClick as a wrapper around info.click
                     Events.buttonClick(this);
                 },
-                cooldown: info.cooldown     //NOTE: cooldown means that the button starts already cooling down, not actual length
+                cooldown: info.cooldown     //sets initial cooldown, since cooldown after click is irrelevant
             }).appendTo(btns);
 
             if(!isUndefined(info.available) && !info.available()) {
+                //disables button if it should not be clickable
                 button.setDisabled(true);
             }
-
             if(!isUndefined(info.cooldown)) {
+                //button starts cooling down so player can not press it immediately
                 button.startCooldown();
             }
-            btnList.push(button);
+            //btnList.push(button);
         }
 
         //Events.updateButtons();
@@ -238,20 +247,20 @@ var Events = {
 
     //handles when the player clicks a button, changes scene or ends event
     buttonClick: function(button) {
-        //extract button object
+        //grab button info and scene
         var scene = Events.getScene(Events.activeScene);
-        if(isType(scene, "function")) {
-            scene = scene(Events.activeEvent().getContext());
-        }
-
         var info = scene.buttons[button.id];
 
-        if(info.checkValid && isType(scene.valid, "function") && !isUndefined(scene.input)) {
+        if(info.checkValid && typeof scene.valid === "function" && !isUndefined(scene.input)) {
+            //button should use valid(), get result
             var text = Events.eventPanel().find("input").val();
             var result = scene.valid(text);
 
-            if(!isType(result, "boolean") || !result) {
-                if(isType(result, "string") && Events.eventPanel().find("#input-result").css("opacity") == 0) {
+            //if result is anything but true
+            if(typeof result !== "boolean" || !result) {
+                //result is not valid
+                if(typeof result === "string" && Events.eventPanel().find("#input-result").css("opacity") == 0) {
+                    //prints string as error message, as long as the last error message is completely invisible
                     if(result.length > 0 && ".!? ".indexOf(result.slice(-1)) == -1) {
                         result += ".";
                     }
@@ -260,45 +269,72 @@ var Events = {
                 return;
             }
 
+            //disables selection again now that input no longer needs to be checked
+            //TODO what if there are two input scenes in an event?
             Game.disableSelection();
         }
+        
         if(!isUndefined(info.notification)) {
+            //notify button click
             Notifications.notify(info.notification);
         }
 
         if(!(isUndefined(info.click))) {
+            //run onClick functions
             info.click();
         }
 
         if(!isUndefined(info.nextScene)) {
+            //change scene
             if(info.nextScene == "end") {
+                //special "end" case, end event
                 button.setDisabled(true);
                 Events.endEvent();
             } else {
+                //usual case, choose next scene based on basic weighted probability
                 var nextScene = chooseWeighted(info.nextScene);
+
                 if(!isUndefined(nextScene)) {
+                    //change scene
                     Events.loadScene(nextScene);
                     return;
                 }
+                
+                //something's gone wrong, exit event
                 Logger.warn("No suitable scene found after \"" + Events.activeScene + "\"");
                 Events.endEvent();
             }
         }
     },
 
+    //every 3 seconds change title to *** EVENT ***, then change back to the original title 1.5 seconds later
+    blinkTitle: function() {
+        var title = document.title;
+
+        //set blinkInterval
+        Events.blinkInterval = Game.setInterval(function() {
+            document.title = "*** EVENT ***";
+            Game.setTimeout(function() {
+                document.title = title;
+            }, 1500);
+        }, 3000)
+    },
+
+    //clears blinkInterval and stops blinking the title
+    stopTitleBlink: function() {
+        clearInterval(Events.blinkInterval);
+        Events.blinkInterval = null;
+    },
+
+    /*
+     * If the scene info is a function, return the result of
+     * calling that function with the context object. Either
+     * way, an object should be returned.
+     * */
     getScene: function(name) {
-        /*
-         * My favorite piece of code in this whole damn thing.
-         * If scene is a function, that means it's a context-based scene and has
-         * a function(context) argument, so it calls the scene fuction with getContext()
-         * as an argument.
-         * 
-         * This redefines scene as an object - which it otherwise should be if
-         * it wasn't a function. So all the code below
-         * will work perfectly either way.
-         * */
         var scene = Events.activeEvent().scenes[name];
-        if(isType(scene, "function")) {
+        if(typeof scene === "function") {
+            //call the function passing the context object
             scene = scene(Events.activeEventContext);
         }
         return scene;
@@ -308,10 +344,12 @@ var Events = {
         //build the event pool
         Events.EventPool = [].concat(
             World.events,
-            House.events
+            House.events,
+            Outside.events
         );
 
+        //start random event task
         Events.Task = new Task("random event", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
         Events.Task.scheduleNext();
     }
-}
+};
