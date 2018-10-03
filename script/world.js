@@ -325,7 +325,7 @@ var World = {
                             "random": {
                                 text: "random",
                                 click: function() {
-                                    Events.eventPanel().find("input").val(Cats.uniqueName(chooseRandom(Cats.DEFAULT_NAMES)));
+                                    Events.eventPanel().find("input").val(chooseRandom(Cats.DEFAULT_NAMES));
                                 }
                             }
                         }
