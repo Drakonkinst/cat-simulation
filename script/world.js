@@ -305,6 +305,9 @@ var World = {
                             if(text.replace(/[\-\'\s\_]/g, "_").indexOf("__") > -1 || !/^[a-z0-9\-\'\_\s]+$/i.test(text)) {
                                 return "cat doesn't seem to recognize that";
                             }
+                            if(itemInList(House.cats.map(cat => cat.name), text, true)) {
+                                return "name is taken";
+                            }
                             return true;
                         },
                         buttons: {
