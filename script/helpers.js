@@ -91,24 +91,33 @@ function chooseWeighted(choiceMap, property) {
     Logger.warn("No choice found");
 }
 
-//replace with roman numerals?
-function ordinalSuffix(i) {
-    var j = i % 10;
-    var k = i % 100;
-    var suffix = "th";
+function romanize(num) {
+    var lookup = {
+        M: 1000,
+        CM: 900,
+        D: 500,
+        CD: 400,
+        C: 100,
+        XC: 90,
+        L: 50,
+        XL: 40,
+        X: 10,
+        IX: 9,
+        V: 5,
+        IV: 4,
+        I: 1
+    };
 
-    if (j == 1 && k != 11) {
-        //ends in 1 but not 11
-        suffix = "st";
-    } else if (j == 2 && k != 12) {
-        //ends in 2 but not 12
-        suffix = "nd";
-    } else if (j == 3 && k != 13) {
-        //ends in 3 but not 13
-        suffix = "rd";
+    var roman = "";
+    
+    for(var i in lookup) {
+        while(num >= lookup[i]) {
+            roman += i;
+            num -= lookup[i];
+        }
     }
 
-    return i + suffix;
+    return roman;
 }
 
 //returns whether a variable exists in an array

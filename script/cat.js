@@ -115,7 +115,7 @@ var Cats = {
 
         while(itemInList(catList, uniqueName, true)) {
             ordinal++;
-            uniqueName = catName + " the " + ordinalSuffix(ordinal);
+            uniqueName = catName + " " + romanize(ordinal);
         }
         return uniqueName;
     }
