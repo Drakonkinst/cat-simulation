@@ -2,6 +2,10 @@ function Cat(properties) {
     properties = properties || {};
     this.name = properties.name || chooseRandom(Cats.DEFAULT_NAMES);
 
+    if(!isUndefined(House.cats)) {
+        this.name = Cats.uniqueName(this.name);
+    }
+
     this.breed = properties.breed || chooseRandom(keysAsList(Cats.BREEDS));
     this.isFemale = properties.isFemale || Math.random() < 0.5;
 
@@ -102,5 +106,17 @@ var Cats = {
             },
             lifespan: [12, 14]
         }
+    },
+
+    uniqueName: function(catName) {
+        var ordinal = 1;
+        var uniqueName = catName;
+        var catList = House.cats.map(cat => cat.name);
+
+        while(itemInList(catList, uniqueName, true)) {
+            ordinal++;
+            uniqueName = catName + " the " + ordinalSuffix(ordinal);
+        }
+        return uniqueName;
     }
 };
