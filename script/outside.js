@@ -1,8 +1,8 @@
 var Outside = {
     name: "outside",
     events: [],
-    onArrival: function() {
-
+    onArrival: function(transitionDiff) {
+        Game.moveEquipmentView(null, transitionDiff)
     },
     Init: function() {
         this.tab = Game.addLocation("outside", "A Quiet Town", Outside);
