@@ -91,6 +91,38 @@ function chooseWeighted(choiceMap, property) {
     Logger.warn("No choice found");
 }
 
+//replace with roman numerals?
+function ordinalSuffix(i) {
+    var j = i % 10;
+    var k = i % 100;
+    var suffix = "th";
+
+    if (j == 1 && k != 11) {
+        //ends in 1 but not 11
+        suffix = "st";
+    } else if (j == 2 && k != 12) {
+        //ends in 2 but not 12
+        suffix = "nd";
+    } else if (j == 3 && k != 13) {
+        //ends in 3 but not 13
+        suffix = "rd";
+    }
+
+    return i + suffix;
+}
+
+//returns whether a variable exists in an array
+function itemInList(list, item, ignoreCase) {
+    if(ignoreCase) {
+        //turn everything to uppercase
+        item = item.toUpperCase();
+        list = list.map(function(value) {
+            return value.toUpperCase();
+        });
+    }
+    return list.includes(item);
+}
+
 //returns if the object has no properties
 function isEmpty(object) {
 	for(var key in object) {
