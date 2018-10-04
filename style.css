@@ -357,24 +357,49 @@ body.noMask #description {
 /* Equipment */
 #equipment-container {
 	position: absolute;
-	top: 0px;
+	top: 40px;
 	right: 0px;
 }
-#equipment::before {
+
+#equipment::before, #perks::before, #house::before {
 	position: absolute;
 	background: white;
 	content: attr(data-legend);
 	left: 8px;
 	top: -13px;
 }
-#equipment {
-	position: relative;
-	z-index:10;
+
+#house {
+	position: absolute;
+	z-index: 10;
+	top: 0px;
+	right: 0px;
 	border: 1px solid black;
 	cursor: default;
 	padding: 5px 10px;
 	width: 200px;
 }
+
+#equipment {
+	position: relative;
+	z-index: 10;
+	border: 1px solid black;
+	cursor: default;
+	padding: 5px 10px;
+	width: 200px;
+}
+
+#perks {
+	margin-top: 15px;
+	z-index: 10;
+	position: relative;
+	right: 0px;
+	border: 1px solid black;
+	cursor: default;
+	padding: 5px 10px;
+	width: 200px;
+}
+
 .equipment-item {
 	position: relative;
 }
