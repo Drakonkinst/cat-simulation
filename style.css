@@ -94,10 +94,9 @@ body {
 	text-decoration: underline;
 }
 
-.location { /*previously #panel_room*/
+.location {
 	position: relative;
 	float: left;
-	/*margin-left: 20px;*/
 	width: 700px;
 }
 
