@@ -31,4 +31,4 @@ Tooltip.prototype = {
     getElement: function() {
         return this.element;
     }
-}
+};
