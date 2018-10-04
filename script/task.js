@@ -7,7 +7,11 @@
  * */
 function Task(name, task, minInterval, maxInterval) {
     this.name = name;                   //the display name of the task, used for debugging
-    this.task = task;                   //the function to run
+    //the function to run
+    this.task = function() {
+        task();
+        this.eventTimeout = null;
+    };                   
     this.minInterval = minInterval;     //the minimum time before the task should run (in minutes)
     this.maxInterval = maxInterval;     //the maximum time before the task should run (in minutes)
 }
@@ -23,6 +27,10 @@ Task.prototype = {
         }
         Logger.log("Next " + this.name + " scheduled in " + interval + " minutes");
         
-        this._eventTimeout = Game.setTimeout(this.task, interval * 60 * 1000);
+        if(this.eventTimeout) {
+            clearTimeout(this.eventTimeout);
+        }
+
+        this.eventTimeout = Game.setTimeout(this.task, interval * 60 * 1000);
     }
 }
