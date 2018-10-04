@@ -389,3 +389,51 @@ body.noMask #description {
 .row_val {
 	float: right;
 }
+
+/* House */
+#house-content {
+	overflow: hidden;
+	height: 624px;
+}
+
+#house-header {
+	padding-bottom: 20px;
+	height: 16px;
+}
+
+#house-content {
+	position: relative;
+}
+
+.room {
+	height: 624px;
+	position: relative;
+}
+
+#room-slider {
+	position: absolute;
+}
+
+.room-button {
+	font-size: 17px;
+	cursor: pointer;
+	float: left;
+	border-left: 1px solid black;
+	margin-left: 10px;
+	padding-left: 10px;
+}
+
+.room-button:hover {
+	text-decoration: underline;
+}
+
+.room-button:first-child {
+	border-left: none;
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+.room-button.selected, .room-button.selected:hover {
+	cursor: default;
+	text-decoration: underline;
+}
