@@ -123,6 +123,15 @@ body {
 	clear: both;
 }
 
+/* Day */
+#day-notify {
+	position: absolute;
+    top: 20px;
+    right: 0px;
+	background: white;
+	opacity: 0;
+}
+
 /* Notifications */
 #notifications {
 	height: 700px;
