@@ -67,8 +67,9 @@ Cat.prototype = {
 };
 
 var Cats = {
-    DEFAULT_NAMES: [ "Miso", "Tara", "Garfield", "Nala", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Coco", "Mistie", "Misty", "Edgar", "Lolcat", "Sox", "Ollie", "Tasha", "Raven", "Leo", "Unagi", "Valencia", "Snickers", "Sesame", "Cherry", "Avocado", "Mango", "Oreo", "Princess", "Charcoal", "Prince", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Toby", "Mikesch", "Buddy", "Lucky", "Loki", "Romeo", "Momo", "Gavin", "Mittens", "Angel", "Emma", "Belle", "Dakota", "Chloe", "Ginger", "Poppy", "Tippy", "Snickers", "Fish" ],
+    DEFAULT_NAMES: [ "Miso", "Tara", "Garfield", "Nala", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Coco", "Mistie", "Misty", "Edgar", "Lolcat", "Sox", "Ollie", "Tasha", "Raven", "Leo", "Unagi", "Valencia", "Snickers", "Sesame", "Cherry", "Avocado", "Mango", "Oreo", "Princess", "Charcoal", "Prince", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Toby", "Mikesch", "Buddy", "Lucky", "Loki", "Romeo", "Momo", "Gavin", "Mittens", "Angel", "Emma", "Belle", "Dakota", "Chloe", "Ginger", "Poppy", "Tippy", "Snickers", "Fish", "Eliot", "Milo", "Max", "Smokey", "Muffin", "Fuzzy", "Nibble", "Athena", "Artemis", "Illia" ],
     //http://www.catbreedslist.com/all-cat-breeds/
+    //secondary source - https://www.hillspet.com/cat-care/cat-breeds/
     BREEDS: {
         "american shorthair": {
             tendencies: [ "quiet", "friendly", "playful", "calm" ],
@@ -93,6 +94,18 @@ var Cats = {
                 f: [6, 10]
             },
             lifespan: [15, 16]
+        },
+        "scottish fold": {
+            tendencies: [ "playful", "friendly" ],
+            colors: [ "white", "blue", "black", "red", "cream", "silver" ],
+            coats: [ "short", "dense", "plush", "soft" ],
+            eyeColors: [ "blue", "green", "gold", "bicolored" ],
+            size: "medium",
+            weight: {
+                m: [7, 11],
+                f: [5, 8]
+            },
+            lifespan: [11, 14]
         },
         "sphinx": {
             tendencies: [ "curious", "friendly", "quiet" ],
