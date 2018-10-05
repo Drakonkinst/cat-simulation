@@ -118,6 +118,10 @@ Button.prototype = {
     appendTo: function(element) {
         this.element.appendTo(element);
         return this;
+    },
+
+    get: function() {
+        return this.element;
     }
 };
 
