@@ -21,5 +21,8 @@ Section.prototype = {
     },
     get: function() {
         return this.element;
+    },
+    exists: function() {
+        return this.element.children().length > 0
     }
 };
