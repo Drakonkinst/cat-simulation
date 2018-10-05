@@ -199,7 +199,7 @@ div.button.disabled:hover {
 }
 
 /* Tooltips */
-div.tooltip {
+.tooltip {
 	display: none;
 	text-align: left;
 	padding: 2px 5px;
@@ -208,6 +208,10 @@ div.tooltip {
 	box-shadow: -1px 3px 2px #666;
 	background: white;
 	z-index: 999;
+}
+
+.button .tooltip {
+	width: 100px;
 }
 
 .tooltip.bottom {
@@ -469,4 +473,17 @@ body.noMask #description {
 .room-button.selected, .room-button.selected:hover {
 	cursor: default;
 	text-decoration: underline;
+}
+
+/* Outside */
+#buy-buttons:before {
+	content: attr(data-legend);
+	position: relative;
+	top: -5px;
+}
+
+#buy-buttons {
+	position: absolute;
+	top: 50px;
+	left: 0px;
 }

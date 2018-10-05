@@ -1,6 +1,6 @@
 /*
  * All this code is copyright Drakonkinst & ctZN4, 2018.
- * - visual design based on A Dark Room by Doublespeak Games (https://adarkroom.doublespeakgames.com)
+ * - design heavily based on A Dark Room by Doublespeak Games (https://adarkroom.doublespeakgames.com)
  * - a bunch of snippets, help, and influence from:
  *   - Cookie Clicker by Orteil (https://orteil.dashnet.org/cookieclicker)
  *   - Candy Box 2 by aniwey (https://candybox2.github.io)
@@ -12,8 +12,9 @@
  */
 
  /*
-  * Game engine, central object that runs
-  * the world and gives the program wings
+  * Game engine and state manager, central
+  * object that runs the world and gives
+  * the program wings
   * */
 var Game = {
     /* ====== Variables and Presets ====== */
@@ -22,16 +23,16 @@ var Game = {
         beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  4,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    3,  //increments for every unstable build tested, resets on every release
+        release:  5,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        build:    7,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
     options: {
         debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
-        fastButtons: false,     //speed up button cooldowns greatly
-        fastEvents: false,       //scheduled tasks happen much more quickly
+        fastButtons: true,     //speed up button cooldowns greatly
+        fastEvents: false,      //scheduled tasks happen much more quickly
     },
     
     //game states
@@ -44,7 +45,7 @@ var Game = {
     getVersionString: function() {
         var prefix = Game.version.alpha ? "alpha" : Game.version.beta ? "beta" : "";
         Logger.warnIf(Game.version.alpha && Game.version.beta, "This build is marked as both alpha and beta!");
-        return prefix + " v" + Game.version.major + "." + Game.version.minor + "." + Game.version.release + "." + Game.version.build;
+        return prefix + " v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
     },
 
     //returns current time
@@ -87,13 +88,9 @@ var Game = {
         var diff = Math.abs(panelIndex - currentIndex);
         slider.animate({left: -(panelIndex * 700) + "px"}, 300 * diff);
 
-        //TODO - manage equipment
-        var equipment = $("#equipment-container");
-
         //update to new module
         Game.activeModule = module;
-        module.onArrival();
-        //module.onArrival(diff);
+        module.onArrival(diff);
         Notifications.printQueue(module);
     },
 
@@ -115,63 +112,176 @@ var Game = {
     },
 
     /* ====== Equipment ====== */
+    //move this to world and create an ItemPool like Events (array to loop through. returns item info)
+    Items: {
+        "cat": {
+            type: "special"
+        },
+        //"money": {
+            //type: "resource"
+        //}
+    }, 
+
+    perks: {
+        "heartless": {
+            desc: "cat morale decreases much faster",
+            notify: "learned to turn that beating heart to stone"
+        }
+    },
+
     //keymap of all values in player's inventory
-    equipment: {},
+    //this is really bad design...something to work on.
+    //character/player object? probably unnecessary
+    equipment: null,
+
+    addItem: function(name, value) {
+        if(!(name in Game.equipment)) {
+            Game.equipment[name] = 0;
+        }
+        Game.equipment[name] += value;
+        Game.updateEquipment();
+    },
+
+    hasItem: function(name, value) {
+        value = value || 1;
+        return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
+    },
+
+    addPerk: function(name) {
+        if(isUndefined(Game.perks[name])) {
+            Logger.warn("Tried to add perk \"" + name + "\" that doesn't exist!");
+            return;
+        }
+
+        if(Game.hasPerk(name)) {
+            return;
+        }
+
+        Game.perks[name].owned = true;
+        Notifications.notify(Game.perks[name].notify);
+        Game.updatePerks();
+    },
+
+    hasPerk: function(name) {
+        return Game.perks[name].owned;
+    },
 
     //updates equipment element from Game.equipment
     updateEquipment: function() {
-        if(isEmpty(Game.equipment)) {
-            //clears element if player has no equipment
-            $("#equipment-container").html("");
+        var equipment = new Section("equipment", "you have");
+        var inventory = new Section("inventory");
+        var special = new Section("special");
+        var house = new Section("house", "house");
+        var stores = new Section("stores");
+        var buildings = new Section("buildings");
+
+        var locations = {
+            "resource": stores,
+            "building": buildings,
+            "special": special,
+            "inventory": inventory,
+            "default": inventory
+        };
+
+        for(var item in Game.equipment) {
+            var type = Game.Items[item] ? Game.Items[item].type : "default";
+            var location = locations[type].get();
+            Game.updateRow(item, Game.equipment[item], location);
+        }
+
+        if(inventory.needsAppend && inventory.exists()) {
+            inventory.create().appendTo(equipment.get());
+        }
+
+        if(special.needsAppend && special.exists()) {
+            special.create().prependTo(equipment.get());
+        }
+
+        if(equipment.needsAppend && equipment.get().find(".row").length > 0) {
+            equipment.create().prependTo("#equipment-container");
+        }
+
+        if(stores.needsAppend && stores.exists()) {
+            stores.create().appendTo(house.get());
+        }
+
+        if(buildings.needsAppend && buildings) {
+            buildings.create().prependTo(house.get());
+        }
+
+        if(house.needsAppend && $("#house-panel").length > 0 && house.get().find(".row").length > 0) {
+            house.create().prependTo("#house-panel");
+        }
+    },
+
+    updatePerks: function() {
+        var perks = new Section("perks", "perks");
+
+        for(var perk in Game.perks) {
+            if(Game.hasPerk(perk)) {
+                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().append($("<div>").text(Game.perks[perk].desc)));
+            }
+        }
+
+        if(perks.needsAppend && perks.get().children().length > 0) {
+            perks.create().appendTo("#equipment-container");
+        }
+    },
+
+    updateRow: function(name, value, location, hideQuantity, tooltip) {
+        var id = "row_" + name.replace(/\s+/g, "-");
+        var row = $("#" + id, location);
+
+        if(!row.length) {
+            row = $("<div>").attr("id", id).addClass("row")
+                .append($("<div>").addClass("row_key"))
+                .append($("<div>").addClass("row_val"))
+                .append($("<div>").addClass("clear"));
+            var prevItem = null;
+            location.children().each(function() {
+                var child = $(this);
+                //alphabetize
+                if(child.children(".row_key").text() < name) {
+                    prevItem = child.attr("id");
+                }
+            });
+            if(isUndefined(prevItem)) {
+                row.prependTo(location);
+            } else {
+                row.insertAfter(location.find("#" + prevItem));
+            }
+        }
+
+        if(value === 0) {
+            //at some point, might want to keep 0 for other inventories
+            row.remove();
+        } else {
+            $("#" + row.attr("id"), location).find(".row_key").text(name);
+            if(value > 1 || !hideQuantity) {
+                $("#" + row.attr("id"), location).find(".row_val").text(value);
+            }
+        }
+
+        if(!isUndefined(tooltip)) {
+            tooltip.appendTo(row);
+        }
+    },
+
+    moveEquipmentView: function(topContainer, transitionDiff) {
+        Game.updateEquipment();
+        var equipment = $("#equipment-container");
+        transitionDiff = transitionDiff || 1;
+
+        if(isUndefined(equipment)) {
             return;
         }
-        
-        var equipment = $("#equipment");
 
-        //creates equipment element if one does not exist
-        if(!equipment.length) {
-            equipment = $("<div>").attr({
-                "id": "equipment",
-                "data-legend": "you have"
-            }).css("opacity", 0);
-            equipment.prependTo("#equipment-container");
-            equipment.animate({opacity: 1}, 300, "linear");
-        }
-
-        //appends and/or updates each item in Game.equipment
-        for(var key in Game.equipment) {
-            var rowName = "row_" + key.replace(/\s+/g, "-");
-            var el = $("#" + rowName);
-
-            //creates row for item if one does not exist
-            if(!el.length || el === undefined) {
-                el = $("<div>").attr("id", rowName).addClass("row");
-                el.append($("<div>").addClass("row_key"))
-                  .append($("<div>").addClass("row_val"))
-                  .append($("<div>").addClass("clear"))
-                  .appendTo("#equipment");
-            }
-
-            if(Game.equipment[key] === 0) {
-                //at some point, might want to keep 0 for other inventories
-                el.remove();
-                delete Game.equipment[key];
-            } else {
-                $("#" + rowName).find(".row_key").text(key);
-
-                //display number if more than one
-                if(Game.equipment[key] > 1) {
-                    $("#" + rowName).find(".row_val").text(Game.equipment[key]);
-                }
-            }
+        if(isUndefined(topContainer) || !topContainer.length) {
+            equipment.animate({top: "40px"}, {queue: false, duration: 300 * transitionDiff});
+        } else {
+            equipment.animate({top: (topContainer.height() + 66) + "px"}, {queue: false, duration: 300 * transitionDiff});
         }
     },
-
-    /* TODO
-    moveStoresView: function() {
-
-    },
-    */
 
     /* ====== Browser Checks ====== */
     //thanks, doublespeak games!
@@ -193,31 +303,30 @@ var Game = {
 
         if(!Game.pressed && !Game.keyLock) {
             Game.pressed = true;
-            if(typeof Game.activeModule.keyDown === "function") {
-                //also calls module's keyDown function
-                Game.activeModule.keyDown(e);
-            }
         }
-        
     },
 
     //when a key is released
     keyUp: function(e) {
         Game.pressed = false;
 
-        if(typeof Game.activeModule.keyUp === "function") {
-            //calls module's keyUp function
-            Game.activeModule.keyUp(e);
-            return;
-        }
-
         /* Default keyUp Handler */
         function arrowUp() {
-            //Logger.log("up!");
+            if(Game.tabNavigation && Game.activeModule == House) {
+                if(!isUndefined(typeof House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) - 1])) {
+                    var prevRoom = House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) - 1];
+                    House.travelTo(prevRoom);
+                }
+            }
         }
 
         function arrowDown() {
-            //Logger.log("down!");
+            if(Game.tabNavigation && Game.activeModule == House) {
+                if(!isUndefined(typeof House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) + 1])) {
+                    var nextRoom = House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) + 1];
+                    House.travelTo(nextRoom);
+                }
+            }
         }
         
         function arrowLeft() {
@@ -280,20 +389,21 @@ var Game = {
         //Game.loadGame();
 
         /* Layout */
-        $("#main").html("");
+        $("#main").empty();
 
-        //$("<div>").attr("id", "save-notify").text("saved.").appendTo("#wrapper");
-        //this.save();
+        $("<div>").attr("id", "day-notify").appendTo("#wrapper");
 
-        //$("<div>").attr("id", "day-notify").text("day 1.").appendTo("#wrapper");
-        //$("#day-notify").css("opacity", 1).animate({opacity: 0}, 1500, "linear");
-
+        $("<div>").attr("id", "equipment-container").appendTo("#main");
         $("<div>").attr("id", "header").appendTo("#main");
         $("<div>").attr("id", "location-slider").appendTo("#main");
+        
 
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version").addClass("menu-btn").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
+            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
+            //.append($("<span>").addClass("version menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))//
+            //.append($("<span>").addClass("menu-btn").text("discord."))
+            //.append($("<span>").addClass("menu-btn").text("save."))
             .appendTo("body");
 
        
@@ -306,6 +416,12 @@ var Game = {
         //register listeners
         $("body").off("keydown").keydown(Game.keyDown);
         $("body").off("keyup").keyup(Game.keyUp);
+
+        Game.equipment = {};
+
+        for(var perk in Game.perks) {
+            Game.perks[perk].owned = false;
+        }
         
         Notifications.Init();
         World.Init();
@@ -313,45 +429,31 @@ var Game = {
         //modules
         Events.Init();
         House.Init();
-        Outside.Init();
+        //Outside.Init();
     },
 
     /* ====== Prepare For Launch! ===== */
     Launch: function() {
         Logger.log("Game initialized!");
-        console.log("> hacked cats simply just aren't the same");
 
         Game.Init();
         Game.travelTo(House);
-        Game.updateEquipment();
-
-        //test button!
-        new Button({
-            id: "test",
-            text: "open door",
-            cooldown: 8000,
-            tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
-            onClick: function() {
-                if(World.events[0].isAvailable()) {
-                    Events.startEvent(World.events[0]);
-                } else {
-                    Notifications.notify("probably shouldn't open the door right now");
-                    return false;
-                }
-            }
-        }).appendTo("#house-panel");
-
-        /*for(var i = 0; i < 10; i++) {
-            var c = new Cat();  
-            c.meow();
-        }*/
-        $("<div>").text("Coming soon!").appendTo("#outside-panel");
-
+        
+        //Game.addItem("lettuce", 16);
+        //Game.addPerk("heartless");
+    
         Logger.log("Version is " + Game.getVersionString());
     }
 }
 
 $(document).ready(function() {
     //Let's do this!
-    Game.Launch();
+
+    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?"]));
+    
+    try {
+        Game.Launch();
+    } catch(err) {
+        console.error("ERROR: " + err.message);
+    }
 });

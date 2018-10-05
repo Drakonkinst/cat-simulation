@@ -4,9 +4,10 @@
 var World = {
 
     WEATHER_INTERVAL: [5, 10],
-    //STRAY_CAT_INTERVAL: [5, 10],
 
     currentWeather: null,
+    day: 1,
+    catsAbandoned: 0,
     
     //weather can change randomly throughout the day, as well as overnight.
     weather: {
@@ -276,6 +277,12 @@ var World = {
                             },
                             "abandon": {
                                 text: "leave it",
+                                click: function() {
+                                    World.catsAbandoned++;
+                                    if(World.catsAbandoned >= 10 && !Game.hasPerk("heartless")) {
+                                        Game.addPerk("heartless");
+                                    }
+                                },
                                 nextScene: "end"
                             }
                         }
@@ -354,26 +361,25 @@ var World = {
         World.currentWeather = nextWeather;
 
         if(World.currentWeather == "lightning") {
-            World.WeatherTask.scheduleNext(0.5);
+            //shouldn't stay on lightning for very long
+            World.WeatherTask.scheduleNext(0.3);
         } else {
             World.WeatherTask.scheduleNext();
         }
     },
 
+    //called on a new day
     greeting: function() {
         Notifications.notify(World.weather[World.currentWeather].greeting);
+        $("#day-notify").text("day " + World.day + ".").css("opacity", 1).animate({opacity: 0}, 3000, "linear");
     },
 
     Init: function() {
         World.WeatherTask = new Task("weather event", World.nextWeather, World.WEATHER_INTERVAL[0], World.WEATHER_INTERVAL[1]);
-        //World.StrayCatTask = new Task("stray cat event", World.nextStrayCat, World.STRAY_CAT_INTERVAL[0], World.STRAY_CAT_INTERVAL[1]);
         
         //World.currentWeather = chooseRandom(keysAsList(World.weather));
-        //World.currentWeather = "snow";
         World.currentWeather = chooseRandom(["sunny", "cloudy", "snow"]);
-        //World.nextWeather();
         World.WeatherTask.scheduleNext();
-        //World.StrayCatTask.scheduleNext();
         World.greeting();
     }
 }
