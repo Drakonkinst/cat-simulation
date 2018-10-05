@@ -85,6 +85,7 @@ var Outside = {
 
         Notifications.notify(info.buyMsg/*, House*/);
         Game.addItem(item, 1);
+        Outside.updateBuyButtons();
     },
     unlocked: function(item) {
         if(Buttons.getButton("buy_" + item)) {

@@ -152,10 +152,12 @@ var House = {
         House.updateTitle();
         Game.addItem("cat", 1);
 
-        Game.setTimeout(function() {
-            Notifications.notify("should head into town, see if there's anything useful");
-            Outside.Init();
-        }, randNum(5, 7) * 1000);
+        if(!$("#outside-panel").length && isUndefined(House._initOutside)) {
+            House._initOutside = Game.setTimeout(function() {
+                Notifications.notify("should head into town, see if there's anything useful");
+                Outside.Init();
+            }, randNum(5, 7) * 1000);
+        }
     },
 
     updateTitle: function() {
