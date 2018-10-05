@@ -1,4 +1,4 @@
-function Equipment(id, title) {
+function Section(id, title) {
     this.id = id;
     this.needsAppend = false;
     this.element = $("#" + this.id);
@@ -14,7 +14,7 @@ function Equipment(id, title) {
     }
 }
 
-Equipment.prototype = {
+Section.prototype = {
     create: function() {
         this.element.animate({opacity: 1}, 300, "linear");
         return this.element;
