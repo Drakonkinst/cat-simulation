@@ -122,4 +122,4 @@ var Outside = {
 
         Outside.updateBuyButtons();
     }
-}
+};

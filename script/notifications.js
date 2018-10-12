@@ -81,4 +81,4 @@ var Notifications = {
     Init: function() {
         $("<div>").attr("id", "notifications").append($("<div>").attr("id", "notify-gradient")).appendTo("#wrapper");
     }
-}
+};
