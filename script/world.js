@@ -7,7 +7,7 @@ var World = {
 
     currentWeather: null,
     day: 1,
-    catsAbandoned: 0,
+    catsAbandoned: 0,   // :(
     
     //weather can change randomly throughout the day, as well as overnight.
     weather: {
@@ -356,6 +356,7 @@ var World = {
         var possibilities = World.weather[World.currentWeather].causes;
         var nextWeather = chooseWeighted(possibilities, "weight");
         if(!isUndefined(possibilities[nextWeather].notification) && !hideAnnouncement) {
+            Logger.log("Changed weather to " + nextWeather);
             Notifications.notify(possibilities[nextWeather].notification);
         }
         World.currentWeather = nextWeather;
@@ -366,6 +367,33 @@ var World = {
         } else {
             World.WeatherTask.scheduleNext();
         }
+    },
+
+    sleep: function() {
+        Game.keyLock = true;
+        //white-out content
+        $("#outer-slider").animate({opacity: 0}, 600, "linear", function() {
+            //reset all sliders
+            $("#outer-slider").css("left", "0px");
+            $("#location-slider").css("left", "0px");
+            $("#equipment-container").css({"top": "40px", "right": "0px"});
+
+            //set current to default\
+            Game.activeModule = House;
+            $(".header-button").removeClass("selected");
+            House.tab.addClass("selected");
+            //set room to bedroom?
+
+            //come back after a time delay
+            Game.setTimeout(function() {
+                House.onArrival();
+                World.day++;
+                Game.keyLock = false;
+                $("#outer-slider").animate({opacity: 1}, 600, "linear");
+                World.greeting();
+                //need to animate this notification better
+            }, 3000);
+        });
     },
 
     //called on a new day
