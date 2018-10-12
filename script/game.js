@@ -23,13 +23,15 @@ var Game = {
         beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  5,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    8,  //increments for every unstable build tested, resets on every release
+        release:  6,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        build:    2,  //increments for every unstable build tested, resets on every release
     },
+
+    //SAVE_KEY: "save",
 
     //cheaty options! no non-cheaty options yet.
     options: {
-        debug: false,            //print debug messages
+        debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
@@ -43,11 +45,12 @@ var Game = {
 
     //parses Game.version into a legible string
     getVersionString: function() {
-        var prefix = Game.version.alpha ? "alpha" : Game.version.beta ? "beta" : "";
+        var prefix = Game.version.alpha ? "alpha " : Game.version.beta ? "beta " : "";
         Logger.warnIf(Game.version.alpha && Game.version.beta, "This build is marked as both alpha and beta!");
-        return prefix + " v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
+        return prefix + "v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
     },
 
+    /* ======= Utils ======= */
     //returns current time
     now: function() {
         return new Date().getTime();
@@ -64,7 +67,8 @@ var Game = {
     },
 
     /* ====== Modules ====== */
-    activeModule: null,     //module object of the current location
+    //module object of the current location
+    activeModule: null,
 
     //returns whether there are enough locations to travel
     canTravel: function() {
@@ -94,7 +98,7 @@ var Game = {
         Notifications.printQueue(module);
     },
 
-    //adds a location tied to a module to the header
+    //adds a location to the header, associated with a module
     addLocation: function(id, text, module) {
         return $("<div>").attr("id", "location_" + id)
             .addClass("header-button")
@@ -116,24 +120,21 @@ var Game = {
     Items: {
         "cat": {
             type: "special"
-        },
-        //"money": {
-            //type: "resource"
-        //}
+        }
     }, 
 
+    //character perks
     perks: {
         "heartless": {
-            desc: "cat morale decreases much faster",
+            desc: "incurred the wrath of your subjects",
             notify: "learned to turn that beating heart to stone"
         }
     },
 
-    //keymap of all values in player's inventory
-    //this is really bad design...something to work on.
-    //character/player object? probably unnecessary
+    //character inventory
     equipment: null,
 
+    //adds (or subtracts if negative) a quantity of an item to/from Game.equipment
     addItem: function(name, value) {
         if(!(name in Game.equipment)) {
             Game.equipment[name] = 0;
@@ -142,11 +143,17 @@ var Game = {
         Game.updateEquipment();
     },
 
+    /*
+     * Returns if the player's inventory contains an item.
+     * If a value is specified, returns if the player's inventory
+     * contains at least that many of the item.
+     * */
     hasItem: function(name, value) {
         value = value || 1;
         return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
     },
 
+    //adds a perk (that must be defined in Game.perks) to the character
     addPerk: function(name) {
         if(isUndefined(Game.perks[name])) {
             Logger.warn("Tried to add perk \"" + name + "\" that doesn't exist!");
@@ -162,6 +169,7 @@ var Game = {
         Game.updatePerks();
     },
 
+    //returns if the character has the specified perk
     hasPerk: function(name) {
         return Game.perks[name].owned;
     },
@@ -267,6 +275,7 @@ var Game = {
         }
     },
 
+    //moves main equipment element to accomodate for other containers
     moveEquipmentView: function(topContainer, transitionDiff) {
         Game.updateEquipment();
         var equipment = $("#equipment-container");
@@ -375,6 +384,15 @@ var Game = {
         document.onmousedown = eventPassThrough;
     },
 
+    /* ====== Saving & Loading ====== */
+    /*
+    saveTo: function(location) {
+        localStorage.setItem(location, JSON.stringify(Game));
+    },
+    loadFrom: function(location) {
+        Game = JSON.parse(localStorage.getItem(location));
+    },*/
+
     /* ====== Game Initialization ====== */
     Init: function() {
         /* Check Browser */
@@ -386,7 +404,7 @@ var Game = {
             //window.location = //set to mobile warning window
         }
 
-        //Game.loadGame();
+        //Game.loadFrom(this.SAVE_KEY);
 
         /* Layout */
         $("#main").empty();
@@ -439,10 +457,10 @@ var Game = {
         Game.Init();
         Game.travelTo(House);
         
-        //Game.addItem("lettuce", 16);
-        //Game.addItem("money", 9001);
-        //House.addCat();
-        //Game.addPerk("heartless");
+        Game.addItem("lettuce", 16);
+        Game.addItem("money", 9001);
+        House.addCat();
+        Game.addPerk("heartless");
     
         Logger.log("Version is " + Game.getVersionString());
     }
@@ -450,9 +468,7 @@ var Game = {
 
 $(document).ready(function() {
     //Let's do this!
-
     console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?"]));
-    
     try {
         Game.Launch();
     } catch(err) {
