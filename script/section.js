@@ -1,10 +1,15 @@
-function Section(id, title) {
-    this.id = id;
+function Section(selector, title) {
+    this.selector = selector;
     this.needsAppend = false;
-    this.element = $("#" + this.id);
+    this.element = $(this.selector);
 
     if(!this.element.length) {
-        this.element = $("<div>").attr("id", this.id).css("opacity", 0);
+        this.element = $("<div>").css("opacity", 0);
+        if(this.selector.startsWith("#")) {
+            this.element.attr("id", this.selector.substring(1));
+        } else if(this.selector.startsWith(".")) {
+            this.element.addClass(this.selector.substring(1));
+        }
 
         if(!isUndefined(title)) {
             this.element.attr("data-legend", title);

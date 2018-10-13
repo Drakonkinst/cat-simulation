@@ -176,12 +176,12 @@ var Game = {
 
     //updates equipment element from Game.equipment
     updateEquipment: function() {
-        var equipment = new Section("equipment", "you have");
-        var inventory = new Section("inventory");
-        var special = new Section("special");
-        var house = new Section("house", "house");
-        var stores = new Section("stores");
-        var buildings = new Section("buildings");
+        var equipment = new Section("#equipment", "you have");
+        var inventory = new Section("#inventory");
+        var special = new Section("#special");
+        var house = new Section("#house", "house");
+        var stores = new Section("#stores");
+        var buildings = new Section("#buildings");
 
         var locations = {
             "resource": stores,
@@ -223,7 +223,7 @@ var Game = {
     },
 
     updatePerks: function() {
-        var perks = new Section("perks", "perks");
+        var perks = new Section("#perks", "perks");
 
         for(var perk in Game.perks) {
             if(Game.hasPerk(perk)) {

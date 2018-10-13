@@ -20,7 +20,7 @@ var Outside = {
         Game.moveEquipmentView(null, transitionDiff)
     },
     updateBuyButtons: function() {
-        var buySection = new Section("buy-buttons", "buy:");
+        var buySection = new Section("#buy-buttons", "buy:");
 
         for(var item in Outside.BuyItems) {
             var buyItem = Outside.BuyItems[item];
