@@ -10,6 +10,22 @@ var House = {
     unlockedRooms: [],
 
     rooms: {},
+    Buildings: {
+        "food bowl": {
+            //max in house vs max per room?
+            maximum: 3,
+            onBuild: function(room) {
+                if(isUndefined(room.food)) {
+                    room.food = {
+                        level: 0,
+                        max: 0
+                    }
+                }
+                room.food.maximum += 5;
+                room.updateFood();
+            }
+        }
+    },
 
     events: [
         {   //Noises Outside - gain stuff
@@ -68,6 +84,9 @@ var House = {
         }
     ],
 
+    getCurrentRoom: function() {
+        return House.rooms[House.currentRoom];
+    },
     onArrival: function(transitionDiff) {
         House.updateTitle();
 
@@ -187,7 +206,7 @@ var House = {
                         text: "go to sleep",
                         cooldown: 90000,
                         onClick: World.sleep
-                    }).appendTo(this.panel);
+                    }).appendTo(this.panel.find(".room-buttons"));
                 }
             }),
             "hallway": new Room({
@@ -207,7 +226,7 @@ var House = {
                                 return false;
                             }
                         }
-                    }).appendTo(this.panel);
+                    }).appendTo(this.panel.find(".room-buttons"));
                 }
             }),
             "living-room": new Room({

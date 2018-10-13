@@ -447,6 +447,18 @@ body.noMask #description {
 	position: relative;
 }
 
+.build-buttons:before {
+	content: attr(data-legend);
+	position: relative;
+	top: -5px;
+}
+
+.build-buttons {
+	position: absolute;
+	top: 50px;
+	left: 0px;
+}
+
 #room-slider {
 	position: absolute;
 }
