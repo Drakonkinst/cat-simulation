@@ -120,9 +120,6 @@ var Game = {
     Items: {
         "cat": {
             type: "special"
-        },
-        "food": {
-            type: "resource"
         }
     }, 
 
@@ -244,7 +241,6 @@ var Game = {
         var row = $("#" + id, location);
 
         if(!row.length) {
-            //create row
             row = $("<div>").attr("id", id).addClass("row")
                 .append($("<div>").addClass("row_key"))
                 .append($("<div>").addClass("row_val"))
@@ -264,15 +260,15 @@ var Game = {
             }
         }
 
-        //if(value === 0) {
+        if(value === 0) {
             //at some point, might want to keep 0 for other inventories
-            //row.remove();
-        //} else {
-        $("#" + row.attr("id"), location).find(".row_key").text(name);
-        if(value > 1 || !hideQuantity) {
-            $("#" + row.attr("id"), location).find(".row_val").text(value);
+            row.remove();
+        } else {
+            $("#" + row.attr("id"), location).find(".row_key").text(name);
+            if(value > 1 || !hideQuantity) {
+                $("#" + row.attr("id"), location).find(".row_val").text(value);
+            }
         }
-        //}
 
         if(!isUndefined(tooltip)) {
             tooltip.appendTo(row);
@@ -477,6 +473,5 @@ $(document).ready(function() {
         Game.Launch();
     } catch(err) {
         console.error("ERROR: " + err.message);
-        console.trace();
     }
 });
