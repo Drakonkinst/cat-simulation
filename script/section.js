@@ -28,6 +28,6 @@ Section.prototype = {
         return this.element;
     },
     exists: function() {
-        return this.element.children().length > 0
+        return this.element.children().length > 0;
     }
 };
