@@ -27,8 +27,6 @@ var Game = {
         build:    2,  //increments for every unstable build tested, resets on every release
     },
 
-    //SAVE_KEY: "save",
-
     //cheaty options! no non-cheaty options yet.
     options: {
         debug: true,            //print debug messages
@@ -40,7 +38,6 @@ var Game = {
     //game states
     pressed: false,         //key is being pressed
     keyLock: false,         //keys do not function
-    //buttonLock: false,      //buttons do not do anything when clicked
     tabNavigation: true,    //tab navigation does not function
 
     //parses Game.version into a legible string
@@ -116,14 +113,11 @@ var Game = {
     },
 
     /* ====== Equipment ====== */
-    //move this to world and create an ItemPool like Events (array to loop through. returns item info)
+    //info table of all game items
     Items: {
         "cat": {
             type: "special"
-        },
-        /*"food": {
-            type: "resource"
-        }*/
+        }
     }, 
 
     //character perks
@@ -139,9 +133,12 @@ var Game = {
 
     //adds (or subtracts if negative) a quantity of an item to/from Game.equipment
     addItem: function(name, value) {
+
+        //initializes value if it does not exist
         if(!(name in Game.equipment)) {
             Game.equipment[name] = 0;
         }
+
         Game.equipment[name] += value;
         Game.updateEquipment();
     },
@@ -156,17 +153,20 @@ var Game = {
         return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
     },
 
-    //adds a perk (that must be defined in Game.perks) to the character
+    //adds a perk to the character
     addPerk: function(name) {
+        //perk must be defined in Game.perks
         if(isUndefined(Game.perks[name])) {
             Logger.warn("Tried to add perk \"" + name + "\" that doesn't exist!");
             return;
         }
 
+        //perks can only be added once
         if(Game.hasPerk(name)) {
             return;
         }
 
+        //adds perk
         Game.perks[name].owned = true;
         Notifications.notify(Game.perks[name].notify);
         Game.updatePerks();
@@ -177,12 +177,14 @@ var Game = {
         return Game.perks[name].owned;
     },
 
-    //updates equipment element from Game.equipment
+    //updates general equipment inventory
     updateEquipment: function() {
+        //creates Sections
         var equipment = new Section("#equipment", "you have");
         var inventory = new Section("#inventory");
         var special = new Section("#special");
 
+        //switch lookup
         var locations = {
             //"resource": stores,
             //"building": buildings,
@@ -191,12 +193,14 @@ var Game = {
             "default": inventory
         };
 
+        //update all items in Game.equipment
         for(var item in Game.equipment) {
             var type = Game.Items[item] ? Game.Items[item].type : "default";
             var location = locations[type].get();
             Game.updateRow(item, Game.equipment[item], location);
         }
 
+        //initialize Sections
         if(inventory.needsAppend && inventory.exists()) {
             inventory.create().appendTo(equipment.get());
         }
@@ -210,21 +214,27 @@ var Game = {
         }
     },
 
+    //updates perk inventory
     updatePerks: function() {
+        //create perk section
         var perks = new Section("#perks", "perks");
 
+        //update all perks
         for(var perk in Game.perks) {
             if(Game.hasPerk(perk)) {
                 Game.updateRow(perk, 1, perks.get(), true, new Tooltip().append($("<div>").text(Game.perks[perk].desc)));
             }
         }
 
+        //initialize section
         if(perks.needsAppend && perks.get().children().length > 0) {
             perks.create().appendTo("#equipment-container");
         }
     },
 
+    //updates a single row in a given location
     updateRow: function(name, value, location, hideQuantity, tooltip) {
+        //find row
         var id = "row_" + name.replace(/\s+/g, "-");
         var row = $("#" + id, location);
 
@@ -237,28 +247,33 @@ var Game = {
             var prevItem = null;
             location.children().each(function() {
                 var child = $(this);
-                //alphabetize
+                //alphabetize within section
                 if(child.children(".row_key").text() < name) {
                     prevItem = child.attr("id");
                 }
             });
             if(isUndefined(prevItem)) {
+                //adds to beginning if no previous item found
                 row.prependTo(location);
             } else {
+                //append after previous alphabetical item
                 row.insertAfter(location.find("#" + prevItem));
             }
         }
 
         if(value === 0) {
-            //at some point, might want to keep 0 for other inventories
+            //might want to keep 0 for other inventories in the future
             row.remove();
         } else {
+            //set row name
             $("#" + row.attr("id"), location).find(".row_key").text(name);
             if(value > 1 || !hideQuantity) {
+                //set row value
                 $("#" + row.attr("id"), location).find(".row_val").text(value);
             }
         }
 
+        //adds tooltip
         if(!isUndefined(tooltip)) {
             tooltip.appendTo(row);
         }
@@ -373,15 +388,6 @@ var Game = {
         document.onmousedown = eventPassThrough;
     },
 
-    /* ====== Saving & Loading ====== */
-    /*
-    saveTo: function(location) {
-        localStorage.setItem(location, JSON.stringify(Game));
-    },
-    loadFrom: function(location) {
-        Game = JSON.parse(localStorage.getItem(location));
-    },*/
-
     /* ====== Game Initialization ====== */
     Init: function() {
         /* Check Browser */
@@ -392,8 +398,6 @@ var Game = {
         if(Game.isMobile()) {
             //window.location = //set to mobile warning window
         }
-
-        //Game.loadFrom(this.SAVE_KEY);
 
         /* Layout */
         $("#main").empty();
@@ -411,13 +415,9 @@ var Game = {
             //.append($("<span>").addClass("version menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))//
             //.append($("<span>").addClass("menu-btn").text("discord."))
             //.append($("<span>").addClass("menu-btn").text("save."))
+            //.append($("<span>").addClass("menu-btn").text("stats."))
             .appendTo("body");
-
-       
-        //$("<div>").attr("id", "panel_room").appendTo("#main");
-
-        //$("<div>").attr("id", "equipment-container").appendTo("#main")
-
+            
         Game.disableSelection();
 
         //register listeners
