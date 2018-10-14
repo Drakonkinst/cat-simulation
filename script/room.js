@@ -158,6 +158,28 @@ Room.prototype = {
         }
         foodEl.text("food: " + this.food.level + "/" + this.food.maximum);
     },
+    refillFood: function() {
+        var foodDifference = this.food.maximum - this.food.level;
+
+        if(Game.equipment["cat food"] - foodDifference > 0) {
+            //more than enough food
+            Notifications.notify("food bowl refilled to full");
+            Game.equipment["cat food"] -= this.food.maximum;
+            this.food.level = this.food.maximum;
+        } else if(Game.equipment["cat food"] - foodDifference === 0) {
+            //just enough food
+            Notifications.notify("food bowl refilled, but no food left");
+            Game.equipment["cat food"] -= foodDifference;
+            this.food.level = this.food.maximum;
+        } else if(Game.equipment["cat food"] - foodDifference < 0) {
+            //not enough food
+            Notifications.notify("not enough food to refill to maximum");
+            this.food.level += Game.equipment["cat food"];
+            Game.equipment["cat food"] = 0;
+        }
+        this.updateFood();
+        Game.updateEquipment();
+    },
     update: function() {
 
     }

@@ -12,6 +12,30 @@ var Outside = {
                     "money": 3
                 };
             }
+        },
+        "cat food": {
+            type: "resource",
+            maximum: 10000,
+            availableMsg: "get some food for your cats!",
+            buyMsg: "survival needs",
+            maxMsg: "don't be stuffing your cats with food now...",
+            cost: function() {
+                return {
+                    "money" : 1
+                };
+            }
+        },
+        "food bowl": {
+            type: "building",
+            maximum: 1000,
+            availableMsg: "get a container to hold the cat food.",
+            buyMsg: "nice bowls!",
+            maxMsg: "how did you fit 1000 of them in your house?",
+            cost: function() {
+                return {
+                    "money": 4
+                };
+            }
         }
     },
     
@@ -42,7 +66,8 @@ var Outside = {
                         width: "80px",
                         tooltip: tooltip,
                         onClick: function() {
-                            Outside.buy(item);
+                            //Outside.buy(item);
+                            Outside.buy(this.id.substring(4));
                         }
                     });
 
