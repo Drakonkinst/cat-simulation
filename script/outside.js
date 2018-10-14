@@ -66,7 +66,8 @@ var Outside = {
                         width: "80px",
                         tooltip: tooltip,
                         onClick: function() {
-                            Outside.buy(item);
+                            //Outside.buy(item);
+                            Outside.buy(this.id.substring(4));
                         }
                     });
 
