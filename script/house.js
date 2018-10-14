@@ -10,9 +10,7 @@ var House = {
     unlockedRooms: [],
     rooms: {},
     stores: {},
-    //equipment:
-    //should we use methods to total up all of the stores/max, or keep track of it
-    //every time a new thing is added/changed?
+
     Buildings: {
         "food bowl": {
             //max in house vs max per room?
@@ -30,9 +28,6 @@ var House = {
             }
         }
     },
-    /*Stores: {
-
-    },*/
 
     events: [
         {   //Noises Outside - gain stuff
@@ -119,6 +114,7 @@ var House = {
         var buildings = new Section("#buildings");
         var equipment = $("#equipment-container");
 
+        //TODO - needs to include items that exist in Game.equipment but are not built in room yet
         for(var item in House.stores) {
             var location = stores;
             if(!isUndefined(House.Buildings[item])) {
@@ -148,8 +144,11 @@ var House = {
         }
 
         //update main inventory
-        equipment.css("top", (house.get().height() + 66) + "px");
+        if($("#house").length && Game.activeModule == this) {
+            equipment.css("top", (house.get().height() + 66) + "px");
+        }
     },
+
     addCat: function(cat) {
         cat = cat || new Cat();
         
