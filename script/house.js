@@ -117,6 +117,7 @@ var House = {
         var house = new Section("#house", "house");
         var stores = new Section("#stores");
         var buildings = new Section("#buildings");
+        var equipment = $("#equipment-container");
 
         for(var item in House.stores) {
             var location = stores;
@@ -145,6 +146,9 @@ var House = {
         if(house.needsAppend && $("#house-panel").length > 0 && house.get().find(".row").length > 0) {
             house.create().prependTo("#house-panel");
         }
+
+        //update main inventory
+        equipment.css("top", (house.get().height() + 66) + "px");
     },
     addCat: function(cat) {
         cat = cat || new Cat();
