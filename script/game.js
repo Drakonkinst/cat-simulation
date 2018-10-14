@@ -370,6 +370,7 @@ var Game = {
     },
 
     /* ====== Document Modifiers? ====== */
+    //cancels all mouse clicks except for menu buttons
     disableSelection: function() {
         function eventNullifier(e) {
             return $(e.target).hasClass("menu-btn");
@@ -379,6 +380,7 @@ var Game = {
 		document.onmousedown = eventNullifier;   //everything else
     },
 
+    //re-enables all mouse clicks
     enableSelection: function() {
         function eventPassThrough() {
             return true;
