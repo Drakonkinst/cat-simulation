@@ -22,6 +22,9 @@ var Outside = {
                 return {
                     "money" : 1
                 };
+            },
+            quantity: function() {
+                return 10;
             }
         },
         "food bowl": {
@@ -112,7 +115,13 @@ var Outside = {
         }
 
         Notifications.notify(info.buyMsg/*, House*/);
-        Game.addItem(item, 1);
+
+        if(isUndefined(info.quantity)) {
+            Game.addItem(item, 1);
+        } else {
+            Game.addItem(item, info.quantity());
+        }
+        
         Outside.updateBuyButtons();
     },
     unlocked: function(item) {
@@ -143,7 +152,7 @@ var Outside = {
             tooltip: new Tooltip().append($("<div>").text("you need to go to work.")),
             onClick: function() {
                 Notifications.notify("hard labor, but necessary");
-                Game.addItem("money", 1);
+                Game.addItem("money", Math.floor(randNum(1, 7)));
                 Outside.updateBuyButtons();
             }
         }).appendTo("#outside-panel");
