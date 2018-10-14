@@ -120,7 +120,10 @@ var Game = {
     Items: {
         "cat": {
             type: "special"
-        }
+        },
+        /*"food": {
+            type: "resource"
+        }*/
     }, 
 
     //character perks
@@ -179,13 +182,10 @@ var Game = {
         var equipment = new Section("#equipment", "you have");
         var inventory = new Section("#inventory");
         var special = new Section("#special");
-        var house = new Section("#house", "house");
-        var stores = new Section("#stores");
-        var buildings = new Section("#buildings");
 
         var locations = {
-            "resource": stores,
-            "building": buildings,
+            //"resource": stores,
+            //"building": buildings,
             "special": special,
             "inventory": inventory,
             "default": inventory
@@ -208,18 +208,6 @@ var Game = {
         if(equipment.needsAppend && equipment.get().find(".row").length > 0) {
             equipment.create().prependTo("#equipment-container");
         }
-
-        if(stores.needsAppend && stores.exists()) {
-            stores.create().appendTo(house.get());
-        }
-
-        if(buildings.needsAppend && buildings) {
-            buildings.create().prependTo(house.get());
-        }
-
-        if(house.needsAppend && $("#house-panel").length > 0 && house.get().find(".row").length > 0) {
-            house.create().prependTo("#house-panel");
-        }
     },
 
     updatePerks: function() {
@@ -241,6 +229,7 @@ var Game = {
         var row = $("#" + id, location);
 
         if(!row.length) {
+            //create row
             row = $("<div>").attr("id", id).addClass("row")
                 .append($("<div>").addClass("row_key"))
                 .append($("<div>").addClass("row_val"))
@@ -460,7 +449,7 @@ var Game = {
         Game.addItem("lettuce", 16);
         Game.addItem("money", 9001);
         House.addCat();
-        Game.addPerk("heartless");
+        //Game.addPerk("heartless");
     
         Logger.log("Version is " + Game.getVersionString());
     }

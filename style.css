@@ -460,6 +460,24 @@ body.noMask #description {
 	padding-left: 10px;
 }
 
+.build-buttons:before {
+	content: attr(data-legend);
+	position: relative;
+	top: -5px;
+}
+
+.room-status {
+	position: absolute;
+	width: 100px;
+	left: 175px;
+}
+
+.build-buttons {
+	position: absolute;
+	top: 75px;
+	left: 0px;
+}
+
 .room-button:hover {
 	text-decoration: underline;
 }

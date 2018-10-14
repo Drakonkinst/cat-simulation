@@ -8,8 +8,31 @@ var House = {
     cats: null,     //all cats in the house
     currentRoom: null,
     unlockedRooms: [],
-
     rooms: {},
+    stores: {},
+    //equipment:
+    //should we use methods to total up all of the stores/max, or keep track of it
+    //every time a new thing is added/changed?
+    Buildings: {
+        "food bowl": {
+            //max in house vs max per room?
+            notify: "",
+            maximum: 3,
+            onBuild: function(room) {
+                if(isUndefined(room.food)) {
+                    room.food = {
+                        level: 0,
+                        maximum: 0
+                    }
+                }
+                room.food.maximum += 5;
+                room.updateFood();
+            }
+        }
+    },
+    /*Stores: {
+
+    },*/
 
     events: [
         {   //Noises Outside - gain stuff
@@ -68,6 +91,9 @@ var House = {
         }
     ],
 
+    getCurrentRoom: function() {
+        return House.rooms[House.currentRoom];
+    },
     onArrival: function(transitionDiff) {
         House.updateTitle();
 
@@ -87,6 +113,39 @@ var House = {
         Game.moveEquipmentView($("#house"), transitionDiff);
     },
 
+    updateHouse: function() {
+        var house = new Section("#house", "house");
+        var stores = new Section("#stores");
+        var buildings = new Section("#buildings");
+
+        for(var item in House.stores) {
+            var location = stores;
+            if(!isUndefined(House.Buildings[item])) {
+                location = buildings;
+            }
+            
+            //section could use some reworking
+            var text = House.stores[item];
+            var maxValue = text + Game.equipment[item];
+            if(!isUndefined(maxValue)) {
+                text += "/" + maxValue;
+            }
+
+            Game.updateRow(item, text, location.get());
+        }
+
+        if(stores.needsAppend && stores.exists()) {
+            stores.create().appendTo(house.get());
+        }
+
+        if(buildings.needsAppend && buildings) {
+            buildings.create().prependTo(house.get());
+        }
+
+        if(house.needsAppend && $("#house-panel").length > 0 && house.get().find(".row").length > 0) {
+            house.create().prependTo("#house-panel");
+        }
+    },
     addCat: function(cat) {
         cat = cat || new Cat();
         
@@ -187,7 +246,7 @@ var House = {
                         text: "go to sleep",
                         cooldown: 90000,
                         onClick: World.sleep
-                    }).appendTo(this.panel);
+                    }).appendTo(this.panel.find(".room-buttons"));
                 }
             }),
             "hallway": new Room({
@@ -207,7 +266,7 @@ var House = {
                                 return false;
                             }
                         }
-                    }).appendTo(this.panel);
+                    }).appendTo(this.panel.find(".room-buttons"));
                 }
             }),
             "living-room": new Room({
