@@ -24,7 +24,7 @@ var Game = {
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  6,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    2,  //increments for every unstable build tested, resets on every release
+        build:    3,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -140,7 +140,11 @@ var Game = {
         }
 
         Game.equipment[name] += value;
-        Game.updateEquipment();
+        if(Game.getItemType(name) == "building") {
+            House.updateHouse();
+        } else {
+            Game.updateEquipment();
+        }
     },
 
     /*
@@ -151,6 +155,16 @@ var Game = {
     hasItem: function(name, value) {
         value = value || 1;
         return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
+    },
+
+    //looks through all item lookup tables to find the item's type
+    getItemType: function(item) {
+        if(Game.Items.hasOwnProperty(item)) {
+            return item.type;
+        } else if(House.Buildings.hasOwnProperty(item)) {
+            return "building";
+        }
+        return null;
     },
 
     //adds a perk to the character
@@ -186,8 +200,8 @@ var Game = {
 
         //switch lookup
         var locations = {
-            //"resource": stores,
-            //"building": buildings,
+            "resource": null,
+            "building": null,
             "special": special,
             "inventory": inventory,
             "default": inventory
@@ -195,9 +209,16 @@ var Game = {
 
         //update all items in Game.equipment
         for(var item in Game.equipment) {
-            var type = Game.Items[item] ? Game.Items[item].type : "default";
-            var location = locations[type].get();
-            Game.updateRow(item, Game.equipment[item], location);
+            //get location for item
+            var type = Game.getItemType(item) || "default";
+            var location = locations[type];
+
+            if(isUndefined(location)) {
+                //do not display
+                continue;
+            }
+            
+            Game.updateRow(item, Game.equipment[item], location.get());
         }
 
         //initialize Sections
