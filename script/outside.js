@@ -114,6 +114,10 @@ var Outside = {
             }
         }
 
+        if(info.type == "building" && isUndefined(House.stores[item])) {
+            House.stores[item] = 0;
+        }
+
         Notifications.notify(info.buyMsg/*, House*/);
 
         if(isUndefined(info.quantity)) {
