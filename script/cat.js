@@ -61,6 +61,25 @@ Cat.prototype = {
         Notifications.notify(base + intensities[Math.abs(loudness) - 1] + suffix);
     },
 
+    eatFood: function(room) {
+        if (this.hunger === 0) {
+            return;
+        }
+        var foodLevel = room.food.level;
+        if(foodLevel <= 0) {
+            Notifications.notify(this.name + " looks at the empty food bowl despondently");
+        } else if(foodLevel - this.hunger <= 0) {
+            this.hunger -= foodLevel;
+            room.food.level = 0;
+            Notifications.notify(this.name + " scarfs down the last of the kibble");
+        } else {
+            room.food.level -= this.hunger;
+            this.hunger = 0;
+            Notifications.notify(this.name + " eats some food");
+        }
+        room.updateFood();
+    },
+
     genderPronoun: function(male, female) {
         return this.isFemale ? female : male;
     }
