@@ -14,7 +14,7 @@ function Section(selector, title) {
         //sets id or class based on selector argument
         if(selector.startsWith("#")) {
             this.element.attr("id", selector.substring(1));
-        } else if(this.selector.startsWith(".")) {
+        } else if(selector.startsWith(".")) {
             this.element.addClass(selector.substring(1));
         }
 
