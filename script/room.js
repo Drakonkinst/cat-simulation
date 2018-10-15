@@ -1,3 +1,13 @@
+/*
+ * Room class that represents a room within House. It is its own
+ * self-contained panel that shares inventories with other rooms
+ * in the House, but is also has its own independent variables.
+ * 
+ * properties: 
+ * - String id: id of the room, same as key in House.rooms
+ * - String title: title of room, shown in the House navigation
+ * - Function onLoad: runs when room is unlocked
+ * */
 function Room(properties) {
     this.id = properties.id || "unknown";
     var title = properties.title || "Room";
