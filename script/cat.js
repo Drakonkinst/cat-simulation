@@ -1,14 +1,25 @@
+/*
+ * Cat class that represents a single cat.
+ * 
+ * properties (all optional, will default to random)
+ * - String name: name of cat
+ * - String breed: name of cat's breed
+ * - boolean isFemale: whether the cat is female (used for gender)
+ * - number weight: weight of cat in pounds
+ * */
 function Cat(properties) {
     properties = properties || {};
     this.name = properties.name || chooseRandom(Cats.DEFAULT_NAMES);
 
     if(!isUndefined(House.cats)) {
+        //ensures that the cat has a unique name if House is active
         this.name = Cats.uniqueName(this.name);
     }
 
     this.breed = properties.breed || chooseRandom(keysAsList(Cats.BREEDS));
     this.isFemale = properties.isFemale || Math.random() < 0.5;
 
+    //gets breed info
     var breed = Cats.BREEDS[this.breed];
 
     //70% chance to retain each tendency
@@ -19,13 +30,16 @@ function Cat(properties) {
         }
     }
 
+    //set weight based on gender and breed
     var weightRange = this.isFemale ? breed.weight.f : breed.weight.m;
     this.weight = properties.weight || Math.floor(randNum(weightRange[0], weightRange[1]));
-
+    
+    //set color, coat, and eyeColor based on breed
     this.color = chooseRandom(breed.colors);
     this.coat = chooseRandom(breed.coats);
     this.eyeColor = chooseRandom(breed.eyeColors);
 
+    //sets random hunger upon spawn
     this.hunger = Math.floor(randNum(0, 21));
 }
 Cat.prototype = {
