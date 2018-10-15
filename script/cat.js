@@ -9,7 +9,10 @@
  * */
 function Cat(properties) {
     properties = properties || {};
-    this.name = properties.name || chooseRandom(Cats.DEFAULT_NAMES);
+    this.isFemale = properties.isFemale || Math.random() < 0.5;
+
+    var namePool = (this.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
+    this.name = properties.name || chooseRandom(namePool);
 
     if(!isUndefined(House.cats)) {
         //ensures that the cat has a unique name if House is active
@@ -17,7 +20,7 @@ function Cat(properties) {
     }
 
     this.breed = properties.breed || chooseRandom(keysAsList(Cats.BREEDS));
-    this.isFemale = properties.isFemale || Math.random() < 0.5;
+    
 
     //gets breed info
     var breed = Cats.BREEDS[this.breed];
@@ -100,7 +103,9 @@ Cat.prototype = {
 };
 
 var Cats = {
-    DEFAULT_NAMES: [ "Miso", "Tara", "Garfield", "Nala", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Coco", "Mistie", "Misty", "Edgar", "Lolcat", "Sox", "Ollie", "Tasha", "Raven", "Leo", "Unagi", "Valencia", "Snickers", "Sesame", "Cherry", "Avocado", "Mango", "Oreo", "Princess", "Charcoal", "Prince", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Toby", "Mikesch", "Buddy", "Lucky", "Loki", "Romeo", "Momo", "Gavin", "Mittens", "Angel", "Emma", "Belle", "Dakota", "Chloe", "Ginger", "Poppy", "Tippy", "Snickers", "Fish", "Eliot", "Milo", "Max", "Smokey", "Muffin", "Fuzzy", "Nibble", "Athena", "Artemis", "Illia" ],
+    DEFAULT_MALE_NAMES: [ "Garfield", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Edgar", "Sox", "Ollie", "Leo", "Snickers", "Charcoal", "Prince", "Toby", "Mikesch", "Buddy", "Romeo", "Loki", "Gavin", "Momo", "Illia", "Theodore", "Eliot", "Milo", "Max" ],
+    DEFAULT_FEMALE_NAMES: [ "Miso", "Tara", "Nala", "Mistie", "Misty", "Coco", "Tasha", "Raven", "Valencia", "Princess", "Cherry", "Chloe", "Felicia", "Olivia", "Emma", "Belle", "Luna", "Minerva", "Ellie", "Athena", "Artemis", "Poppy"],
+    DEFAULT_NEUTRAL_NAMES: [ "Lolcat", "Sesame", "Unagi", "Avocado", "Mango", "Oreo", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Lucky", "Mittens", "Angel", "Dakota", "Ginger", "Tippy", "Snickers", "Fish", "Smokey", "Muffin", "Fuzzy", "Nibbles", "Chaser" ],
     //http://www.catbreedslist.com/all-cat-breeds/
     //secondary source - https://www.hillspet.com/cat-care/cat-breeds/
     BREEDS: {
