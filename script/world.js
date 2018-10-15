@@ -384,9 +384,11 @@ var World = {
             House.tab.addClass("selected");
             //set room to bedroom?
 
+            //animate onArrival before the screen fades in
+            House.onArrival();
+
             //come back after a time delay
             Game.setTimeout(function() {
-                House.onArrival();
                 World.day++;
                 Game.keyLock = false;
                 $("#outer-slider").animate({opacity: 1}, 600, "linear");
