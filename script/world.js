@@ -410,4 +410,4 @@ var World = {
         World.WeatherTask.scheduleNext();
         World.greeting();
     }
-}
+};
