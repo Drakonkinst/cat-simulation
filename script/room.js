@@ -75,8 +75,14 @@ Room.prototype = {
         if(!House.stores.hasOwnProperty(id)) {
             House.stores[id] = 0;
         }
+
+        if(!this.buildings.hasOwnProperty(id)) {
+            this.buildings[id] = 0;
+        }
+        
         House.stores[id]++;
-        Notifications.notify(building.notify);
+        this.buildings[id]++;
+        Notifications.notify(building.buildMsg);
         building.onBuild(this);
         this.updateBuildButtons();
         House.updateHouse();
@@ -86,12 +92,11 @@ Room.prototype = {
         
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
-            //replace below with a method searching in this Room.buildings
-            //var max = Game.hasItem(building, buildItem.maximum);
+            var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
 
             if(isUndefined(buildItem.button)) {
                 var location = buildSection.get();
-                //TODO
+                //TODO - needs to be redone to support multiple runs
                 buildItem.button = new Button({
                     id: "build_" + building,
                     text: building,
@@ -102,6 +107,14 @@ Room.prototype = {
                 });
 
                 buildItem.button.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            } else {
+                if(max && !buildItem.button.get().hasClass("disabled")) {
+                    Notifications.notify(buildItem.maxMsg);
+                }
+            }
+
+            if(!isUndefined(buildItem.button)) {
+                buildItem.button.setDisabled(max);
             }
         }
 
