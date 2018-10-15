@@ -14,9 +14,9 @@ var House = {
     Buildings: {
         "food bowl": {
             //max in house vs max per room?
-            maximum: 3,
             buildMsg: "",
             maxMsg: "more bowls won't help now",
+            maximum: 5,
             onBuild: function(room) {
                 if(isUndefined(room.food)) {
                     room.food = {
