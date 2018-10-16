@@ -89,6 +89,7 @@ Room.prototype = {
     },
     updateBuildButtons: function() {
         var buildContainer = new Container(".build-buttons", "build:");
+        var roomButtons = this.panel.find(".room-buttons");
         
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
@@ -96,9 +97,8 @@ Room.prototype = {
 
             if(isUndefined(buildItem.button)) {
                 var location = buildContainer.get();
-                //TODO - needs to be redone to support multiple runs
                 buildItem.button = new Button({
-                    id: "build_" + building,
+                    id: this.id + "_build_" + building,
                     text: building,
                     width: "80px",
                     onClick: function() {
@@ -119,11 +119,32 @@ Room.prototype = {
         }
 
         if(buildContainer.needsAppend && buildContainer.exists()) {
-            buildContainer.create().appendTo(".room-buttons");
+            buildContainer.create().appendTo(roomButtons);
         }
 
+        this.updateManageButtons();
+    },
+
+    updateManageButtons: function() {
+        var manageContainer = new Container(".manage-buttons", "manage:");
+        var roomButtons = this.panel.find(".room-buttons");
+
+        if(!isUndefined(this.food) && !this.panel.find(".manage_refill-food").length) {
+            var location = manageContainer.get();
+            var room = this;
+            var refillFood = new Button({
+                id: this.id + "_manage_refill-food",
+                text: "refill food",
+                onClick: function() {
+                    room.refillFood();
+                }
+            });
+            refillFood.get().addClass("manage_refill-food").css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
         }
 
+        if(manageContainer.needsAppend && manageContainer.exists()) {
+            manageContainer.create().appendTo(roomButtons);
+        }
     },
 
     updateFood: function() {
@@ -142,23 +163,22 @@ Room.prototype = {
 
     refillFood: function() {
         var foodDifference = this.food.maximum - this.food.level;
+        var foodStores = Game.equipment["cat food"] || 0;
 
-        if(Game.equipment["cat food"] - foodDifference > 0) {
-            //more than enough food
-            Notifications.notify("food bowl refilled to full");
-            Game.equipment["cat food"] -= this.food.maximum;
-            this.food.level = this.food.maximum;
-        } else if(Game.equipment["cat food"] - foodDifference === 0) {
-            //just enough food
-            Notifications.notify("food bowl refilled, but no food left");
+        if(foodDifference === 0) {
+            Notifications.notify("food bowl already full");
+        } else if(foodStores <= 0) {
+            Notifications.notify("not enough cat food");
+        } else if(foodStores - foodDifference >= 0) {
+            Notifications.notify("food bowl refilled");
             Game.equipment["cat food"] -= foodDifference;
             this.food.level = this.food.maximum;
-        } else if(Game.equipment["cat food"] - foodDifference < 0) {
-            //not enough food
+        } else /*if(foodStores - foodDifference) < 0)*/{
             Notifications.notify("not enough food to refill to maximum");
-            this.food.level += Game.equipment["cat food"];
             Game.equipment["cat food"] = 0;
+            this.food.level += foodStores;
         }
+
         this.updateFood();
         Game.updateEquipment();
     },
