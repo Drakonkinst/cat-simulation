@@ -15,7 +15,7 @@ var Outside = {
         "cat food": {
             type: "resource",
             maximum: 1000,
-            availableMsg: "get some food for your cats!",
+            //availableMsg: "get some food for your cats!",
             buyMsg: "survival needs",
             maxMsg: "don't be stuffing your cats with food now...",
             cost: function() {
@@ -30,7 +30,7 @@ var Outside = {
         "food bowl": {
             type: "building",
             maximum: 100,
-            availableMsg: "get a container to hold the cat food.",
+            //availableMsg: "get a container to hold the cat food.",
             buyMsg: "nice bowls!",
             maxMsg: "how did you fit 1000 of them in your house?",
             cost: function() {
