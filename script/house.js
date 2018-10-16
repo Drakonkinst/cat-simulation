@@ -174,7 +174,7 @@ var House = {
     updateTitle: function() {
         var title;
         if(this.cats.length === 0) {
-            title = "A Quiet Room";
+            title = "A Dreary Room";
         } else if(this.cats.length === 1) {
             title = "A Lonely House";
         } else if(this.cats.length < 5) {

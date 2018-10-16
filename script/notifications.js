@@ -3,9 +3,6 @@
  * messages on the left side of each module. Notifications
  * fade as new ones are added, and each module has its own
  * notification list.
- * 
- * TODO: should it save notifications while moving between
- * panels? leaning on no
  * */
 var Notifications = {
 

@@ -59,7 +59,7 @@ var Outside = {
             if(isUndefined(buyItem.button)) {
                 if(Outside.unlocked(item)) {
                     var location = buyContainer.get();
-                    var cost = buyItem.cost()
+                    var cost = buyItem.cost();
                     var tooltip = new Tooltip(location.children().length > 10 ? "top left" : "bottom left");
 
                     for(var id in cost) {
@@ -118,7 +118,7 @@ var Outside = {
             House.stores[item] = 0;
         }
 
-        Notifications.notify(info.buyMsg/*, House*/);
+        Notifications.notify(info.buyMsg);
 
         if(isUndefined(info.quantity)) {
             Game.addItem(item, 1);
