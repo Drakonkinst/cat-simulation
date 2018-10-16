@@ -110,9 +110,9 @@ var House = {
     },
 
     updateHouse: function() {
-        var house = new Section("#house", "house");
-        var stores = new Section("#stores");
-        var buildings = new Section("#buildings");
+        var house = new Container("#house", "house");
+        var stores = new Container("#stores");
+        var buildings = new Container("#buildings");
         var equipment = $("#equipment-container");
 
         //TODO - needs to include items that exist in Game.equipment but are not built in room yet

@@ -1,9 +1,9 @@
 /*
- * Section that wraps around a container that may or may not
+ * Container that wraps around a container element that may or may not
  * exist, creates a pseudoelement if it does not exist that may
  * be appended to other elements.
  * */
-function Section(selector, title) {
+function Container(selector, title) {
     this.needsAppend = false;      //whether the pseudoelement was created or not
     this.element = $(selector);    //searches for the element
 
@@ -27,7 +27,7 @@ function Section(selector, title) {
     }
 }
 
-Section.prototype = {
+Container.prototype = {
     //animates the element into view and returns it for appending
     create: function() {
         this.element.animate({opacity: 1}, 300, "linear");

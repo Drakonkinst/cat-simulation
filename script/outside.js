@@ -46,7 +46,7 @@ var Outside = {
         Game.moveEquipmentView(null, transitionDiff)
     },
     updateBuyButtons: function() {
-        var buySection = new Section("#buy-buttons", "buy:");
+        var buyContainer = new Container("#buy-buttons", "buy:");
 
         for(var item in Outside.BuyItems) {
             var buyItem = Outside.BuyItems[item];
@@ -58,7 +58,7 @@ var Outside = {
 
             if(isUndefined(buyItem.button)) {
                 if(Outside.unlocked(item)) {
-                    var location = buySection.get();
+                    var location = buyContainer.get();
                     var cost = buyItem.cost()
                     var tooltip = new Tooltip(location.children().length > 10 ? "top left" : "bottom left");
 
@@ -92,8 +92,8 @@ var Outside = {
             }
         }
 
-        if(buySection.needsAppend && buySection.exists()) {
-            buySection.create().appendTo("#outside-panel");
+        if(buyContainer.needsAppend && buyContainer.exists()) {
+            buyContainer.create().appendTo("#outside-panel");
         }
     },
     buy: function(item) {

@@ -88,14 +88,14 @@ Room.prototype = {
         House.updateHouse();
     },
     updateBuildButtons: function() {
-        var buildSection = new Section(".build-buttons", "build:");
+        var buildContainer = new Container(".build-buttons", "build:");
         
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
             var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
 
             if(isUndefined(buildItem.button)) {
-                var location = buildSection.get();
+                var location = buildContainer.get();
                 //TODO - needs to be redone to support multiple runs
                 buildItem.button = new Button({
                     id: "build_" + building,
@@ -118,8 +118,8 @@ Room.prototype = {
             }
         }
 
-        if(buildSection.needsAppend && buildSection.exists()) {
-            buildSection.create().appendTo(".room-buttons");
+        if(buildContainer.needsAppend && buildContainer.exists()) {
+            buildContainer.create().appendTo(".room-buttons");
         }
 
         }

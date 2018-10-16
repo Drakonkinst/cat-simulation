@@ -193,10 +193,10 @@ var Game = {
 
     //updates general equipment inventory
     updateEquipment: function() {
-        //creates Sections
-        var equipment = new Section("#equipment", "you have");
-        var inventory = new Section("#inventory");
-        var special = new Section("#special");
+        //creates Containers
+        var equipment = new Container("#equipment", "you have");
+        var inventory = new Container("#inventory");
+        var special = new Container("#special");
 
         //switch lookup
         var locations = {
@@ -221,7 +221,7 @@ var Game = {
             Game.updateRow(item, Game.equipment[item], location.get());
         }
 
-        //initialize Sections
+        //initialize Containers
         if(inventory.needsAppend && inventory.exists()) {
             inventory.create().appendTo(equipment.get());
         }
@@ -237,8 +237,8 @@ var Game = {
 
     //updates perk inventory
     updatePerks: function() {
-        //create perk section
-        var perks = new Section("#perks", "perks");
+        //create perk container
+        var perks = new Container("#perks", "perks");
 
         //update all perks
         for(var perk in Game.perks) {
@@ -247,7 +247,7 @@ var Game = {
             }
         }
 
-        //initialize section
+        //initialize container
         if(perks.needsAppend && perks.get().children().length > 0) {
             perks.create().appendTo("#equipment-container");
         }
@@ -268,7 +268,7 @@ var Game = {
             var prevItem = null;
             location.children().each(function() {
                 var child = $(this);
-                //alphabetize within section
+                //alphabetize within container
                 if(child.children(".row_key").text() < name) {
                     prevItem = child.attr("id");
                 }
