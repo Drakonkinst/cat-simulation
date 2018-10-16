@@ -22,6 +22,7 @@ function Room(properties) {
 
     //stores
     //this.food = null;
+    this.lightsOn = true;
 
     this.onLoad = properties.onLoad || function() {};
 
@@ -94,10 +95,11 @@ Room.prototype = {
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
             var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
+            var buildButton = Buttons.getButton(this.id + "_build_" + building);
 
-            if(isUndefined(buildItem.button)) {
+            if(isUndefined(buildButton) && Game.hasItem(building)) {
                 var location = buildContainer.get();
-                buildItem.button = new Button({
+                var buildButton = new Button({
                     id: this.id + "_build_" + building,
                     text: building,
                     width: "80px",
@@ -106,15 +108,15 @@ Room.prototype = {
                     }
                 });
 
-                buildItem.button.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
             } else {
-                if(max && !buildItem.button.get().hasClass("disabled")) {
+                if(max && !buildButton.get().hasClass("disabled")) {
                     Notifications.notify(buildItem.maxMsg);
                 }
             }
 
-            if(!isUndefined(buildItem.button)) {
-                buildItem.button.setDisabled(max);
+            if(!isUndefined(buildButton)) {
+                buildButton.setDisabled(max);
             }
         }
 
@@ -128,18 +130,32 @@ Room.prototype = {
     updateManageButtons: function() {
         var roomButtons = this.panel.find(".room-buttons");
         var manageContainer = new Container(".manage-buttons", "manage:", roomButtons);
+        var location = manageContainer.get();
 
-        if(!isUndefined(this.food) && !this.panel.find(".manage_refill-food").length) {
-            var location = manageContainer.get();
+        if(!roomButtons.find(".manage_light-toggle").length) {
             var room = this;
-            var refillFood = new Button({
-                id: this.id + "_manage_refill-food",
-                text: "refill food",
+            var lightButton = new Button({
+                id: this.id + "_manage_light-toggle",
+                text: "lights off",
+                //cooldown + setText() appears to be bugged
                 onClick: function() {
-                    room.refillFood();
+                    room.toggleLight();
                 }
             });
-            refillFood.get().addClass("manage_refill-food").css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            lightButton.get().addClass("manage_light-toggle").css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+        }
+
+        if(!isUndefined(this.food) && !roomButtons.find(".manage_refill-food").length) {
+            var room = this;
+            var refillFoodButton = new Button({
+                id: this.id + "_manage_refill-food",
+                text: "refill food",
+                cooldown: 4000,
+                onClick: function() {
+                    return room.refillFood();
+                }
+            });
+            refillFoodButton.get().addClass("manage_refill-food").css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
         }
 
         if(manageContainer.needsAppend && manageContainer.exists()) {
@@ -161,14 +177,26 @@ Room.prototype = {
         foodEl.text("food: " + this.food.level + "/" + this.food.maximum);
     },
 
+    toggleLight: function() {
+        var lightButton = Buttons.getButton(this.id + "_manage_light-toggle");
+        if(this.lightsOn) {
+            lightButton.setText("lights on");
+        } else {
+            lightButton.setText("lights off");
+        }
+        this.lightsOn = !this.lightsOn;
+    },
+
     refillFood: function() {
         var foodDifference = this.food.maximum - this.food.level;
         var foodStores = Game.equipment["cat food"] || 0;
 
         if(foodDifference === 0) {
             Notifications.notify("food bowl already full");
+            return false;
         } else if(foodStores <= 0) {
             Notifications.notify("not enough cat food");
+            return false;
         } else if(foodStores - foodDifference >= 0) {
             Notifications.notify("food bowl refilled");
             Game.equipment["cat food"] -= foodDifference;
@@ -181,6 +209,7 @@ Room.prototype = {
 
         this.updateFood();
         Game.updateEquipment();
+        return true;
     },
     update: function() {
 

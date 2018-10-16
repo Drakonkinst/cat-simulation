@@ -24,7 +24,7 @@ var Game = {
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  6,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    4,  //increments for every unstable build tested, resets on every release
+        build:    5,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -365,7 +365,6 @@ var Game = {
         
         function arrowLeft() {
             if(Game.tabNavigation) {
-                //TODO - is there a better way to do this?
                 if(Game.activeModule == Outside && House.tab) {
                     Game.travelTo(House);
                 }
