@@ -22,7 +22,7 @@ var House = {
                     room.food = {
                         level: 0,
                         maximum: 0
-                    }
+                    };
                 }
                 room.food.maximum += 5;
                 room.updateFood();
@@ -303,4 +303,4 @@ var House = {
 
         //$("<div>").text("Coming soon!").prependTo(".room");
     }
-}
+};

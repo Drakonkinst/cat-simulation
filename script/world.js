@@ -305,7 +305,7 @@ var World = {
                                 }
                             }
                         }
-                    }
+                    };
                 },
                 "adoptNameless": function(context) {
                     return {
@@ -346,7 +346,7 @@ var World = {
                                 }
                             }
                         }
-                    }
+                    };
                 },
             }
         },

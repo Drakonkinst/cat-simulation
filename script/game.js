@@ -476,7 +476,7 @@ var Game = {
     
         Logger.log("Version is " + Game.getVersionString());
     }
-}
+};
 
 $(document).ready(function() {
     //Let's do this!

@@ -43,7 +43,7 @@ var Outside = {
     
     events: [],
     onArrival: function(transitionDiff) {
-        Game.moveEquipmentView(null, transitionDiff)
+        Game.moveEquipmentView(null, transitionDiff);
     },
     updateBuyButtons: function() {
         var buyContainer = new Container("#buy-buttons", "buy:");
