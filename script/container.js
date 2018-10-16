@@ -3,9 +3,16 @@
  * exist, creates a pseudoelement if it does not exist that may
  * be appended to other elements.
  * */
-function Container(selector, title) {
+function Container(selector, title, context) {
     this.needsAppend = false;      //whether the pseudoelement was created or not
-    this.element = $(selector);    //searches for the element
+
+    //searches for the element, in context if necessary
+    if(isUndefined(context)) {
+        this.element = $(selector); 
+    } else {
+        this.element = context.find(selector);
+    }
+       
 
     if(!this.element.length) {
         //element does not exist, create pseudoelement

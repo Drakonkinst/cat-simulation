@@ -88,8 +88,8 @@ Room.prototype = {
         House.updateHouse();
     },
     updateBuildButtons: function() {
-        var buildContainer = new Container(".build-buttons", "build:");
         var roomButtons = this.panel.find(".room-buttons");
+        var buildContainer = new Container(".build-buttons", "build:", roomButtons);
         
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
@@ -126,8 +126,8 @@ Room.prototype = {
     },
 
     updateManageButtons: function() {
-        var manageContainer = new Container(".manage-buttons", "manage:");
         var roomButtons = this.panel.find(".room-buttons");
+        var manageContainer = new Container(".manage-buttons", "manage:", roomButtons);
 
         if(!isUndefined(this.food) && !this.panel.find(".manage_refill-food").length) {
             var location = manageContainer.get();
