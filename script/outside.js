@@ -79,7 +79,9 @@ var Outside = {
 
                     buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
 
-                    Notifications.notify(buyItem.availableMsg);
+                    if(!isUndefined(buyItem.availableMsg)) {
+                        Notifications.notify(buyItem.availableMsg);
+                    }
                 }
             } else {
                 //TODO - refresh the tooltip - for items that change cost based on context
