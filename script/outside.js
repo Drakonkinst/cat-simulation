@@ -128,6 +128,13 @@ var Outside = {
             Game.addItem(item, info.quantity());
         }
         
+        if(info.type == "building") {
+            //better way to do these loops? we're going to need a lot of them
+            for(var k in House.rooms) {
+                House.rooms[k].updateBuildButtons();
+            }
+        }
+
         Outside.updateBuyButtons();
     },
     unlocked: function(item) {
