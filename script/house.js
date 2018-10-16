@@ -87,9 +87,11 @@ var House = {
         }
     ],
 
+    //returns Room object of player's current location
     getCurrentRoom: function() {
         return House.rooms[House.currentRoom];
     },
+
     onArrival: function(transitionDiff) {
         House.updateTitle();
 
