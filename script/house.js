@@ -1,5 +1,5 @@
 /*
- * House module that represent's the player's house.
+ * House module that represents the player's house.
  * */
 var House = {
     name: "house",      //module id
