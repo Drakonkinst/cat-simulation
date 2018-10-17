@@ -1,15 +1,20 @@
-//manages WORLD, not just outside
-//that means weather and cat adoptions!
-
+/*
+ * World object that manages the global virtual world. Unlike
+ * modules, World is always present no matter the player's
+ * location.
+ */
 var World = {
+    WEATHER_INTERVAL: [5, 10],  //possible interval between weather updates, in minutes
 
-    WEATHER_INTERVAL: [5, 10],
-
-    currentWeather: null,
-    day: 1,
-    catsAbandoned: 0,   // :(
+    currentWeather: null,       //name of current weather
+    day: 1,                     //current day, increments every time the player sleeps
+    catsAbandoned: 0,           //statistic tracking how many cats you have refused to take in :(
     
-    //weather can change randomly throughout the day, as well as overnight.
+    /*
+     * Weather probability tree
+     * Weather can change randomly throughout the day, as well as overnight.
+     * The next weather is based on the weighted probabilities listed below.
+     * */
     weather: {
         "sunny": {
             greeting: "the curtains open to clear skies",
@@ -136,8 +141,10 @@ var World = {
         }
     },
 
+    //global events
     events: [
         {
+            //Stray Cat Event - how to get more cats!
             title: "A Stray Cat",
             isAvailable: function() {
                 return !["rain", "storm", "lightning", "hail"].includes(World.currentWeather);
@@ -352,6 +359,7 @@ var World = {
         },
     ],
 
+    //attempts to change the weather based on the current weather
     nextWeather: function(hideAnnouncement) {
         var possibilities = World.weather[World.currentWeather].causes;
         var nextWeather = chooseWeighted(possibilities, "weight");
@@ -361,14 +369,17 @@ var World = {
         }
         World.currentWeather = nextWeather;
 
+        //schedule next update
         if(World.currentWeather == "lightning") {
             //shouldn't stay on lightning for very long
             World.WeatherTask.scheduleNext(0.3);
         } else {
+            //use default interval
             World.WeatherTask.scheduleNext();
         }
     },
 
+    //pauses the game and transitions to the next day
     sleep: function() {
         Game.keyLock = true;
         //white-out content
@@ -393,12 +404,12 @@ var World = {
                 Game.keyLock = false;
                 $("#outer-slider").animate({opacity: 1}, 600, "linear");
                 World.greeting();
-                //need to animate this notification better
+
             }, 3000);
         });
     },
 
-    //called on a new day
+    //called at the start of a new day
     greeting: function() {
         Notifications.notify(World.weather[World.currentWeather].greeting);
         $("#day-notify").text("day " + World.day + ".").css("opacity", 1).animate({opacity: 0}, 3000, "linear");

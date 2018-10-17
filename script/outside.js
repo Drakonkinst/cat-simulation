@@ -1,6 +1,12 @@
+/*
+ * Outside module that represents the outside world.
+ */
 var Outside = {
-    name: "outside",
+    name: "outside",    //module id
+
+    //info table of all items that can be bought
     BuyItems: {
+        //pet store
         "cat treat": {
             type: "inventory",
             availableMsg: "found a local pet store, could have some useful supplies",
@@ -41,17 +47,23 @@ var Outside = {
         }
     },
     
+    //outside-related events
     events: [],
+
+    //called when player travels to this location
     onArrival: function(transitionDiff) {
         Game.moveEquipmentView(null, transitionDiff);
     },
+
+    //updates item buying section
     updateBuyButtons: function() {
         var buyContainer = new Container("#buy-buttons", "buy:");
 
         for(var item in Outside.BuyItems) {
             var buyItem = Outside.BuyItems[item];
-            var max = false;
 
+            //determine whether item has hit max limit, if any
+            var max = false;
             if(!isUndefined(buyItem.maximum)) {
                 max = Game.hasItem(item, buyItem.maximum);
             }
@@ -98,6 +110,8 @@ var Outside = {
             buyContainer.create().appendTo("#outside-panel");
         }
     },
+
+    //attempts to buy an item
     buy: function(item) {
         var info = Outside.BuyItems[item];
         var num = Game.equipment[item] || 0;
@@ -130,6 +144,7 @@ var Outside = {
         
         if(info.type == "building") {
             //better way to do these loops? we're going to need a lot of them
+            //should this be in addItem instead?
             for(var k in House.rooms) {
                 House.rooms[k].updateBuildButtons();
             }
@@ -152,6 +167,9 @@ var Outside = {
         }
 
         return true;
+    },
+    updateTitle: function() {
+        //A Quiet Town, A Bustling World - as more things unlock
     },
     Init: function() {
         this.tab = Game.addLocation("outside", "A Quiet Town", Outside);
