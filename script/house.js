@@ -2,15 +2,18 @@
  * House module that represent's the player's house.
  * */
 var House = {
-    name: "house",
+    name: "house",      //module id
 
-    newCats: null,  //cats that have not been introduced to the house
-    cats: null,     //all cats in the house
-    currentRoom: null,
-    unlockedRooms: [],
-    rooms: {},
-    stores: {},
+    newCats: null,      //cats that have not been introduced to the house
+    cats: null,         //all cats in the house
 
+    currentRoom: null,  //name of current room
+    unlockedRooms: [],  //ordered list of room names
+    rooms: {},          //keymap of Room ids and objects
+
+    stores: {},         //house inventory
+
+    //info table of all buildings
     Buildings: {
         "food bowl": {
             //max in house vs max per room?
@@ -30,6 +33,7 @@ var House = {
         }
     },
 
+    //house-related events
     events: [
         {   //Noises Outside - gain stuff
             title: "Noises",
@@ -92,9 +96,11 @@ var House = {
         return House.rooms[House.currentRoom];
     },
 
+    //called when player travels to this location
     onArrival: function(transitionDiff) {
         House.updateTitle();
 
+        //introduce new cats gradually
         for(var i = 0; i < House.newCats.length; i++) {
             //self-invoking function so the timeout will use consecutive values
             (function() {
@@ -108,16 +114,20 @@ var House = {
             })();
         }
 
+        //moves main inventory to accomodate for house inventory display
         Game.moveEquipmentView($("#house"), transitionDiff);
     },
 
+    //updates house inventory
     updateHouse: function() {
+        //build containers
         var house = new Container("#house", "house");
         var stores = new Container("#stores");
         var buildings = new Container("#buildings");
         var equipment = $("#equipment-container");
 
         //TODO - needs to include items that exist in Game.equipment but are not built in room yet
+        //update all items in House.stores
         for(var item in House.stores) {
             var location = stores;
             if(!isUndefined(House.Buildings[item])) {
@@ -134,11 +144,12 @@ var House = {
             Game.updateRow(item, text, location.get());
         }
 
+        //initialize containers
         if(stores.needsAppend && stores.exists()) {
             stores.create().appendTo(house.get());
         }
 
-        if(buildings.needsAppend && buildings) {
+        if(buildings.needsAppend && buildings.exists()) {
             buildings.create().prependTo(house.get());
         }
 
@@ -152,19 +163,25 @@ var House = {
         }
     },
 
+    //adds a cat to the House
     addCat: function(cat) {
+        //creates a random cat if none is specified
         cat = cat || new Cat();
         
         if(Game.activeModule == House) {
+            //introduces cat immediately
             Notifications.notify(cat.name + " sniffs around, seems to like this place");
         } else {
+            //adds cat to newCats so it can be introduced later
             House.newCats.push(cat);
         }
         
+        //adds cat and updates everything
         House.cats.push(cat);
         House.updateTitle();
         Game.addItem("cat", 1);
 
+        //triggers Outside panel after a delay - this will be changed eventually
         if(!$("#outside-panel").length && isUndefined(House._initOutside)) {
             House._initOutside = Game.setTimeout(function() {
                 Notifications.notify("should head into town, see if there's anything useful");
@@ -173,6 +190,7 @@ var House = {
         }
     },
 
+    //updates title based on number of cats in house
     updateTitle: function() {
         var title;
         if(this.cats.length === 0) {
@@ -216,9 +234,11 @@ var House = {
         House.currentRoom = room;
     },
 
+    //adds room to house header
     unlockRoom: function(id) {
         var room = House.rooms[id];
 
+        //room must be defined
         if(isUndefined(room)) {
             Logger.warn("Tried to unlock room \"" + id + "\" that does not exist!");
             return;
@@ -228,6 +248,7 @@ var House = {
         House.unlockedRooms.push(id);
     },
 
+    //changes height of slider to match number of room locations
     updateSlider: function() {
         var slider = $("#room-slider");
         slider.width((slider.children().length * 700) + "px");
@@ -302,7 +323,5 @@ var House = {
 
         House.newCats = [];
         House.cats = []; //House.newCats.slice();
-
-        //$("<div>").text("Coming soon!").prependTo(".room");
     }
 };
