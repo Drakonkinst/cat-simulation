@@ -24,12 +24,12 @@ var Game = {
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  6,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    5,  //increments for every unstable build tested, resets on every release
+        build:    6,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
     options: {
-        debug: true,            //print debug messages
+        debug: false,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
@@ -468,9 +468,9 @@ var Game = {
         Game.Init();
         Game.travelTo(House);
         
-        Game.addItem("lettuce", 16);
-        Game.addItem("money", 9001);
-        House.addCat();
+        //Game.addItem("lettuce", 16);
+        //Game.addItem("money", 9001);
+        //House.addCat();
         //Game.addPerk("heartless");
     
         Logger.log("Version is " + Game.getVersionString());
