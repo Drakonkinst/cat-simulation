@@ -1,83 +1,41 @@
 /*
- * House module that represent's the player's house.
+ * House module that represents the player's house.
  * */
 var House = {
-    name: "house",
+    name: "house",      //module id
 
-    newCats: null,  //cats that have not been introduced to the house
-    cats: null,     //all cats in the house
-    currentRoom: null,
-    unlockedRooms: [],
+    newCats: null,      //cats that have not been introduced to the house
+    cats: null,         //all cats in the house
 
-    rooms: {
-        "bedroom": {
-            title: "Bedroom",
-            init: function(panel) {
-                new Button({
-                    id: "sleep",
-                    text: "go to sleep",
-                    cooldown: 90000,
-                    onClick: function() {
-                        Game.keyLock = true;
-                        $("#outer-slider").animate({opacity: 0}, 600, "linear", function() {
-                            $("#outer-slider").css("left", "0px");
-                            $("#location-slider").css("left", "0px");
-                            $("#equipment-container").css({"top": "40px", "right": "0px"});
-                            Game.activeModule = House;
-                            $(".header-button").removeClass("selected");
-                            House.tab.addClass("selected");
-                            Game.setTimeout(function() {
-                                House.onArrival();
-                                World.day++;
-                                Game.keyLock = false;
-                                $("#outer-slider").animate({opacity: 1}, 600, "linear");
-                                World.greeting();
-                                //need to animate this notification better
-                            }, 3000);
-                        });
-                    }
-                }).appendTo(panel);
-            }
-        },
-        "hallway": {
-            title: "Hallway",
-            init: function(panel) {
-                new Button({
-                    id: "test",
-                    text: "open door",
-                    cooldown: 8000,
-                    tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
-                    onClick: function() {
-                        if(World.events[0].isAvailable()) {
-                            Events.startEvent(World.events[0]);
-                        } else {
-                            Notifications.notify("probably shouldn't open the door right now");
-                            return false;
-                        }
-                    }
-                }).appendTo(panel);
-            }
-        },
-        "living-room": {
-            title: "Living Room",
-            init: function(panel) {
-                
-            }
-        },
-        "kitchen": {
-            title: "Kitchen",
-            init: function(panel) {
-                
-            }
-        },
-        "dining-room": {
-            title: "Dining Room",
-            init: function(panel) {
-                
+    currentRoom: null,  //name of current room
+    unlockedRooms: [],  //ordered list of room names
+    rooms: {},          //keymap of Room ids and objects
+
+    stores: {},         //house inventory
+
+    //info table of all buildings
+    Buildings: {
+        "food bowl": {
+            //should space be based on single buildings or overall? maybe
+            //assign weight to each structure and have each room cap..
+            //for later.
+            buildMsg: "very shiny bowls, needs food though",
+            maxMsg: "no more space for more bowls",
+            maximum: 5,
+            onBuild: function(room) {
+                if(isUndefined(room.food)) {
+                    room.food = {
+                        level: 0,
+                        maximum: 0
+                    };
+                }
+                room.food.maximum += 5;
+                room.updateFood();
             }
         }
     },
 
+    //house-related events
     events: [
         {   //Noises Outside - gain stuff
             title: "Noises",
@@ -87,15 +45,15 @@ var House = {
             scenes: {
                 "start": {
                     text: [
-                        "scratching noises can be heard through the door.",
-                        "something's out there."
+                        "knocking sounds can be heard through the door.",
+                        "someone's out there."
                     ],
-                    notification: "something's scratching outside",
+                    notification: "someone's knocking outside",
                     blink: true,
                     buttons: {
                         "investigate": {
                             text: "investigate",
-                            nextScene: {"stuff": 1}
+                            nextScene: {"bread": 1, "treats": 1}
                         },
                         "ignore": {
                             text: "do nothing",
@@ -103,7 +61,7 @@ var House = {
                         }
                     }
                 },
-                "stuff": {
+                "bread": {
                     text: [
                         "a basket full of warm bread sits on the doorstep.",
                         "the streets are silent."
@@ -115,14 +73,94 @@ var House = {
                         }
                     }
 
+                },
+                "treats": {
+                    text: [
+                        "a handful of cat treats sits on the doorstep, wrapped in colorful ribbons.",
+                        "the streets are silent."
+                    ],
+                    onLoad: function() {
+                        Game.addItem("cat treat", 3);
+                    },
+                    buttons: {
+                        "leave": {
+                            text: "go back inside",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            //A Disturbance - Lost Stuff
+            title: "A Disturbance",
+            isAvailable: function() {
+                return House.cats.length > 0 && Game.hasItem("cat food") && Game.activeModule == House;  //later should require pantry
+            },
+            scenes: {
+                "start": {
+                    text: [
+                        "scratching noises can be heard in the pantry.",
+                        "something's in there."
+                    ],
+                    notification: "something's in the pantry",
+                    blink: true,
+                    buttons: {
+                        "investigate": {
+                            text: "investigate",
+                            nextScene: {"rats": 1, "cat": 2}
+                        },
+                        "ignore": {
+                            text: "do nothing",
+                            nextScene: "end"
+                        }
+                    }
+                },
+                "cat": function() {
+                    var cat = chooseRandom(House.cats);
+                    return {
+                        text: [
+                            cat.name + " pokes out " + cat.genderPronoun("his", "her") + " head from behind a tub of food.",
+                            "nothing to see here."
+                        ],
+                        buttons: {
+                            "leave": {
+                                text: "leave",
+                                nextScene: "end"
+                            }
+                        }
+                    };
+                },
+                "rats": {
+                    text: [
+                        //"spilled kibble is strewn across the floor.",
+                        "a corner of one of the food bags is covered in tiny nibbles.",
+                        "some of the food is missing."
+                    ],
+                    onLoad: function() {
+                        Game.addItem("cat food", -10);
+                    },
+                    buttons: {
+                        "leave": {
+                            text: "leave",
+                            nextScene: "end"
+                        }
+                    }
                 }
             }
         }
     ],
 
+    //returns Room object of player's current location
+    getCurrentRoom: function() {
+        return House.rooms[House.currentRoom];
+    },
+
+    //called when player travels to this location
     onArrival: function(transitionDiff) {
         House.updateTitle();
 
+        //introduce new cats gradually
         for(var i = 0; i < House.newCats.length; i++) {
             //self-invoking function so the timeout will use consecutive values
             (function() {
@@ -136,22 +174,74 @@ var House = {
             })();
         }
 
+        //moves main inventory to accomodate for house inventory display
         Game.moveEquipmentView($("#house"), transitionDiff);
     },
 
+    //updates house inventory
+    updateHouse: function() {
+        //build containers
+        var house = new Container("#house", "house");
+        var stores = new Container("#stores");
+        var buildings = new Container("#buildings");
+        var equipment = $("#equipment-container");
+
+        //TODO - needs to include items that exist in Game.equipment but are not built in room yet
+        //update all items in House.stores
+        for(var item in House.stores) {
+            var location = stores;
+            if(!isUndefined(House.Buildings[item])) {
+                location = buildings;
+            }
+            
+            //section could use some reworking
+            var text = House.stores[item];
+            var maxValue = text + Game.equipment[item];
+            if(!isUndefined(maxValue)) {
+                text += "/" + maxValue;
+            }
+
+            Game.updateRow(item, text, location.get());
+        }
+
+        //initialize containers
+        if(stores.needsAppend && stores.exists()) {
+            stores.create().appendTo(house.get());
+        }
+
+        if(buildings.needsAppend && buildings.exists()) {
+            buildings.create().prependTo(house.get());
+        }
+
+        if(house.needsAppend && $("#house-panel").length > 0 && house.get().find(".row").length > 0) {
+            house.create().prependTo("#house-panel");
+        }
+
+        //update main inventory
+        if($("#house").length && Game.activeModule == this) {
+            equipment.css("top", (house.get().height() + 66) + "px");
+        }
+    },
+
+    //adds a cat to the House
     addCat: function(cat) {
+        //creates a random cat if none is specified
         cat = cat || new Cat();
         
         if(Game.activeModule == House) {
+            //introduces cat immediately
             Notifications.notify(cat.name + " sniffs around, seems to like this place");
         } else {
+            //adds cat to newCats so it can be introduced later
             House.newCats.push(cat);
         }
         
+        //adds cat and updates everything
         House.cats.push(cat);
         House.updateTitle();
         Game.addItem("cat", 1);
 
+        //triggers Outside panel after a delay - this will be changed eventually
         if(!$("#outside-panel").length && isUndefined(House._initOutside)) {
             House._initOutside = Game.setTimeout(function() {
                 Notifications.notify("should head into town, see if there's anything useful");
@@ -160,12 +250,19 @@ var House = {
         }
     },
 
+    //updates title based on number of cats in house
     updateTitle: function() {
         var title;
         if(this.cats.length === 0) {
+            title = "A Dreary Room";
+        } else if(this.cats.length === 1) {
             title = "A Lonely House";
-        } else if(this.cats.length > 0) {
-            title = "A Humble Home";
+        } else if(this.cats.length < 5) {
+            title = "A Humble Abode";
+        } else if(this.cats.length < 10) {
+            title = "A Modest Home";
+        } else if(this.cats.length < 15) {
+            title = "A Raucous Mansion";
         }
         $("#location_house").text(title);
     },
@@ -184,6 +281,7 @@ var House = {
             return;
         }
 
+
         $(".room-button").removeClass("selected");
         tab.addClass("selected");
 
@@ -196,25 +294,21 @@ var House = {
         House.currentRoom = room;
     },
 
+    //adds room to house header
     unlockRoom: function(id) {
         var room = House.rooms[id];
+
+        //room must be defined
         if(isUndefined(room)) {
             Logger.warn("Tried to unlock room \"" + id + "\" that does not exist!");
             return;
         }
 
-        $("<div>").attr("id", "room-location_" + id)
-            .addClass("room-button")
-            .text(room.title).click(function() {
-                if(House.canTravel()) {
-                    House.travelTo(id);
-                }
-            }).appendTo($("#house-header"));
-        $("<div>").attr("id", "room_" + id).addClass("room").appendTo("#room-slider");
-        room.init($("#room_" + id));
+        room.init();
         House.unlockedRooms.push(id);
     },
 
+    //changes height of slider to match number of room locations
     updateSlider: function() {
         var slider = $("#room-slider");
         slider.width((slider.children().length * 700) + "px");
@@ -229,11 +323,56 @@ var House = {
         $("<div>").attr("id", "house-content").appendTo(this.panel);
         $("<div>").attr("id", "room-slider").appendTo("#house-content");
         
-        for(var id in House.rooms) {
-            if(House.rooms.hasOwnProperty(id)) {
-                House.rooms[id].isUnlocked = false;
-            }
-        }
+        this.rooms = {
+            "bedroom": new Room({
+                id: "bedroom",
+                title: "Bedroom",
+                onLoad: function() {
+                    var sleepButton = new Button({
+                        id: "sleep",
+                        text: "go to sleep",
+                        cooldown: 90000,
+                        onClick: World.sleep
+                    }).appendTo(this.panel.find(".room-buttons"));
+                    sleepButton.startCooldown();
+                }
+            }),
+            "hallway": new Room({
+                id: "hallway",
+                title: "Hallway",
+                onLoad: function() {
+                    new Button({
+                        id: "test",
+                        text: "open door",
+                        cooldown: 8000,
+                        tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
+                        onClick: function() {
+                            if(World.events[0].isAvailable()) {
+                                Events.startEvent(World.events[0]);
+                            } else {
+                                Notifications.notify("probably shouldn't open the door right now");
+                                return false;
+                            }
+                        }
+                    }).appendTo(this.panel.find(".room-buttons"));
+                }
+            }),
+            "living-room": new Room({
+                id: "living-room",
+                title: "Living Room",
+                onLoad: function() {}
+            }),
+            "kitchen": new Room({
+                id: "kitchen",
+                title: "Kitchen",
+                onLoad: function() {}
+            }),
+            "dining-room": new Room({
+                id: "dining-room",
+                title: "Dining Room",
+                onLoad: function() {}
+            })
+        };
         
         House.unlockRoom("bedroom", "Bedroom");
         House.unlockRoom("hallway", "Hallway");
@@ -245,7 +384,5 @@ var House = {
 
         House.newCats = [];
         House.cats = []; //House.newCats.slice();
-
-        //$("<div>").text("Coming soon!").prependTo(".room");
     }
-}
+};

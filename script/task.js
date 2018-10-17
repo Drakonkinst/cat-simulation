@@ -33,4 +33,4 @@ Task.prototype = {
 
         this.eventTimeout = Game.setTimeout(this.task, interval * 60 * 1000);
     }
-}
+};

@@ -317,7 +317,7 @@ var Events = {
             Game.setTimeout(function() {
                 document.title = title;
             }, 1500);
-        }, 3000)
+        }, 3000);
     },
 
     //clears blinkInterval and stops blinking the title

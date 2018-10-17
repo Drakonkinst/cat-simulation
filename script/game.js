@@ -23,8 +23,8 @@ var Game = {
         beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  5,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    8,  //increments for every unstable build tested, resets on every release
+        release:  6,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        build:    6,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -38,16 +38,16 @@ var Game = {
     //game states
     pressed: false,         //key is being pressed
     keyLock: false,         //keys do not function
-    //buttonLock: false,      //buttons do not do anything when clicked
     tabNavigation: true,    //tab navigation does not function
 
     //parses Game.version into a legible string
     getVersionString: function() {
-        var prefix = Game.version.alpha ? "alpha" : Game.version.beta ? "beta" : "";
+        var prefix = Game.version.alpha ? "alpha " : Game.version.beta ? "beta " : "";
         Logger.warnIf(Game.version.alpha && Game.version.beta, "This build is marked as both alpha and beta!");
-        return prefix + " v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
+        return prefix + "v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
     },
 
+    /* ======= Utils ======= */
     //returns current time
     now: function() {
         return new Date().getTime();
@@ -64,7 +64,8 @@ var Game = {
     },
 
     /* ====== Modules ====== */
-    activeModule: null,     //module object of the current location
+    //module object of the current location
+    activeModule: null,
 
     //returns whether there are enough locations to travel
     canTravel: function() {
@@ -94,7 +95,7 @@ var Game = {
         Notifications.printQueue(module);
     },
 
-    //adds a location tied to a module to the header
+    //adds a location to the header, associated with a module
     addLocation: function(id, text, module) {
         return $("<div>").attr("id", "location_" + id)
             .addClass("header-button")
@@ -112,83 +113,115 @@ var Game = {
     },
 
     /* ====== Equipment ====== */
-    //move this to world and create an ItemPool like Events (array to loop through. returns item info)
+    //info table of all game items
     Items: {
         "cat": {
             type: "special"
-        },
-        //"money": {
-            //type: "resource"
-        //}
+        }
     }, 
 
+    //character perks
     perks: {
         "heartless": {
-            desc: "cat morale decreases much faster",
+            desc: "incurred the wrath of your subjects",
             notify: "learned to turn that beating heart to stone"
         }
     },
 
-    //keymap of all values in player's inventory
-    //this is really bad design...something to work on.
-    //character/player object? probably unnecessary
+    //character inventory
     equipment: null,
 
+    //adds (or subtracts if negative) a quantity of an item to/from Game.equipment
     addItem: function(name, value) {
+
+        //initializes value if it does not exist
         if(!(name in Game.equipment)) {
             Game.equipment[name] = 0;
         }
+
         Game.equipment[name] += value;
-        Game.updateEquipment();
+        if(Game.getItemType(name) == "building") {
+            House.updateHouse();
+        } else {
+            Game.updateEquipment();
+        }
     },
 
+    /*
+     * Returns if the player's inventory contains an item.
+     * If a value is specified, returns if the player's inventory
+     * contains at least that many of the item.
+     * */
     hasItem: function(name, value) {
         value = value || 1;
         return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
     },
 
+    //looks through all item lookup tables to find the item's type
+    getItemType: function(item) {
+        if(Game.Items.hasOwnProperty(item)) {
+            return item.type;
+        } else if(House.Buildings.hasOwnProperty(item)) {
+            return "building";
+        }
+        return null;
+    },
+
+    //adds a perk to the character
     addPerk: function(name) {
+        //perk must be defined in Game.perks
         if(isUndefined(Game.perks[name])) {
             Logger.warn("Tried to add perk \"" + name + "\" that doesn't exist!");
             return;
         }
 
+        //perks can only be added once
         if(Game.hasPerk(name)) {
             return;
         }
 
+        //adds perk
         Game.perks[name].owned = true;
         Notifications.notify(Game.perks[name].notify);
         Game.updatePerks();
     },
 
+    //returns if the character has the specified perk
     hasPerk: function(name) {
         return Game.perks[name].owned;
     },
 
-    //updates equipment element from Game.equipment
+    //updates general equipment inventory
     updateEquipment: function() {
-        var equipment = new Section("equipment", "you have");
-        var inventory = new Section("inventory");
-        var special = new Section("special");
-        var house = new Section("house", "house");
-        var stores = new Section("stores");
-        var buildings = new Section("buildings");
+        //creates Containers
+        var equipment = new Container("#equipment", "you have");
+        var inventory = new Container("#inventory");
+        var special = new Container("#special");
 
+        //switch lookup
         var locations = {
-            "resource": stores,
-            "building": buildings,
+            "resource": null,
+            "building": null,
             "special": special,
             "inventory": inventory,
             "default": inventory
         };
 
+        //update all items in Game.equipment
         for(var item in Game.equipment) {
-            var type = Game.Items[item] ? Game.Items[item].type : "default";
-            var location = locations[type].get();
-            Game.updateRow(item, Game.equipment[item], location);
+            //get location for item
+            var type = Game.getItemType(item) || "default";
+            var location = locations[type];
+
+            if(isUndefined(location)) {
+                //do not display
+                continue;
+            }
+            
+            Game.updateRow(item, Game.equipment[item], location.get());
         }
 
+        //initialize containers
         if(inventory.needsAppend && inventory.exists()) {
             inventory.create().appendTo(equipment.get());
         }
@@ -200,39 +233,34 @@ var Game = {
         if(equipment.needsAppend && equipment.get().find(".row").length > 0) {
             equipment.create().prependTo("#equipment-container");
         }
-
-        if(stores.needsAppend && stores.exists()) {
-            stores.create().appendTo(house.get());
-        }
-
-        if(buildings.needsAppend && buildings) {
-            buildings.create().prependTo(house.get());
-        }
-
-        if(house.needsAppend && $("#house-panel").length > 0 && house.get().find(".row").length > 0) {
-            house.create().prependTo("#house-panel");
-        }
     },
 
+    //updates perk inventory
     updatePerks: function() {
-        var perks = new Section("perks", "perks");
+        //create perk container
+        var perks = new Container("#perks", "perks");
 
+        //update all perks
         for(var perk in Game.perks) {
             if(Game.hasPerk(perk)) {
                 Game.updateRow(perk, 1, perks.get(), true, new Tooltip().append($("<div>").text(Game.perks[perk].desc)));
             }
         }
 
+        //initialize container
         if(perks.needsAppend && perks.get().children().length > 0) {
             perks.create().appendTo("#equipment-container");
         }
     },
 
+    //updates a single row in a given location
     updateRow: function(name, value, location, hideQuantity, tooltip) {
+        //find row
         var id = "row_" + name.replace(/\s+/g, "-");
         var row = $("#" + id, location);
 
         if(!row.length) {
+            //create row
             row = $("<div>").attr("id", id).addClass("row")
                 .append($("<div>").addClass("row_key"))
                 .append($("<div>").addClass("row_val"))
@@ -240,33 +268,39 @@ var Game = {
             var prevItem = null;
             location.children().each(function() {
                 var child = $(this);
-                //alphabetize
+                //alphabetize within container
                 if(child.children(".row_key").text() < name) {
                     prevItem = child.attr("id");
                 }
             });
             if(isUndefined(prevItem)) {
+                //adds to beginning if no previous item found
                 row.prependTo(location);
             } else {
+                //append after previous alphabetical item
                 row.insertAfter(location.find("#" + prevItem));
             }
         }
 
         if(value === 0) {
-            //at some point, might want to keep 0 for other inventories
+            //might want to keep 0 for other inventories in the future
             row.remove();
         } else {
+            //set row name
             $("#" + row.attr("id"), location).find(".row_key").text(name);
             if(value > 1 || !hideQuantity) {
+                //set row value
                 $("#" + row.attr("id"), location).find(".row_val").text(value);
             }
         }
 
+        //adds tooltip
         if(!isUndefined(tooltip)) {
             tooltip.appendTo(row);
         }
     },
 
+    //moves main equipment element to accomodate for other containers
     moveEquipmentView: function(topContainer, transitionDiff) {
         Game.updateEquipment();
         var equipment = $("#equipment-container");
@@ -331,7 +365,6 @@ var Game = {
         
         function arrowLeft() {
             if(Game.tabNavigation) {
-                //TODO - is there a better way to do this?
                 if(Game.activeModule == Outside && House.tab) {
                     Game.travelTo(House);
                 }
@@ -357,6 +390,7 @@ var Game = {
     },
 
     /* ====== Document Modifiers? ====== */
+    //cancels all mouse clicks except for menu buttons
     disableSelection: function() {
         function eventNullifier(e) {
             return $(e.target).hasClass("menu-btn");
@@ -366,6 +400,7 @@ var Game = {
 		document.onmousedown = eventNullifier;   //everything else
     },
 
+    //re-enables all mouse clicks
     enableSelection: function() {
         function eventPassThrough() {
             return true;
@@ -386,8 +421,6 @@ var Game = {
             //window.location = //set to mobile warning window
         }
 
-        //Game.loadGame();
-
         /* Layout */
         $("#main").empty();
 
@@ -404,13 +437,9 @@ var Game = {
             //.append($("<span>").addClass("version menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))//
             //.append($("<span>").addClass("menu-btn").text("discord."))
             //.append($("<span>").addClass("menu-btn").text("save."))
+            //.append($("<span>").addClass("menu-btn").text("stats."))
             .appendTo("body");
-
-       
-        //$("<div>").attr("id", "panel_room").appendTo("#main");
-
-        //$("<div>").attr("id", "equipment-container").appendTo("#main")
-
+            
         Game.disableSelection();
 
         //register listeners
@@ -446,13 +475,11 @@ var Game = {
     
         Logger.log("Version is " + Game.getVersionString());
     }
-}
+};
 
+//Let's do this!
 $(document).ready(function() {
-    //Let's do this!
-
-    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?"]));
-    
+    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!"]));
     try {
         Game.Launch();
     } catch(err) {

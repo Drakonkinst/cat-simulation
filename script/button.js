@@ -19,6 +19,7 @@ function Button(properties) {
     this.onCooldown = false;
     var text = properties.text || "press me";
 
+    //create element
     this.element = $("<div>")
         .attr("id", this.id)
         .addClass("button")
@@ -115,11 +116,13 @@ Button.prototype = {
         this.cooldown = cooldown;
     },
 
+    //appends Button element to another element
     appendTo: function(element) {
         this.element.appendTo(element);
         return this;
     },
 
+    //returns the Button's element
     get: function() {
         return this.element;
     }

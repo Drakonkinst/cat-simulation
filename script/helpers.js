@@ -146,7 +146,7 @@ function isEmpty(object) {
 /*
  * Returns if a variable is not defined.
  * This will return true if the variable is undefined or null,
- * but will return false if the variable is a boolean false--
+ * but will return false if the variable is a boolean false,
  * which if(variable) does not support.
  * */
 function isUndefined(variable) {

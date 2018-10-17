@@ -1,15 +1,20 @@
-//manages WORLD, not just outside
-//that means weather and cat adoptions!
-
+/*
+ * World object that manages the global virtual world. Unlike
+ * modules, World is always present no matter the player's
+ * location.
+ */
 var World = {
+    WEATHER_INTERVAL: [5, 10],  //possible interval between weather updates, in minutes
 
-    WEATHER_INTERVAL: [5, 10],
-
-    currentWeather: null,
-    day: 1,
-    catsAbandoned: 0,
+    currentWeather: null,       //name of current weather
+    day: 1,                     //current day, increments every time the player sleeps
+    catsAbandoned: 0,           //statistic tracking how many cats you have refused to take in :(
     
-    //weather can change randomly throughout the day, as well as overnight.
+    /*
+     * Weather probability tree
+     * Weather can change randomly throughout the day, as well as overnight.
+     * The next weather is based on the weighted probabilities listed below.
+     * */
     weather: {
         "sunny": {
             greeting: "the curtains open to clear skies",
@@ -136,8 +141,10 @@ var World = {
         }
     },
 
+    //global events
     events: [
         {
+            //Stray Cat Event - how to get more cats!
             title: "A Stray Cat",
             isAvailable: function() {
                 return !["rain", "storm", "lightning", "hail"].includes(World.currentWeather);
@@ -305,7 +312,7 @@ var World = {
                                 }
                             }
                         }
-                    }
+                    };
                 },
                 "adoptNameless": function(context) {
                     return {
@@ -346,29 +353,75 @@ var World = {
                                 }
                             }
                         }
-                    }
+                    };
                 },
             }
         },
     ],
 
+    //attempts to change the weather based on the current weather
     nextWeather: function(hideAnnouncement) {
         var possibilities = World.weather[World.currentWeather].causes;
         var nextWeather = chooseWeighted(possibilities, "weight");
-        if(!isUndefined(possibilities[nextWeather].notification) && !hideAnnouncement) {
-            Notifications.notify(possibilities[nextWeather].notification);
+        var notification = possibilities[nextWeather].notification
+
+        //play notification if the weather changes
+        if(!isUndefined(notification) && !hideAnnouncement) {
+            Logger.log("Changed weather to " + nextWeather);
+            Notifications.notify(notification);
         }
+
         World.currentWeather = nextWeather;
 
+        //schedule next update
         if(World.currentWeather == "lightning") {
             //shouldn't stay on lightning for very long
             World.WeatherTask.scheduleNext(0.3);
         } else {
+            //use default interval
             World.WeatherTask.scheduleNext();
         }
     },
 
-    //called on a new day
+    //pauses the game and transitions to the next day
+    sleep: function() {
+        Game.keyLock = true;
+        //white-out content
+        $("#outer-slider").animate({opacity: 0}, 600, "linear", function() {
+            //reset all sliders
+            $("#outer-slider").css("left", "0px");
+            $("#location-slider").css("left", "0px");
+            $("#equipment-container").css({"top": "40px", "right": "0px"});
+
+            //set current to default\
+            Game.activeModule = House;
+            $(".header-button").removeClass("selected");
+            House.tab.addClass("selected");
+            //set room to bedroom?
+
+            //animate onArrival before the screen fades in
+            House.onArrival();
+
+            //come back after a time delay
+            Game.setTimeout(function() {
+                World.day++;
+                Game.keyLock = false;
+                $("#outer-slider").animate({opacity: 1}, 600, "linear");
+                //dream system needs improvements - either many messages of this style, or a randomizer with two clauses
+                Notifications.notify("dreamed of " + chooseRandom(["dark and stormy nights", "bright skies and lazy clouds", "a soft whisper and a warm embrace", "fish swimming across the sky", "a hunter stalking its prey", "a world covered in ash", "crimson mist and a wolf's howl", "a trident in the sea"]));
+                World.greeting();
+
+                //update rooms so the lights on/off button shows - this should be changed
+                for(var k in House.rooms) {
+                    House.rooms[k].updateManageButtons();
+                }
+
+                //delay weather greeting?
+            }, 3000);
+        });
+    },
+
+    //called at the start of a new day
     greeting: function() {
         Notifications.notify(World.weather[World.currentWeather].greeting);
         $("#day-notify").text("day " + World.day + ".").css("opacity", 1).animate({opacity: 0}, 3000, "linear");
@@ -382,4 +435,4 @@ var World = {
         World.WeatherTask.scheduleNext();
         World.greeting();
     }
-}
+};

@@ -28,7 +28,11 @@ Tooltip.prototype = {
     exists: function() {
         return this.element.children().length > 0;
     },
-    getElement: function() {
+
+    /*
+    //returns the Tooltip's element
+    get: function() {
         return this.element;
     }
+    */
 };

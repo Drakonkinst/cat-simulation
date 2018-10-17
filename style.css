@@ -1,10 +1,61 @@
+/* Reset CSS
+   http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
 /* Base */
 html, body {
 	height: 100%;
 }
+
 div {
 	display: block;
 }
+
 body {
 	font-family: "Times New Roman", Times, serif;
 	font-size: 16px;
@@ -15,6 +66,7 @@ body {
 	padding: 0;
 	border: 0;
 }
+
 #wrapper {
 	margin: auto;
 	width: 700px;
@@ -458,6 +510,31 @@ body.noMask #description {
 	border-left: 1px solid black;
 	margin-left: 10px;
 	padding-left: 10px;
+}
+
+.build-buttons:before, .manage-buttons:before {
+	content: attr(data-legend);
+	position: relative;
+	top: -5px;
+}
+
+.room-status {
+	position: absolute;
+	width: 100px;
+	left: 160px;
+	/* food at 150, water at 150, cats either 1st or last row */
+}
+
+.build-buttons {
+	position: absolute;
+	top: 75px;
+	left: 0px;
+}
+
+.manage-buttons {
+	position: absolute;
+	top: 75px;
+	left: 150px;
 }
 
 .room-button:hover {
