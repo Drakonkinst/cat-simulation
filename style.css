@@ -521,7 +521,8 @@ body.noMask #description {
 .room-status {
 	position: absolute;
 	width: 100px;
-	left: 175px;
+	left: 160px;
+	/* food at 150, water at 150, cats either 1st or last row */
 }
 
 .build-buttons {
