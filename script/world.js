@@ -363,10 +363,14 @@ var World = {
     nextWeather: function(hideAnnouncement) {
         var possibilities = World.weather[World.currentWeather].causes;
         var nextWeather = chooseWeighted(possibilities, "weight");
-        if(!isUndefined(possibilities[nextWeather].notification) && !hideAnnouncement) {
+        var notification = possibilities[nextWeather].notification
+
+        //play notification if the weather changes
+        if(!isUndefined(notification) && !hideAnnouncement) {
             Logger.log("Changed weather to " + nextWeather);
-            Notifications.notify(possibilities[nextWeather].notification);
+            Notifications.notify(notification);
         }
+
         World.currentWeather = nextWeather;
 
         //schedule next update
