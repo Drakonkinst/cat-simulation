@@ -115,7 +115,7 @@ Room.prototype = {
             if(isUndefined(buildButton) && Game.hasItem(building)) {
                 //create build button if one doesn't exist
                 var location = buildContainer.get();
-                var buildButton = new Button({
+                buildButton = new Button({
                     id: this.id + "_build_" + building,
                     text: building,
                     width: "80px",
@@ -124,7 +124,7 @@ Room.prototype = {
                     }
                 });
 
-            buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+                buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
             } else {
                 //notify if max buildings is reached
                 if(max && !buildButton.get().hasClass("disabled")) {
@@ -154,8 +154,8 @@ Room.prototype = {
         var location = manageContainer.get();
         var room = this;
 
-        if(!roomButtons.find(".manage_light-toggle").length) {
-            var room = this;
+        //light switch
+        if(World.day > 1 && isUndefined(Buttons.getButton(this.id + "_manage_light-toggle"))) {
             var lightButton = new Button({
                 id: this.id + "_manage_light-toggle",
                 text: "lights off",
@@ -164,12 +164,12 @@ Room.prototype = {
                     room.toggleLight();
                 }
             });
-            lightButton.get().addClass("manage_light-toggle").css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            lightButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
         }
 
-        if(!isUndefined(this.food) && !roomButtons.find(".manage_refill-food").length) {
-            var room = this;
-            var refillFoodButton = new Button({
+        //refill food
+        if(!isUndefined(this.food) && isUndefined(Buttons.getButton(this.id + "_manage_refill-food"))) {
+            var foodButton = new Button({
                 id: this.id + "_manage_refill-food",
                 text: "refill food",
                 cooldown: 4000,
@@ -177,7 +177,7 @@ Room.prototype = {
                     return room.refillFood();
                 }
             });
-            refillFoodButton.get().addClass("manage_refill-food").css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            foodButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
         }
 
         //initialize manage container
@@ -250,8 +250,5 @@ Room.prototype = {
         this.updateFood();
         Game.updateEquipment();
         return true;
-    },
-    update: function() {
-
     }
 };
