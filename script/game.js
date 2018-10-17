@@ -221,7 +221,7 @@ var Game = {
             Game.updateRow(item, Game.equipment[item], location.get());
         }
 
-        //initialize Containers
+        //initialize containers
         if(inventory.needsAppend && inventory.exists()) {
             inventory.create().appendTo(equipment.get());
         }
@@ -477,9 +477,9 @@ var Game = {
     }
 };
 
+//Let's do this!
 $(document).ready(function() {
-    //Let's do this!
-    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?"]));
+    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!"]));
     try {
         Game.Launch();
     } catch(err) {

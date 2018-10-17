@@ -192,17 +192,21 @@ Room.prototype = {
         var foodStores = Game.equipment["cat food"] || 0;
 
         if(foodDifference === 0) {
-            Notifications.notify("food bowl already full");
+            //bowl is already full, exit early
+            Notifications.notify("bowl's already full of kibble");
             return false;
         } else if(foodStores <= 0) {
+            //not enough cat food, exit early
             Notifications.notify("not enough cat food");
             return false;
         } else if(foodStores - foodDifference >= 0) {
-            Notifications.notify("food bowl refilled");
+            //successfully topped off
+            Notifications.notify("food topped off");
             Game.equipment["cat food"] -= foodDifference;
             this.food.level = this.food.maximum;
         } else /*if(foodStores - foodDifference) < 0)*/{
-            Notifications.notify("not enough food to refill to maximum");
+            //not enough to fill bowl completely
+            Notifications.notify("filled the bowl with the last of the stock");
             Game.equipment["cat food"] = 0;
             this.food.level += foodStores;
         }

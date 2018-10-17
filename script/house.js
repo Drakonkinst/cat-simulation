@@ -16,9 +16,11 @@ var House = {
     //info table of all buildings
     Buildings: {
         "food bowl": {
-            //max in house vs max per room?
-            buildMsg: "",
-            maxMsg: "more bowls won't help now",
+            //should space be based on single buildings or overall? maybe
+            //assign weight to each structure and have each room cap..
+            //for later.
+            buildMsg: "very shiny bowls, needs food though",
+            maxMsg: "no more space for more bowls",
             maximum: 5,
             onBuild: function(room) {
                 if(isUndefined(room.food)) {
