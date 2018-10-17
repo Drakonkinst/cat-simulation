@@ -328,12 +328,13 @@ var House = {
                 id: "bedroom",
                 title: "Bedroom",
                 onLoad: function() {
-                    new Button({
+                    var sleepButton = new Button({
                         id: "sleep",
                         text: "go to sleep",
                         cooldown: 90000,
                         onClick: World.sleep
                     }).appendTo(this.panel.find(".room-buttons"));
+                    sleepButton.startCooldown();
                 }
             }),
             "hallway": new Room({
