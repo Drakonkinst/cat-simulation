@@ -43,10 +43,10 @@ var House = {
             scenes: {
                 "start": {
                     text: [
-                        "scratching noises can be heard through the door.",
-                        "something's out there."
+                        "knocking sounds can be heard through the door.",
+                        "someone's out there."
                     ],
-                    notification: "something's scratching outside",
+                    notification: "someone's knocking outside",
                     blink: true,
                     buttons: {
                         "investigate": {
@@ -82,7 +82,65 @@ var House = {
                     },
                     buttons: {
                         "leave": {
-                            text: "close the door",
+                            text: "go back inside",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            //A Disturbance - Lost Stuff
+            title: "A Disturbance",
+            isAvailable: function() {
+                return House.cats.length > 0 && Game.hasItem("cat food") && Game.activeModule == House;  //later should require pantry
+            },
+            scenes: {
+                "start": {
+                    text: [
+                        "scratching noises can be heard in the pantry.",
+                        "something's in there."
+                    ],
+                    notification: "something's in the pantry",
+                    blink: true,
+                    buttons: {
+                        "investigate": {
+                            text: "investigate",
+                            nextScene: {"rats": 1, "cat": 2}
+                        },
+                        "ignore": {
+                            text: "do nothing",
+                            nextScene: "end"
+                        }
+                    }
+                },
+                "cat": function() {
+                    var cat = chooseRandom(House.cats);
+                    return {
+                        text: [
+                            cat.name + " pokes out " + cat.genderPronoun("his", "her") + " head from behind a tub of food.",
+                            "nothing to see here."
+                        ],
+                        buttons: {
+                            "leave": {
+                                text: "leave",
+                                nextScene: "end"
+                            }
+                        }
+                    };
+                },
+                "rats": {
+                    text: [
+                        //"spilled kibble is strewn across the floor.",
+                        "a corner of one of the food bags is covered in tiny nibbles.",
+                        "some of the food is missing."
+                    ],
+                    onLoad: function() {
+                        Game.addItem("cat food", -10);
+                    },
+                    buttons: {
+                        "leave": {
+                            text: "leave",
                             nextScene: "end"
                         }
                     }
