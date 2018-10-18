@@ -21,7 +21,6 @@ function Cat(properties) {
 
     this.breed = properties.breed || chooseRandom(keysAsList(Cats.BREEDS));
     
-
     //gets breed info
     var breed = Cats.BREEDS[this.breed];
 
@@ -44,8 +43,51 @@ function Cat(properties) {
 
     //sets random hunger upon spawn
     this.hunger = Math.floor(randNum(0, 21));
+    this.morale = 10;
+    this.energy = 0//Cats.MAX_ENERGY;
+
+    this.isSleeping = false;
+
+    var cat = this;
+    this.wakeUpTask = new Task(cat.name + " - wake up", function() {
+        cat.wakeUp();
+    }, 1, 5);
 }
 Cat.prototype = {
+    update: function() {
+        Logger.log("Updating " + this.name);
+
+        if(this.isSleeping) {
+            return;
+        }
+
+        if(chance(0.4) && this.energy > 0) {
+            this.energy--;
+        }
+
+        if(this.energy <= 0) {
+            this.startSleep();
+            return;
+        }
+
+        if(chance(0.01)) {
+            this.meow();
+        }
+    },
+
+    startSleep: function() {
+        this.isSleeping = true;
+        Notifications.notify(this.name + " curls up for a nap", House, true);
+        this.wakeUpTask.scheduleNext();
+    },
+
+    wakeUp: function() {
+        this.isSleeping = false;
+        this.energy = Cats.MAX_ENERGY;
+        this.hunger += Math.floor(randNum(1, 6));
+        Notifications.notify(this.name + " wakes up", House, true);
+    },
+
     greeting: function() {
         //based on morale - later
         //"doesn't seem to mind this place" - indifferent
@@ -109,6 +151,7 @@ Cat.prototype = {
 };
 
 var Cats = {
+    MAX_ENERGY: 20,
     DEFAULT_MALE_NAMES: [ "Garfield", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Edgar", "Sox", "Ollie", "Leo", "Snickers", "Charcoal", "Prince", "Toby", "Mikesch", "Buddy", "Romeo", "Loki", "Gavin", "Momo", "Illia", "Theodore", "Eliot", "Milo", "Max", "Monty" ],
     DEFAULT_FEMALE_NAMES: [ "Miso", "Tara", "Nala", "Mistie", "Misty", "Coco", "Tasha", "Raven", "Valencia", "Princess", "Cherry", "Chloe", "Felicia", "Olivia", "Emma", "Belle", "Luna", "Minerva", "Ellie", "Athena", "Artemis", "Poppy", "Venus"],
     DEFAULT_NEUTRAL_NAMES: [ "Lolcat", "Sesame", "Unagi", "Avocado", "Mango", "Oreo", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Lucky", "Mittens", "Angel", "Dakota", "Ginger", "Tippy", "Snickers", "Fish", "Smokey", "Muffin", "Fuzzy", "Nibbles", "Chaser" ],
