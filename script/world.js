@@ -280,7 +280,7 @@ var World = {
                         buttons: {
                             "adopt": {
                                 text: context.adopt,
-                                nextScene: {"adoptNamed": 2, "adoptNameless": 1}
+                                nextScene: {"adoptNamed": 6, "adoptNameless": 5}
                             },
                             "abandon": {
                                 text: "leave it",
@@ -408,7 +408,7 @@ var World = {
                 Game.keyLock = false;
                 $("#outer-slider").animate({opacity: 1}, 600, "linear");
                 //dream system needs improvements - either many messages of this style, or a randomizer with two clauses
-                Notifications.notify("dreamed of " + chooseRandom(["dark and stormy nights", "bright skies and lazy clouds", "a soft whisper and a warm embrace", "fish swimming across the sky", "a hunter stalking its prey", "a world covered in ash", "crimson mist and a wolf's howl", "a trident in the sea"]));
+                Notifications.notify("dreamed of " + chooseRandom(["dark and stormy nights", "bright skies and lazy clouds", "soft whispers and a warm embrace", "fish swimming across the sky", "a hunter stalking its prey", "a world covered in ash", "crimson mist and a wolf's howl", "a trident in the sea", "a better life"]));
                 World.greeting();
 
                 //update rooms so the lights on/off button shows - this should be changed

@@ -106,24 +106,29 @@ Room.prototype = {
     updateBuildButtons: function() {
         var roomButtons = this.panel.find(".room-buttons");
         var buildContainer = new Container(".build-buttons", "build:", roomButtons);
+        var location = buildContainer.get();
         
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
             var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
-            var buildButton = Buttons.getButton(this.id + "_build_" + building);
+            var roomName = this.id;
+            var buildButton = Buttons.getButton(roomName + "_build_" + building);
+            
 
             if(isUndefined(buildButton) && Game.hasItem(building)) {
                 //create build button if one doesn't exist
-                var location = buildContainer.get();
-                buildButton = new Button({
-                    id: this.id + "_build_" + building,
-                    text: building,
-                    width: "80px",
-                    onClick: function() {
-                        House.getCurrentRoom().build(building);
-                    }
-                });
-
+                //oh closure, I hate you
+                (function() {
+                    buildButton = new Button({
+                        id: roomName + "_build_" + building,
+                        text: building,
+                        width: "80px",
+                        onClick: function() {
+                            House.getCurrentRoom().build(building);
+                        }
+                    });
+                })();
+                
                 buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
             } else {
                 //notify if max buildings is reached

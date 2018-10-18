@@ -13,7 +13,6 @@ function Container(selector, title, context) {
         this.element = context.find(selector);
     }
        
-
     if(!this.element.length) {
         //element does not exist, create pseudoelement
         this.element = $("<div>").css("opacity", 0);

@@ -412,6 +412,8 @@ var Game = {
 
     /* ====== Game Initialization ====== */
     Init: function() {
+        Logger.log("Version is " + Game.getVersionString());
+
         /* Check Browser */
         if(!Game.browserValid()) {
             //window.location = //set to browser warning window
@@ -463,17 +465,18 @@ var Game = {
 
     /* ====== Prepare For Launch! ===== */
     Launch: function() {
-        Logger.log("Game initialized!");
-
+        var start = Game.now();
+        Logger.log("Game initializing...");
+        
         Game.Init();
         Game.travelTo(House);
         
-        //Game.addItem("lettuce", 16);
+        //tester
         Game.addItem("money", 9001);
         House.addCat();
-        //Game.addPerk("heartless");
-    
-        Logger.log("Version is " + Game.getVersionString());
+
+        var end = Game.now();
+        Logger.log("Game initialized! (took " + (end - start) + "ms)");
     }
 };
 
