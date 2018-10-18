@@ -37,8 +37,20 @@ var Outside = {
             type: "building",
             maximum: 100,
             //availableMsg: "get a container to hold the cat food.",
-            buyMsg: "more bowls means more food",
-            maxMsg: "more bowls won't help now",
+            buyMsg: "more food bowls means more food",
+            maxMsg: "more food bowls won't help now",
+            cost: function() {
+                return {
+                    "money": 4
+                };
+            }
+        },
+        "water bowl": {
+            type: "building",
+            maximum: 100,
+            //availableMsg: "water bowl available",
+            buyMsg: "cats love drinking out of bowls",
+            maxMsg: "drinking out of taps works too, you know?",
             cost: function() {
                 return {
                     "money": 4
