@@ -111,14 +111,13 @@ Room.prototype = {
         for(var building in House.Buildings) {
             var buildItem = House.Buildings[building];
             var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
-            var roomName = this.id;
-            var buildButton = Buttons.getButton(roomName + "_build_" + building);
+            var buildButton = Buttons.getButton(this.id + "_build_" + building);
             
 
             if(isUndefined(buildButton) && Game.hasItem(building)) {
                 //create build button if one doesn't exist
                 //oh closure, I hate you
-                (function() {
+                (function(roomName, building) {
                     buildButton = new Button({
                         id: roomName + "_build_" + building,
                         text: building,
@@ -127,7 +126,7 @@ Room.prototype = {
                             House.getCurrentRoom().build(building);
                         }
                     });
-                })();
+                })(this.id, building);
                 
                 buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
             } else {
