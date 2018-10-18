@@ -4,7 +4,6 @@
 var House = {
     name: "house",      //module id
 
-    newCats: null,      //cats that have not been introduced to the house
     cats: null,         //all cats in the house
 
     currentRoom: null,  //name of current room
@@ -160,20 +159,6 @@ var House = {
     onArrival: function(transitionDiff) {
         House.updateTitle();
 
-        //introduce new cats gradually
-        for(var i = 0; i < House.newCats.length; i++) {
-            //self-invoking function so the timeout will use consecutive values
-            (function() {
-                var cat = House.newCats[i];
-                Game.setTimeout(function() {
-                    if(Game.activeModule == House) {
-                        Notifications.notify(cat.name + " sniffs around, seems to like this place");
-                        House.newCats.splice(House.newCats.indexOf(cat), 1);
-                    }
-                }, randNum(500, 1000));
-            })();
-        }
-
         //moves main inventory to accomodate for house inventory display
         Game.moveEquipmentView($("#house"), transitionDiff);
     },
@@ -228,13 +213,7 @@ var House = {
         //creates a random cat if none is specified
         cat = cat || new Cat();
         
-        if(Game.activeModule == House) {
-            //introduces cat immediately
-            Notifications.notify(cat.name + " sniffs around, seems to like this place");
-        } else {
-            //adds cat to newCats so it can be introduced later
-            House.newCats.push(cat);
-        }
+        cat.greeting();
         
         //adds cat and updates everything
         House.cats.push(cat);
@@ -382,7 +361,6 @@ var House = {
         Game.updateSlider();
         House.travelTo("hallway");
 
-        House.newCats = [];
-        House.cats = []; //House.newCats.slice();
+        House.cats = [];
     }
 };

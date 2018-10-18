@@ -46,6 +46,12 @@ function Cat(properties) {
     this.hunger = Math.floor(randNum(0, 21));
 }
 Cat.prototype = {
+    greeting: function() {
+        //based on morale - later
+        //"doesn't seem to mind this place" - indifferent
+        Notifications.notify(this.name + " sniffs around, seems to like this place.", House);
+    },
+    
     meow: function(volume) {
         var loudness = volume || Math.floor(randNum(-4, 5));
         this.makeSound("meows", loudness, "quietly", "loudly");
