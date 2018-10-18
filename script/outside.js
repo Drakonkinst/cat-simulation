@@ -183,7 +183,7 @@ var Outside = {
             tooltip: new Tooltip().append($("<div>").text("you need to go to work.")),
             onClick: function() {
                 Notifications.notify("hard labor, but necessary");
-                Game.addItem("money", Math.floor(randNum(1, 7)));
+                Game.addItem("money", Math.floor(randNum(1, 3)));
                 Outside.updateBuyButtons();
             }
         }).appendTo("#outside-panel");

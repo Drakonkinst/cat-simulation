@@ -109,8 +109,8 @@ Cat.prototype = {
 };
 
 var Cats = {
-    DEFAULT_MALE_NAMES: [ "Garfield", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Edgar", "Sox", "Ollie", "Leo", "Snickers", "Charcoal", "Prince", "Toby", "Mikesch", "Buddy", "Romeo", "Loki", "Gavin", "Momo", "Illia", "Theodore", "Eliot", "Milo", "Max" ],
-    DEFAULT_FEMALE_NAMES: [ "Miso", "Tara", "Nala", "Mistie", "Misty", "Coco", "Tasha", "Raven", "Valencia", "Princess", "Cherry", "Chloe", "Felicia", "Olivia", "Emma", "Belle", "Luna", "Minerva", "Ellie", "Athena", "Artemis", "Poppy"],
+    DEFAULT_MALE_NAMES: [ "Garfield", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Edgar", "Sox", "Ollie", "Leo", "Snickers", "Charcoal", "Prince", "Toby", "Mikesch", "Buddy", "Romeo", "Loki", "Gavin", "Momo", "Illia", "Theodore", "Eliot", "Milo", "Max", "Monty" ],
+    DEFAULT_FEMALE_NAMES: [ "Miso", "Tara", "Nala", "Mistie", "Misty", "Coco", "Tasha", "Raven", "Valencia", "Princess", "Cherry", "Chloe", "Felicia", "Olivia", "Emma", "Belle", "Luna", "Minerva", "Ellie", "Athena", "Artemis", "Poppy", "Venus"],
     DEFAULT_NEUTRAL_NAMES: [ "Lolcat", "Sesame", "Unagi", "Avocado", "Mango", "Oreo", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Lucky", "Mittens", "Angel", "Dakota", "Ginger", "Tippy", "Snickers", "Fish", "Smokey", "Muffin", "Fuzzy", "Nibbles", "Chaser" ],
     //http://www.catbreedslist.com/all-cat-breeds/
     //secondary source - https://www.hillspet.com/cat-care/cat-breeds/

@@ -310,7 +310,7 @@ var House = {
                     var sleepButton = new Button({
                         id: "sleep",
                         text: "go to sleep",
-                        cooldown: 90000,
+                        cooldown: 120000,
                         onClick: World.sleep
                     }).appendTo(this.panel.find(".room-buttons"));
                     sleepButton.startCooldown();
