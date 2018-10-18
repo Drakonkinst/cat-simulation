@@ -101,17 +101,19 @@ var Outside = {
                         tooltip.append($("<div>").addClass("row_key").text(id)).append($("<div>").addClass("row_val").text(cost[id]));
                     }
 
-                    buyItem.button = new Button({
-                        id: "buy_" + item,
-                        text: item,
-                        width: "80px",
-                        tooltip: tooltip,
-                        onClick: function() {
-                            //Outside.buy(item);
-                            Outside.buy(this.id.substring(4));
-                        }
-                    });
-
+                    //closure is important
+                    (function(item) {
+                        buyItem.button = new Button({
+                            id: "buy_" + item,
+                            text: item,
+                            width: "80px",
+                            tooltip: tooltip,
+                            onClick: function() {
+                                Outside.buy(item);
+                            }
+                        });
+                    })(item);
+                    
                     buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
 
                     if(!isUndefined(buyItem.availableMsg)) {
