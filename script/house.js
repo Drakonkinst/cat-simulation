@@ -32,6 +32,21 @@ var House = {
                 room.food.maximum += 5;
                 room.updateFood();
             }
+        },
+        "water bowl": {
+            buildMsg: "new water bowl, but it looks dry",
+            maxMsg: "too many water bowls",
+            maximum: 5,
+            onBuild: function(room) {
+                if(isUndefined(room.water)) {
+                    room.water = {
+                        level: 0,
+                        maximum: 0
+                    };
+                }
+                room.water.maximum += 5;
+                room.updateWater();
+            }
         }
     },
 
