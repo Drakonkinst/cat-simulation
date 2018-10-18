@@ -180,6 +180,19 @@ Room.prototype = {
             foodButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
         }
 
+        //refill water
+        if(!isUndefined(this.water) && isUndefined(Buttons.getButton(this.id + "_manage_refill-water"))) {
+            var waterButton = new Button({
+                id: this.id + "_manage_refill-water",
+                text: "refill water",
+                cooldown: 4000,
+                onClick: function() {
+                    return room.refillWater();
+                }
+            });
+            waterButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+        }
+
         //initialize manage container
         if(manageContainer.needsAppend && manageContainer.exists()) {
             manageContainer.create().appendTo(roomButtons);
@@ -204,6 +217,26 @@ Room.prototype = {
 
         //update text
         foodEl.text("food: " + this.food.level + "/" + this.food.maximum);
+    },
+
+    //updates water status
+    updateWater: function() {
+        //exit early if this room doesn't support water
+        if(isUndefined(this.water)) {
+            return;
+        }
+
+        var status = this.panel.find(".room-status");
+        var waterEl = status.find(".water");
+
+        if(!waterEl.length) {
+            //create water status element
+            waterEl = $("<div>").addClass("water");
+            waterEl.appendTo(status);
+        }
+
+        //update text
+        waterEl.text("water: " + this.water.level + "/" + this.water.maximum);
     },
 
     //toggles light switch
@@ -248,6 +281,23 @@ Room.prototype = {
 
         //updates
         this.updateFood();
+        Game.updateEquipment();
+        return true;
+    },
+
+    //trying to refill water
+    refillWater: function() {
+        if(this.water.level == this.water.maximum) {
+            //water is already full
+            Notifications.notify("water is going to overflow!");
+            return false;
+        }
+        //refills water to max level
+        Notifications.notify("water is filled up.");
+        this.water.level = this.water.maximum;
+
+        //updates
+        this.updateWater();
         Game.updateEquipment();
         return true;
     }
