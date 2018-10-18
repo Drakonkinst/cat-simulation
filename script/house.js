@@ -231,7 +231,7 @@ var House = {
 
     //updates title based on number of cats in house
     updateTitle: function() {
-        var title;
+        var title = $("#location_house").text();
         if(this.cats.length === 0) {
             title = "A Dreary Room";
         } else if(this.cats.length === 1) {
