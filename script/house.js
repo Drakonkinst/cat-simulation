@@ -293,6 +293,12 @@ var House = {
         slider.width((slider.children().length * 700) + "px");
     },
 
+    tick: function() {
+        for(var k in House.cats) {
+            House.cats[k].update();
+        }
+    },
+
     Init: function() {
         this.tab = Game.addLocation("house", "A Lonely House", House);
         this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
@@ -360,6 +366,8 @@ var House = {
         //House.unlockRoom("dining-room", "Dining Room");
         Game.updateSlider();
         House.travelTo("hallway");
+
+        Game.setInterval(House.tick, 5000);
 
         House.cats = [];
     }
