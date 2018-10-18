@@ -428,7 +428,7 @@ var World = {
     },
 
     Init: function() {
-        World.WeatherTask = new Task("weather event", World.nextWeather, World.WEATHER_INTERVAL[0], World.WEATHER_INTERVAL[1]);
+        World.WeatherTask = new Task("weather", World.nextWeather, World.WEATHER_INTERVAL[0], World.WEATHER_INTERVAL[1]);
         
         //World.currentWeather = chooseRandom(keysAsList(World.weather));
         World.currentWeather = chooseRandom(["sunny", "cloudy", "snow"]);

@@ -349,7 +349,7 @@ var Events = {
         );
 
         //start random event task
-        Events.Task = new Task("random event", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
+        Events.Task = new Task("random", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
         Events.Task.scheduleNext();
     }
 };

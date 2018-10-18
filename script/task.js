@@ -25,7 +25,7 @@ Task.prototype = {
         if(Game.options.fastEvents) {
             interval /= 8;
         }
-        Logger.log("Next " + this.name + " scheduled in " + interval + " minutes");
+        Logger.log("Next " + this.name + " event scheduled in " + interval + " minutes");
         
         if(this.eventTimeout) {
             clearTimeout(this.eventTimeout);
