@@ -21,7 +21,6 @@ var Outside = {
         "cat food": {
             type: "resource",
             maximum: 1000,
-            //availableMsg: "get some food for your cats!",
             buyMsg: "cans of kibble to keep the hunger away",
             maxMsg: "pantry won't be able to hold any more",
             cost: function() {
@@ -33,10 +32,23 @@ var Outside = {
                 return 10;
             }
         },
+        "water": {
+            type: "resource",
+            maximum: 1000,
+            buyMsg: "water is good for you",
+            maxMsg: "too much water is bad for you",
+            cost: function() {
+                return {
+                    "money": 2
+                }
+            },
+            quantity: function() {
+                return 10;
+            }
+        },
         "food bowl": {
             type: "building",
             maximum: 100,
-            //availableMsg: "get a container to hold the cat food.",
             buyMsg: "more food bowls means more food",
             maxMsg: "more food bowls won't help now",
             cost: function() {
@@ -48,7 +60,6 @@ var Outside = {
         "water bowl": {
             type: "building",
             maximum: 100,
-            //availableMsg: "water bowl available",
             buyMsg: "cats love drinking out of bowls",
             maxMsg: "drinking out of taps works too, you know?",
             cost: function() {

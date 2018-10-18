@@ -127,6 +127,7 @@ Room.prototype = {
                         }
                     });
                 })(this.id, building);
+                //do this in order? prevItem system?
                 
                 buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
             } else {
@@ -289,16 +290,30 @@ Room.prototype = {
         return true;
     },
 
-    //trying to refill water
+    //attempt to refill water
     refillWater: function() {
-        if(this.water.level == this.water.maximum) {
-            //water is already full
-            Notifications.notify("water is going to overflow!");
+        var waterDifference = this.water.maximum - this.water.level;
+        var waterStores = Game.equipment["water"] || 0;
+
+        if(waterDifference === 0) {
+            //bowl is already full, exit early
+            Notifications.notify("bowl's already near overflowing");
             return false;
+        } else if(waterStores <= 0) {
+            //not enough water, exit early
+            Notifications.notify("not enough water");
+            return false;
+        } else if(waterStores - waterDifference >= 0) {
+            //successfully topped off
+            Notifications.notify("water replenished");
+            Game.equipment["water"] -= waterDifference;
+            this.water.level = this.water.maximum;
+        } else /*if(waterStores - waterDifference) < 0)*/{
+            //not enough to fill bowl completely
+            Notifications.notify("filled the bowl with the last of the stock");
+            Game.equipment["water"] = 0;
+            this.water.level += waterStores;
         }
-        //refills water to max level
-        Notifications.notify("water is filled up.");
-        this.water.level = this.water.maximum;
 
         //updates
         this.updateWater();
