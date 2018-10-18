@@ -49,8 +49,8 @@ var Outside = {
         "food bowl": {
             type: "building",
             maximum: 100,
-            buyMsg: "more food bowls means more food",
-            maxMsg: "more food bowls won't help now",
+            buyMsg: "more bowls means more food",
+            maxMsg: "more bowls won't help now",
             cost: function() {
                 return {
                     "money": 4
