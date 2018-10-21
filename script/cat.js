@@ -77,15 +77,15 @@ Cat.prototype = {
 
     startSleep: function() {
         this.isSleeping = true;
-        Notifications.notify(this.name + " curls up for a nap", House, true);
+        this.action("curls up for a nap");
         this.wakeUpTask.scheduleNext();
     },
 
     wakeUp: function() {
         this.isSleeping = false;
         this.energy = Cats.MAX_ENERGY;
-        Notifications.notify(this.name + " wakes up", House, true);
         this.hunger += randInt(1, 6);
+        this.action("wakes up");
     },
 
     greeting: function() {
@@ -106,16 +106,15 @@ Cat.prototype = {
 
     makeSound: function(sound, loudness, softStr, loudStr) {
         const intensities = [" somewhat ", " ", " rather ", " very "];
-        var base = this.name + " " + sound;
         var suffix = loudStr;
 
         if(loudness < -4 || loudness > 4) {
-            Notifications.notify(this.name + " makes a strange sound");
+            this.action("makes a strange sound");
             return;
         }
 
         if(loudness == 0) {
-            Notifications.notify(base);
+            this.action(sound);
             return;
         }
         
@@ -123,7 +122,7 @@ Cat.prototype = {
             suffix = softStr;
         }
 
-        Notifications.notify(base + intensities[Math.abs(loudness) - 1] + suffix);
+        this.action(sound + intensities[Math.abs(loudness) - 1] + suffix);
     },
 
     eatFood: function(room) {
@@ -136,11 +135,11 @@ Cat.prototype = {
         } else if(foodLevel - this.hunger <= 0) {
             this.hunger -= foodLevel;
             room.food.level = 0;
-            Notifications.notify(this.name + " scarfs down the last of the kibble");
+            this.action("scarfs down the last of the kibble");
         } else {
             room.food.level -= this.hunger;
             this.hunger = 0;
-            Notifications.notify(this.name + " eats some food");
+            this.action("eats some food");
         }
         room.updateFood();
     },
