@@ -164,7 +164,6 @@ Cat.prototype = {
 
     addMorale: function(points) {
         this.moralePoints += points;
-        Logger.log("Set morale to " + this.moralePoints);
 
         if(this.moralePoints >= 100 && this.morale < Cats.MoraleEnum.morales.length - 1) {
             this.morale++;
