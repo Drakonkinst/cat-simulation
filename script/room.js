@@ -19,7 +19,7 @@ function Room(properties) {
     };*/
     this.buildings = {};
 
-    //this.cats = [];                 //section of House.cats that are currently in this room
+    this.cats = [];                 //section of House.cats that are currently in this room
 
     //stores
     //this.food = null;
@@ -60,6 +60,12 @@ Room.prototype = {
         this.onLoad();
         this.updateBuildButtons();
         this.updateFood();
+    },
+
+    tick: function() {
+        for(var k in this.cats) {
+            this.cats[k].tick(this);
+        }
     },
 
     //places a building in this room
