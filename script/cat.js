@@ -70,6 +70,10 @@ Cat.prototype = {
         this.energy -= 0.1;
         this.hunger += 0.05;
 
+        if(this.hunger < 3) {
+            this.addMorale(3 - Math.floor(this.hunger));
+        }
+
         if(this.energy <= 0) {
             this.startSleep();
             return;
@@ -165,12 +169,19 @@ Cat.prototype = {
     addMorale: function(points) {
         this.moralePoints += points;
 
-        if(this.moralePoints >= 100 && this.morale < Cats.MoraleEnum.morales.length - 1) {
-            this.morale++;
-            this.moralePoints = 20;
-        } else if(this.moralePoints < 0 && this.morale > 0) {
-            this.morale--;
-            this.moralePoints = 80;
+        if(this.moralePoints >= 100) {
+            if(this.morale < Cats.MoraleEnum.morales.length - 1) {
+                this.morale++;
+                this.moralePoints = 20;
+            } else {
+                this.moralePoints = 100;
+            }
+        } else if(this.moralePoints < 0) {
+            if(this.morale > 0) {
+                this.morale--;
+                this.moralePoints = 80;
+            }
+            this.moralePoints = 0;
         }
     },
 
