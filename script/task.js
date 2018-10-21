@@ -18,7 +18,7 @@ function Task(name, task, minInterval, maxInterval) {
 Task.prototype = {
     //schedules the next task, usually called at the end of the task function
     scheduleNext: function(scale) {
-        var interval = Math.floor(randNum(this.minInterval, this.maxInterval));
+        var interval = randInt(this.minInterval, this.maxInterval);
         if(scale > 0) {
             interval *= scale;
         }

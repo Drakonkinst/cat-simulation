@@ -34,7 +34,7 @@ function Cat(properties) {
 
     //set weight based on gender and breed
     var weightRange = this.isFemale ? breed.weight.f : breed.weight.m;
-    this.weight = properties.weight || Math.floor(randNum(weightRange[0], weightRange[1]));
+    this.weight = properties.weight || randInt(weightRange[0], weightRange[1]);
     
     //set color, coat, and eyeColor based on breed
     this.color = chooseRandom(breed.colors);
@@ -42,9 +42,9 @@ function Cat(properties) {
     this.eyeColor = chooseRandom(breed.eyeColors);
 
     //sets random hunger upon spawn
-    this.hunger = Math.floor(randNum(0, 21));
-    this.morale = 10;
     this.energy = 0//Cats.MAX_ENERGY;
+    this.hunger = randInt(0, 11);
+    this.morale = randInt(0, Cats.MoraleEnum.morales.length + 1);
 
     this.isSleeping = false;
 
@@ -84,8 +84,8 @@ Cat.prototype = {
     wakeUp: function() {
         this.isSleeping = false;
         this.energy = Cats.MAX_ENERGY;
-        this.hunger += Math.floor(randNum(1, 6));
         Notifications.notify(this.name + " wakes up", House, true);
+        this.hunger += randInt(1, 6);
     },
 
     greeting: function() {
@@ -95,12 +95,12 @@ Cat.prototype = {
     },
     
     meow: function(volume) {
-        var loudness = volume || Math.floor(randNum(-4, 5));
+        var loudness = volume || randInt(-4, 5);
         this.makeSound("meows", loudness, "quietly", "loudly");
     },
 
     purr: function(volume) {
-        var loudness = volume || Math.floor(randNum(-4, 5));
+        var loudness = volume || randInt(-4, 5);
         this.makeSound("purrs", loudness, "softly", "loudly");
     },
 

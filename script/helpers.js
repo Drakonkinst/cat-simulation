@@ -4,10 +4,16 @@
 
 /*
  * Returns a number between min and max, non-inclusive.
- * For integers, just do Math.floor(randNum(min, max))
  * */
 function randNum(min, max) {
     return Math.random() * (max - min) + min;
+}
+
+/*
+ * Returns an integer between min and max, not including max
+ * */
+function randInt(min, max) {
+    return Math.floor(randNum(min, max));
 }
 
 //returns a randomly selected item from an array
