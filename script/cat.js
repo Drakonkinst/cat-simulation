@@ -72,6 +72,11 @@ Cat.prototype = {
 
         if(chance(0.01)) {
             this.meow();
+        } else if(chance(0.01)) {
+            this.purr();
+        } else if(chance(0.05) && this.morale < 3) {
+            this.hiss();
+        }
         }
     },
 
@@ -102,6 +107,11 @@ Cat.prototype = {
     purr: function(volume) {
         var loudness = volume || randInt(-4, 5);
         this.makeSound("purrs", loudness, "softly", "loudly");
+    },
+
+    hiss: function(volume) {
+        var loudness = volume || randInt(-4, 5);
+        this.makeSound("hisses", loudness, "quietly", "loudly");
     },
 
     makeSound: function(sound, loudness, softStr, loudStr) {
