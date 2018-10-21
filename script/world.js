@@ -7,7 +7,7 @@ var World = {
     WEATHER_INTERVAL: [5, 10],  //possible interval between weather updates, in minutes
 
     currentWeather: null,       //name of current weather
-    day: 1,                     //current day, increments every time the player sleeps
+    day: 0,                     //current day, increments every time the player sleeps
     catsAbandoned: 0,           //statistic tracking how many cats you have refused to take in :(
     
     /*
@@ -404,12 +404,11 @@ var World = {
 
             //come back after a time delay
             Game.setTimeout(function() {
-                World.day++;
                 Game.keyLock = false;
                 $("#outer-slider").animate({opacity: 1}, 600, "linear");
                 //dream system needs improvements - either many messages of this style, or a randomizer with two clauses
                 Notifications.notify("dreamed of " + chooseRandom(["dark and stormy nights", "bright skies and lazy clouds", "soft whispers and a warm embrace", "fish swimming across the sky", "a hunter stalking its prey", "a world covered in ash", "crimson mist and a wolf's howl", "a trident in the sea", "a better life"]));
-                World.greeting();
+                World.nextDay();
 
                 //update rooms so the lights on/off button shows - this should be changed
                 for(var k in House.rooms) {
@@ -422,7 +421,8 @@ var World = {
     },
 
     //called at the start of a new day
-    greeting: function() {
+    nextDay: function() {
+        World.day++;
         Notifications.notify(World.weather[World.currentWeather].greeting);
         $("#day-notify").text("day " + World.day + ".").css("opacity", 1).animate({opacity: 0}, 3000, "linear");
     },
@@ -433,6 +433,6 @@ var World = {
         //World.currentWeather = chooseRandom(keysAsList(World.weather));
         World.currentWeather = chooseRandom(["sunny", "cloudy", "snow"]);
         World.WeatherTask.scheduleNext();
-        World.greeting();
+        World.nextDay();
     }
 };
