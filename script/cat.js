@@ -49,7 +49,7 @@ function Cat(properties) {
     this.isSleeping = false;
 
     var cat = this;
-    this.wakeUpTask = new Task(cat.name + " - wake up", function() {
+    this.wakeUpTask = new Task("[" + cat.name + " - wake up]", function() {
         cat.wakeUp();
     }, 1, 5);
 }
