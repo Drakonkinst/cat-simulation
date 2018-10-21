@@ -42,11 +42,14 @@ function Cat(properties) {
     this.eyeColor = chooseRandom(breed.eyeColors);
 
     //sets random hunger upon spawn
-    this.energy = 0//Cats.MAX_ENERGY;
     this.hunger = randInt(0, 11);
     this.morale = randInt(0, Cats.MoraleEnum.morales.length + 1);
+    this.moralePoints = 50;
+    //points until next morale drop - things like petting/such should be increasingly less effective
+    this.energy = Cats.MAX_ENERGY;
 
     this.isSleeping = false;
+    this.room = null;
 
     var cat = this;
     this.wakeUpTask = new Task("[" + cat.name + " - wake up]", function() {
@@ -60,9 +63,12 @@ Cat.prototype = {
             return;
         }
 
-        if(chance(0.4) && this.energy > 0) {
-            this.energy--;
+        if(chance(0.005) && this.leaveRoom()) {
+            return;
         }
+
+        this.energy -= 0.1;
+        this.hunger += 0.05;
 
         if(this.energy <= 0) {
             this.startSleep();
@@ -76,6 +82,28 @@ Cat.prototype = {
         } else if(chance(0.05) && this.morale < 3) {
             this.hiss();
         }
+
+
+        if(!isUndefined(this.room.food)) {
+            if(this.room.food.level > 0 && this.hunger >= 3) {
+                if(chance(0.35)) {
+                    this.eatFood(this.room);
+                }
+            } else if(this.hunger >= 6 && chance(0.05)) {
+                this.action("looks at the empty food bowl despondently");
+                this.addMorale(-5);
+            }
+        } else if(this.hunger >= 10 && chance(0.85)) {
+            this.addMorale(5 - this.hunger);
+            if(this.leaveRoom(this.room)) {
+                return;
+            }
+        }
+    },
+
+    nextDay: function() {
+        if(this.morale == 0 && chance(0.9)) {
+            this.runAway();
         }
     },
 
@@ -90,12 +118,89 @@ Cat.prototype = {
         this.energy = Cats.MAX_ENERGY;
         this.hunger += randInt(1, 6);
         this.action("wakes up");
+        this.addMorale(20);
+    },
+
+    leaveRoom: function() {
+        var index = House.unlockedRooms.indexOf(this.room.id);
+        var nextIndex;
+
+        do {
+            nextIndex = randInt(0, House.unlockedRooms.length);
+        }
+        while(index == nextIndex);
+
+        var nextRoom = House.rooms[House.unlockedRooms[nextIndex]];
+        this.room.cats.splice(this.room.cats.indexOf(this), 1);
+        nextRoom.cats.push(this);
+        this.room = nextRoom;
+        return nextIndex > index;
+    },
+
+    runAway: function() {
+        this.room.cats.splice(this.room.cats.indexOf(this), 1);
+        House.cats.splice(House.cats.indexOf(this), 1);
+        Game.addItem("cat", -1);
+        Events.startEvent({
+            title: "A Disappearance",
+            scenes: {
+                "start": {
+                    text: [
+                        this.name + " disappeared in the night.",
+                        "doesn't seem likely " + this.genderPronoun("he", "she") + "'ll return."
+                    ],
+                    notification: this.name + " ran away last night",
+                    blink: true,
+                    buttons: {
+                        "continue": {
+                            text: "move on",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    addMorale: function(points) {
+        this.moralePoints += points;
+        Logger.log("Set morale to " + this.moralePoints);
+
+        if(this.moralePoints >= 100 && this.morale < Cats.MoraleEnum.morales.length - 1) {
+            this.morale++;
+            this.moralePoints = 20;
+        } else if(this.moralePoints < 0 && this.morale > 1) {
+            this.morale--;
+            this.moralePoints = 80;
+        }
+    },
+
+    addEnergy: function(points) {
+        if(this.energy + points > Cats.MAX_ENERGY) {
+            this.energy = Cats.MAX_ENERGY;
+        } else if(this.energy + points >= 0) {
+            this.energy += points;
+        }
     },
 
     greeting: function() {
-        //based on morale - later
-        //"doesn't seem to mind this place" - indifferent
-        Notifications.notify(this.name + " sniffs around, seems to like this place.", House);
+        var message;
+        if(this.morale > 3) {
+            message = "seems to like this place";
+        } else if(this.morale < 3) {
+            if(House.cats.length > 1) {
+                message = "watches the other cats warily";
+            } else {
+                message = "doesn't seem impressed";
+            }
+        } else {
+            message = "doesn't seem to mind this place";
+        }
+        Notifications.notify(this.name + " sniffs around, " + message, House);
+        var hallway = House.rooms["hallway"];
+        hallway.cats.push(this);
+        this.room = hallway;
+
     },
     
     meow: function(volume) {
@@ -134,23 +239,34 @@ Cat.prototype = {
         this.action(sound + intensities[Math.abs(loudness) - 1] + suffix);
     },
 
-    eatFood: function(room) {
-        if (this.hunger === 0) {
-            return;
-        }
-        var foodLevel = room.food.level;
-        if(foodLevel <= 0) {
-            Notifications.notify(this.name + " looks at the empty food bowl despondently");
-        } else if(foodLevel - this.hunger <= 0) {
+    //attempt to eat food in the current room
+    eatFood: function() {
+        var foodLevel = this.room.food.level;
+        var hungerInt = Math.floor(this.hunger);
+        
+        if(foodLevel - hungerInt <= 0) {
             this.hunger -= foodLevel;
-            room.food.level = 0;
+            this.room.food.level = 0;
+            this.addMorale(7);
             this.action("scarfs down the last of the kibble");
         } else {
-            room.food.level -= this.hunger;
-            this.hunger = 0;
+            this.room.food.level -= hungerInt;
+            this.hunger -= hungerInt;
+            this.addMorale(10);
             this.action("eats some food");
         }
-        room.updateFood();
+        this.room.updateFood();
+        this.addEnergy(3);
+    },
+
+    action: function(actionMsg, noName) {
+        if(!noName) {
+            actionMsg = this.name + " " + actionMsg;
+        }
+
+        if(House.currentRoom == this.room.id) {
+            Notifications.notify(actionMsg, House, true);
+        }
     },
 
     genderPronoun: function(male, female) {
@@ -214,6 +330,19 @@ var Cats = {
             },
             lifespan: [12, 14]
         }
+    },
+
+    MoraleEnum: {
+        morales: ["depressed", "very unhappy", "unhappy", "indifferent", "happy", "very happy", "content"],
+        fromInt: function(value) {
+			if(value < 0) {
+                return this.morales[0];
+            }
+            if(value >= this.morales.length) {
+                return this.morales[this.morales.length - 1];
+            }
+            return this.morales[value];
+		}
     },
 
     uniqueName: function(catName) {
