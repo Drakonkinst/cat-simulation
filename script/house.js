@@ -317,6 +317,12 @@ var House = {
         Logger.log("Update took " + (end - start) + "ms");
     },
 
+    nextDay: function() {
+        for(var k in House.cats) {
+            House.cats[k].nextDay();
+        }
+    },
+
     Init: function() {
         this.tab = Game.addLocation("house", "A Lonely House", House);
         this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
