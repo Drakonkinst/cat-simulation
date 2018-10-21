@@ -168,7 +168,7 @@ Cat.prototype = {
         if(this.moralePoints >= 100 && this.morale < Cats.MoraleEnum.morales.length - 1) {
             this.morale++;
             this.moralePoints = 20;
-        } else if(this.moralePoints < 0 && this.morale > 1) {
+        } else if(this.moralePoints < 0 && this.morale > 0) {
             this.morale--;
             this.moralePoints = 80;
         }
