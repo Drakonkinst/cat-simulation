@@ -309,9 +309,12 @@ var House = {
     },
 
     tick: function() {
-        for(var k in House.cats) {
-            House.cats[k].update();
+        var start = Game.now();
+        for(var k in House.rooms) {
+            House.rooms[k].tick();
         }
+        var end = Game.now();
+        Logger.log("Update took " + (end - start) + "ms");
     },
 
     Init: function() {

@@ -54,8 +54,7 @@ function Cat(properties) {
     }, 1, 5);
 }
 Cat.prototype = {
-    update: function() {
-        Logger.log("Updating " + this.name);
+    tick: function() {
 
         if(this.isSleeping) {
             return;
