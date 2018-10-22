@@ -282,15 +282,15 @@ div.button.disabled:hover {
 	bottom: 30px;
 }
 
-*:hover > div.tooltip {
+*:hover > .tooltip {
 	display: block;
 }
 
-div.tooltip:hover {
+.tooltip:hover {
 	display: none !important;
 }
 
-.disabled:hover > div.tooltip, .button.free:hover > div.tooltip {
+.disabled:hover > .tooltip, .button.free:hover > .tooltip {
 	display: none;
 }
 
@@ -518,13 +518,6 @@ body.noMask #description {
 	top: -5px;
 }
 
-.room-status {
-	position: absolute;
-	width: 100px;
-	left: 160px;
-	/* food at 150, water at 150, cats either 1st or last row */
-}
-
 .build-buttons {
 	position: absolute;
 	top: 75px;
@@ -550,6 +543,38 @@ body.noMask #description {
 .room-button.selected, .room-button.selected:hover {
 	cursor: default;
 	text-decoration: underline;
+}
+
+/* Room Status */
+.room-status {
+	position: absolute;
+	width: 300px;
+	left: 160px;
+}
+
+.room-upper-status {
+	height: 18px;
+}
+
+.room-upper-status div {
+	float: left;
+	margin-right: 15px;
+}
+
+.cat-icon {
+	position: relative;
+	margin-left: 5px;
+	cursor: pointer;
+}
+
+.cat-icon:hover {
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+.cat-icon .tooltip {
+	font-family: 'Times New Roman', Times, serif;
+	font-weight: 400;
 }
 
 /* Outside */

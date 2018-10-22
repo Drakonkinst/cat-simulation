@@ -135,14 +135,14 @@ Cat.prototype = {
         while(index == nextIndex);
 
         var nextRoom = House.rooms[House.unlockedRooms[nextIndex]];
-        this.room.cats.splice(this.room.cats.indexOf(this), 1);
-        nextRoom.cats.push(this);
-        this.room = nextRoom;
+        
+        this.room.removeCat(this);
+        nextRoom.addCat(this);
         return nextIndex > index;
     },
 
     runAway: function() {
-        this.room.cats.splice(this.room.cats.indexOf(this), 1);
+        this.room.removeCat(this);
         House.cats.splice(House.cats.indexOf(this), 1);
         Game.addItem("cat", -1);
         Events.startEvent({
@@ -207,10 +207,6 @@ Cat.prototype = {
             message = "doesn't seem to mind this place";
         }
         Notifications.notify(this.name + " sniffs around, " + message, House);
-        var hallway = House.rooms["hallway"];
-        hallway.cats.push(this);
-        this.room = hallway;
-
     },
     
     meow: function(volume) {

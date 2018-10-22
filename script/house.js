@@ -233,6 +233,7 @@ var House = {
         //adds cat and updates everything
         House.cats.push(cat);
         House.updateTitle();
+        House.rooms["hallway"].addCat(cat);
         Game.addItem("cat", 1);
 
         //triggers Outside panel after a delay - this will be changed eventually

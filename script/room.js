@@ -22,7 +22,8 @@ function Room(properties) {
     this.cats = [];                 //section of House.cats that are currently in this room
 
     //stores
-    //this.food = null;
+    this.food = null;
+    this.water = null;
     this.lightsOn = true;
 
     this.onLoad = properties.onLoad || function() {};
@@ -40,7 +41,14 @@ function Room(properties) {
     
     //create panel element
     this.panel = $("<div>").attr("id", "room_" + this.id).addClass("room");
-    $("<div>").addClass("room-status").appendTo(this.panel);
+
+    var roomStatus = $("<div>").addClass("room-status").appendTo(this.panel);
+    var upperStatus = $("<div>").addClass("room-upper-status").appendTo(roomStatus);
+    $("<div>").addClass("food-status").appendTo(upperStatus);
+    $("<div>").addClass("water-status").appendTo(upperStatus);
+    $("<div>").addClass("litter-box-status").appendTo(upperStatus);
+    $("<div>").addClass("cat-list").append($("<span>").text("cats:")).append($("<span>").addClass("room-cats")).appendTo(roomStatus);
+
     $("<div>").addClass("room-buttons").appendTo(this.panel);
 }
 Room.prototype = {
@@ -65,6 +73,26 @@ Room.prototype = {
     tick: function() {
         for(var k in this.cats) {
             this.cats[k].tick(this);
+        }
+    addCat: function(cat) {
+        cat.room = this;
+        this.cats.push(cat);
+        var catList = this.panel.find(".room-cats");
+        var catIcon = $("<span>").addClass("cat-icon").text("@");
+        var nameTooltip = new Tooltip("bottom right").append($("<div>").text(cat.name));
+        nameTooltip.appendTo(catIcon);
+
+        catList.append($("<span>").attr("id", "cat-"+cat.name).addClass("cat-icon-container").append(catIcon).css("opacity", 0).animate({opacity: 1}, 200, "linear"));
+    },
+
+    removeCat: function(cat) {
+        this.cats.splice(this.cats.indexOf(cat), 1);
+        var catIconContainer = this.panel.find($("#cat-" + cat.name));
+        if(catIconContainer.length) {
+            //smooth sliding animation later? only needed for removal
+            catIconContainer.animate({opacity: 0}, 200, "linear", function() {
+                this.remove();
+            })
         }
     },
 
@@ -217,17 +245,10 @@ Room.prototype = {
             return;
         }
 
-        var status = this.panel.find(".room-status");
-        var foodEl = status.find(".food");
-
-        if(!foodEl.length) {
-            //create food status element
-            foodEl = $("<div>").addClass("food");
-            foodEl.appendTo(status);
-        }
+        var foodStatus = this.panel.find(".food-status");
 
         //update text
-        foodEl.text("food: " + this.food.level + "/" + this.food.maximum);
+        foodStatus.text("food: " + this.food.level + "/" + this.food.maximum);
     },
 
     //updates water status
@@ -237,17 +258,12 @@ Room.prototype = {
             return;
         }
 
-        var status = this.panel.find(".room-status");
-        var waterEl = status.find(".water");
-
-        if(!waterEl.length) {
-            //create water status element
-            waterEl = $("<div>").addClass("water");
-            waterEl.appendTo(status);
-        }
+        var waterStatus = this.panel.find(".water-status");
 
         //update text
-        waterEl.text("water: " + this.water.level + "/" + this.water.maximum);
+        waterStatus.text("water: " + this.water.level + "/" + this.water.maximum);
+    },
+
     },
 
     //toggles light switch
