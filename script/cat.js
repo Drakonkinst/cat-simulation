@@ -43,6 +43,8 @@ function Cat(properties) {
 
     //sets random hunger upon spawn
     this.hunger = randInt(0, 11);
+    this.thirst = randInt(0, 11);
+    this.morale = randInt(0, Cats.MoraleEnum.morales.length);
     this.moralePoints = 50;
     //points until next morale drop - things like petting/such should be increasingly less effective
     this.energy = Cats.MAX_ENERGY;
@@ -98,6 +100,25 @@ Cat.prototype = {
             }
         } else if(this.hunger >= 10 && chance(0.85)) {
             this.addMorale(5 - Math.floor(this.hunger));
+
+            //looks for another room, exits early if it went into a later room
+            if(this.leaveRoom()) {
+                return;
+            }
+        }
+
+        //water
+        if(!isUndefined(this.room.water)) {
+            if(this.room.water.level > 0 && this.thirst >= 3) {
+                if(chance(0.35)) {
+                    this.drinkWater();
+                }
+            } else if(this.thirst >= 6 && chance(0.05)) {
+                this.action("looks at the dry water bowl sadly");
+                this.addMorale(-5);
+            }
+        } else if(this.thirst >= 10 && chance(0.85)) {
+            this.addMorale(5 - Math.floor(this.thirst));
 
             //looks for another room, exits early if it went into a later room
             if(this.leaveRoom()) {
@@ -262,8 +283,29 @@ Cat.prototype = {
             this.addMorale(10);
             this.action("eats some food");
         }
+
         this.room.updateFood();
         this.addEnergy(3);
+    },
+
+    drinkWater: function() {
+        var waterLevel = this.room.water.level;
+        var thirstInt = Math.floor(this.thirst);
+
+        if(waterLevel - thirstInt <= 0) {
+            this.thirst -= waterLevel;
+            this.room.water.level = 0;
+            this.addMorale(7);
+            this.action("drinks the last of the water");
+        } else {
+            this.room.water.level -= thirstInt;
+            this.thirst -= thirstInt;
+            this.addMorale(10);
+            this.action("drinks some water");
+        }
+
+        this.room.updateWater();
+        this.addEnergy(2);
     },
 
     action: function(actionMsg, noName) {
