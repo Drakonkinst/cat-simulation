@@ -351,7 +351,8 @@ var World = {
                             "random": {
                                 text: "random",
                                 click: function() {
-                                    Events.eventPanel().find("input").val(chooseRandom(Cats.DEFAULT_NAMES));
+                                    var namePool = (context.cat.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
+                                    Events.eventPanel().find("input").val(Cats.uniqueName(chooseRandom(namePool)));
                                 }
                             }
                         }
