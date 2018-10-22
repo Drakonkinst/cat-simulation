@@ -168,7 +168,7 @@ Room.prototype = {
                 buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
             } else {
                 //notify if max buildings is reached
-                if(max && !buildButton.get().hasClass("disabled")) {
+                if(max && !buildButton.get().hasClass("disabled") && !isUndefined(buildItem.maxMsg)) {
                     Notifications.notify(buildItem.maxMsg);
                 }
             }
