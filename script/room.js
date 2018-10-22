@@ -266,11 +266,6 @@ Room.prototype = {
         waterStatus.text("water: " + this.water.level + "/" + this.water.maximum);
     },
 
-    //updates litter box
-    updateLitterBox: function() {
-
-    },
-
     //toggles light switch
     toggleLight: function() {
         var lightButton = Buttons.getButton(this.id + "_manage_light-toggle");
