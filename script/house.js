@@ -310,12 +310,14 @@ var House = {
     },
 
     tick: function() {
-        var start = Game.now();
+        //var start = Game.now();
+
         for(var k in House.rooms) {
             House.rooms[k].tick();
         }
-        var end = Game.now();
-        Logger.log("Update took " + (end - start) + "ms");
+
+        //var end = Game.now();
+        //Logger.log("Update took " + (end - start) + "ms");
     },
 
     nextDay: function() {
@@ -352,7 +354,7 @@ var House = {
                 title: "Hallway",
                 onLoad: function() {
                     new Button({
-                        id: "test",
+                        id: "door",
                         text: "open door",
                         cooldown: 8000,
                         tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
@@ -370,7 +372,16 @@ var House = {
             "living-room": new Room({
                 id: "living-room",
                 title: "Living Room",
-                onLoad: function() {}
+                onLoad: function() {
+                    new Button({
+                        id: "tv",
+                        text: "watch tv",
+                        cooldown: 10000,
+                        onClick: function() {
+                            
+                        }
+                    }).appendTo(this.panel.find(".room-buttons"));
+                }
             }),
             "kitchen": new Room({
                 id: "kitchen",
@@ -386,7 +397,7 @@ var House = {
         
         House.unlockRoom("bedroom", "Bedroom");
         House.unlockRoom("hallway", "Hallway");
-        //House.unlockRoom("living-room", "Living Room");
+        House.unlockRoom("living-room", "Living Room");
         //House.unlockRoom("kitchen", "Kitchen");
         //House.unlockRoom("dining-room", "Dining Room");
         Game.updateSlider();
