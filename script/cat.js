@@ -46,10 +46,11 @@ function Cat(properties) {
     this.thirst = randInt(0, 11);
     this.morale = randInt(0, Cats.MoraleEnum.morales.length);
     this.moralePoints = 50;
-    //points until next morale drop - things like petting/such should be increasingly less effective
+    //points until cat wants to leave room?
     this.energy = Cats.MAX_ENERGY;
 
     this.isSleeping = false;
+    this.consumedRecently = chance(1 - ((this.hunger + this.thirst) / 20));
     this.room = null;
 
     var cat = this;
@@ -58,29 +59,36 @@ function Cat(properties) {
     }, 1, 5);
 }
 Cat.prototype = {
+    //updates the cat
     tick: function() {
         var wantsToLeave = false;
 
         if(this.isSleeping) {
+            //exit early if the cat is sleeping
             return;
         }
 
+        //chance for cat to leave the room for no reason
         if(chance(0.005)) {
             wantsToLeave = true;
         }
 
+        //increments energy and hunger
         this.energy -= 0.1;
         this.hunger += 0.05;
 
+        //if cat has eaten recently, increase morale
         if(this.hunger < 3) {
             this.addMorale(3 - Math.floor(this.hunger));
         }
 
         if(this.energy <= 0) {
+            //starts cat napping
             this.startSleep();
             return;
         }
 
+        //sounds
         if(chance(0.01)) {
             this.meow();
         } else if(chance(0.01)) {
@@ -89,7 +97,7 @@ Cat.prototype = {
             this.hiss();
         }
 
-
+        //food
         if(!isUndefined(this.room.food)) {
             if(this.room.food.level > 0 && this.hunger >= 3) {
                 if(chance(0.35)) {
@@ -104,6 +112,8 @@ Cat.prototype = {
             this.addMorale(5 - Math.floor(this.hunger));
             wantsToLeave = true;
         }
+
+        //add starving/dehyrated? >= 20 - this SHOULD be announced
 
         //water
         if(!isUndefined(this.room.water)) {
@@ -120,96 +130,18 @@ Cat.prototype = {
             this.addMorale(5 - Math.floor(this.thirst));
             wantsToLeave = true;
         }
-    },
 
-    nextDay: function() {
-        if(this.morale == 0 && chance(0.9)) {
-            this.runAway();
+        if(this.consumedRecently && chance(0.2)) {
+            this.action("needs to use the litterbox");
+            this.consumedRecently = false;
+        }
+
+        if(wantsToLeave) {
+            this.leaveRoom();
         }
     },
 
-    startSleep: function() {
-        this.isSleeping = true;
-        this.action("curls up for a nap");
-        this.wakeUpTask.scheduleNext();
-    },
-
-    wakeUp: function() {
-        this.isSleeping = false;
-        this.energy = Cats.MAX_ENERGY;
-        this.hunger += randInt(1, 6);
-        this.action("wakes up");
-        this.addMorale(20);
-    },
-
-    leaveRoom: function() {
-        var index = House.unlockedRooms.indexOf(this.room.id);
-        var nextIndex;
-
-        do {
-            nextIndex = randInt(0, House.unlockedRooms.length);
-        }
-        while(index == nextIndex);
-
-        var nextRoom = House.rooms[House.unlockedRooms[nextIndex]];
-        
-        this.room.removeCat(this);
-        nextRoom.addCat(this);
-        return nextIndex > index;
-    },
-
-    runAway: function() {
-        this.room.removeCat(this);
-        House.cats.splice(House.cats.indexOf(this), 1);
-        Game.addItem("cat", -1);
-        Events.startEvent({
-            title: "A Disappearance",
-            scenes: {
-                "start": {
-                    text: [
-                        this.name + " disappeared in the night.",
-                        "doesn't seem likely " + this.genderPronoun("he", "she") + "'ll return."
-                    ],
-                    notification: this.name + " ran away last night",
-                    blink: true,
-                    buttons: {
-                        "continue": {
-                            text: "move on",
-                            nextScene: "end"
-                        }
-                    }
-                }
-            }
-        });
-    },
-
-    addMorale: function(points) {
-        this.moralePoints += points;
-
-        if(this.moralePoints >= 100) {
-            if(this.morale < Cats.MoraleEnum.morales.length - 1) {
-                this.morale++;
-                this.moralePoints = 20;
-            } else {
-                this.moralePoints = 100;
-            }
-        } else if(this.moralePoints < 0) {
-            if(this.morale > 0) {
-                this.morale--;
-                this.moralePoints = 80;
-            }
-            this.moralePoints = 0;
-        }
-    },
-
-    addEnergy: function(points) {
-        if(this.energy + points > Cats.MAX_ENERGY) {
-            this.energy = Cats.MAX_ENERGY;
-        } else if(this.energy + points >= 0) {
-            this.energy += points;
-        }
-    },
-
+    //called when the cat is added to the house
     greeting: function() {
         var message;
         if(this.morale > 3) {
@@ -225,10 +157,46 @@ Cat.prototype = {
         }
         Notifications.notify(this.name + " sniffs around, " + message, House);
     },
+
+    //called upon the start of a new day
+    nextDay: function() {
+        if(this.morale == 0 && chance(0.9)) {
+            this.runAway();
+        }
+    },
+
+    //removes cat from house
+    runAway: function() {
+        this.room.removeCat(this);
+        House.cats.splice(House.cats.indexOf(this), 1);
+        Game.addItem("cat", -1);
+        Events.startEvent({
+            title: "A Disappearance",
+            scenes: {
+                "start": {
+                    text: [
+                        this.name + " disappeared in the night.",
+                        //how did the cat get out? OR if other cats, then say they are sad or something lol
+                        "doesn't seem likely " + this.genderPronoun("he", "she") + "'ll return."
+                    ],
+                    notification: this.name + " ran away last night",
+                    blink: true,
+                    buttons: {
+                        "continue": {
+                            text: "move on",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        });
+    },
     
+    /* Sounds */
     meow: function(volume) {
         var loudness = volume || randInt(-4, 5);
         this.makeSound("meows", loudness, "quietly", "loudly");
+        //do repetitive meowing here
     },
 
     purr: function(volume) {
@@ -241,7 +209,9 @@ Cat.prototype = {
         this.makeSound("hisses", loudness, "quietly", "loudly");
     },
 
+    //constructs sound message given arguments
     makeSound: function(sound, loudness, softStr, loudStr) {
+        //hisses/meows AT "you" or another cat, code later
         const intensities = [" somewhat ", " ", " rather ", " very "];
         var suffix = loudStr;
 
@@ -262,7 +232,8 @@ Cat.prototype = {
         this.action(sound + intensities[Math.abs(loudness) - 1] + suffix);
     },
 
-    //attempt to eat food in the current room
+    /* Normal Actions */
+    //attempts to eat food in the current room
     eatFood: function() {
         var foodLevel = this.room.food.level;
         var hungerInt = Math.floor(this.hunger);
@@ -281,8 +252,10 @@ Cat.prototype = {
 
         this.room.updateFood();
         this.addEnergy(3);
+        this.consumedRecently = true;
     },
 
+    //attemps to drink water in current room
     drinkWater: function() {
         var waterLevel = this.room.water.level;
         var thirstInt = Math.floor(this.thirst);
@@ -301,18 +274,90 @@ Cat.prototype = {
 
         this.room.updateWater();
         this.addEnergy(2);
+        this.consumedRecently = true;
     },
 
+    //begins a nap
+    startSleep: function() {
+        this.isSleeping = true;
+        this.action("curls up for a nap");
+        this.wakeUpTask.scheduleNext();
+    },
+
+    //called at the end of a nap
+    wakeUp: function() {
+        this.isSleeping = false;
+        this.energy = Cats.MAX_ENERGY;
+        this.hunger += randInt(1, 6);
+        this.action("wakes up");
+        this.addMorale(20);
+    },
+
+    //leaves current room and goes into a random other room
+    leaveRoom: function() {
+        var nextRoomId;
+
+        do {
+            nextRoomId = chooseRandom(House.unlockedRooms);
+        }
+        while(this.room.id == nextRoomId);
+
+        var nextRoom = House.rooms[nextRoomId];
+        
+        this.room.removeCat(this);
+        nextRoom.addCat(this);
+    },
+
+    /* Helpers */
+    //adds morale points, handles changes in morale stage
+    addMorale: function(points) {
+        this.moralePoints += points;
+
+        if(this.moralePoints >= 100) {
+            if(this.morale < Cats.MoraleEnum.morales.length - 1) {
+                //next stage, give 20 points of grace
+                this.morale++;
+                this.moralePoints = 20;
+            } else {
+                //already at max, stay there
+                this.moralePoints = 100;
+            }
+        } else if(this.moralePoints < 0) {
+            if(this.morale > 0) {
+                //previous stage, give 80 points of grace
+                this.morale--;
+                this.moralePoints = 80;
+            } else {
+                //already at min, stay there
+                this.moralePoints = 0;
+            }
+        }
+    },
+
+    //adds energy, makes sure neither limit is reached
+    addEnergy: function(points) {
+        if(this.energy + points > Cats.MAX_ENERGY) {
+            //max
+            this.energy = Cats.MAX_ENERGY;
+        } else if(this.energy + points >= 0) {
+            //min
+            this.energy += points;
+        }
+    },
+
+    //plays a notification if the player is in the room
     action: function(actionMsg, noName) {
         if(!noName) {
             actionMsg = this.name + " " + actionMsg;
         }
 
         if(House.currentRoom == this.room.id) {
+            //message only plays if player is in the House AND in the same room
             Notifications.notify(actionMsg, House, true);
         }
     },
 
+    //returns male or female string based on gender
     genderPronoun: function(male, female) {
         return this.isFemale ? female : male;
     }
@@ -321,7 +366,7 @@ Cat.prototype = {
 var Cats = {
     MAX_ENERGY: 20,
     DEFAULT_MALE_NAMES: [ "Garfield", "Salem", "Tom", "Azrael", "Whiskers", "Felix", "Oscar", "Edgar", "Sox", "Ollie", "Leo", "Snickers", "Charcoal", "Prince", "Toby", "Mikesch", "Buddy", "Romeo", "Loki", "Gavin", "Momo", "Illia", "Theodore", "Eliot", "Milo", "Max", "Monty" ],
-    DEFAULT_FEMALE_NAMES: [ "Miso", "Tara", "Nala", "Mistie", "Misty", "Coco", "Tasha", "Raven", "Valencia", "Princess", "Cherry", "Chloe", "Felicia", "Olivia", "Emma", "Belle", "Luna", "Minerva", "Ellie", "Athena", "Artemis", "Poppy", "Venus"],
+    DEFAULT_FEMALE_NAMES: [ "Miso", "Tara", "Nala", "Mistie", "Misty", "Coco", "Tasha", "Raven", "Valencia", "Princess", "Cherry", "Chloe", "Felicia", "Olivia", "Emma", "Belle", "Luna", "Minerva", "Ellie", "Athena", "Artemis", "Poppy", "Venus", "Calypso"],
     DEFAULT_NEUTRAL_NAMES: [ "Lolcat", "Sesame", "Unagi", "Avocado", "Mango", "Oreo", "Swirly", "Striped", "Alpha", "Beta", "Gamma", "Lucky", "Mittens", "Angel", "Dakota", "Ginger", "Tippy", "Snickers", "Fish", "Smokey", "Muffin", "Fuzzy", "Nibbles", "Chaser" ],
     //http://www.catbreedslist.com/all-cat-breeds/
     //secondary source - https://www.hillspet.com/cat-care/cat-breeds/
