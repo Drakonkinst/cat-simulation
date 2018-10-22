@@ -59,13 +59,14 @@ function Cat(properties) {
 }
 Cat.prototype = {
     tick: function() {
+        var wantsToLeave = false;
 
         if(this.isSleeping) {
             return;
         }
 
-        if(chance(0.005) && this.leaveRoom()) {
-            return;
+        if(chance(0.005)) {
+            wantsToLeave = true;
         }
 
         this.energy -= 0.1;
@@ -98,13 +99,10 @@ Cat.prototype = {
                 this.action("looks at the empty food bowl despondently");
                 this.addMorale(-5);
             }
-        } else if(this.hunger >= 10 && chance(0.85)) {
+        } else if(this.hunger >= 10 && chance(0.65)) {
+            //wants to look for food in other rooms
             this.addMorale(5 - Math.floor(this.hunger));
-
-            //looks for another room, exits early if it went into a later room
-            if(this.leaveRoom()) {
-                return;
-            }
+            wantsToLeave = true;
         }
 
         //water
@@ -117,13 +115,10 @@ Cat.prototype = {
                 this.action("looks at the dry water bowl sadly");
                 this.addMorale(-5);
             }
-        } else if(this.thirst >= 10 && chance(0.85)) {
+        } else if(this.thirst >= 10 && chance(0.65)) {
+            //wants to look for water in other rooms
             this.addMorale(5 - Math.floor(this.thirst));
-
-            //looks for another room, exits early if it went into a later room
-            if(this.leaveRoom()) {
-                return;
-            }
+            wantsToLeave = true;
         }
     },
 
