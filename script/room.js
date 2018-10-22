@@ -74,9 +74,6 @@ Room.prototype = {
         for(var k in this.cats) {
             this.cats[k].tick(this);
         }
-        if(this.lightsOn) {
-            House.usePower(0.01);
-        }
     },
 
     addCat: function(cat) {
