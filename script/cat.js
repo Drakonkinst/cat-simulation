@@ -82,7 +82,7 @@ Cat.prototype = {
             this.meow();
         } else if(chance(0.01)) {
             this.purr();
-        } else if(chance(0.05) && this.morale < 3) {
+        } else if(chance(0.01) && this.morale < 3) {
             this.hiss();
         }
 
@@ -90,15 +90,17 @@ Cat.prototype = {
         if(!isUndefined(this.room.food)) {
             if(this.room.food.level > 0 && this.hunger >= 3) {
                 if(chance(0.35)) {
-                    this.eatFood(this.room);
+                    this.eatFood();
                 }
             } else if(this.hunger >= 6 && chance(0.05)) {
                 this.action("looks at the empty food bowl despondently");
                 this.addMorale(-5);
             }
         } else if(this.hunger >= 10 && chance(0.85)) {
-            this.addMorale(5 - this.hunger);
-            if(this.leaveRoom(this.room)) {
+            this.addMorale(5 - Math.floor(this.hunger));
+
+            //looks for another room, exits early if it went into a later room
+            if(this.leaveRoom()) {
                 return;
             }
         }
