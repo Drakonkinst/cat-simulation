@@ -141,6 +141,8 @@ var World = {
         }
     },
 
+    dreams: [ "dark and stormy nights", "bright skies and lazy clouds", "soft whispers and a warm embrace", "fish swimming across the sky", "a hunter stalking its prey", "a world covered in ash", "crimson mist and a wolf's howl", "a trident in the sea", "a better life" ],
+
     //global events
     events: [
         {
@@ -407,7 +409,7 @@ var World = {
                 Game.keyLock = false;
                 $("#outer-slider").animate({opacity: 1}, 600, "linear");
                 //dream system needs improvements - either many messages of this style, or a randomizer with two clauses
-                Notifications.notify("dreamed of " + chooseRandom(["dark and stormy nights", "bright skies and lazy clouds", "soft whispers and a warm embrace", "fish swimming across the sky", "a hunter stalking its prey", "a world covered in ash", "crimson mist and a wolf's howl", "a trident in the sea", "a better life"]));
+                World.dream();
                 World.nextDay();
 
                 //update rooms so the lights on/off button shows - this should be changed
@@ -418,6 +420,15 @@ var World = {
                 //delay weather greeting?
             }, 3000);
         });
+    },
+
+    dream: function() {
+        var dream = chooseRandom(this.dreams);
+        Notifications.notify("dreamed of " + dream);
+
+        //chance for dream 2 not to occur, but if it does it must be different than dream 1
+        //later: World.dreams { "type": [] }, can have "bad dreams" and returns what type of dream it is
+        //if bad/restless, (which should also be calculated in sleep), reduces number of actions player can make on the next day
     },
 
     //called at the start of a new day
