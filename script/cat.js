@@ -9,7 +9,7 @@
  * */
 function Cat(properties) {
     properties = properties || {};
-    this.isFemale = properties.isFemale || Math.random() < 0.5;
+    this.isFemale = properties.isFemale || chance(0.5);
 
     var namePool = (this.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
     this.name = properties.name || chooseRandom(namePool);
@@ -43,7 +43,6 @@ function Cat(properties) {
 
     //sets random hunger upon spawn
     this.hunger = randInt(0, 11);
-    this.morale = randInt(0, Cats.MoraleEnum.morales.length + 1);
     this.moralePoints = 50;
     //points until next morale drop - things like petting/such should be increasingly less effective
     this.energy = Cats.MAX_ENERGY;
