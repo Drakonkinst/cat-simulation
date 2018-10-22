@@ -27,12 +27,5 @@ Tooltip.prototype = {
     //returns whether the Tooltip has any text to show
     exists: function() {
         return this.element.children().length > 0;
-    },
-
-    /*
-    //returns the Tooltip's element
-    get: function() {
-        return this.element;
     }
-    */
 };
