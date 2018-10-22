@@ -262,10 +262,6 @@ div.button.disabled:hover {
 	z-index: 999;
 }
 
-.button .tooltip {
-	width: 100px;
-}
-
 .tooltip.bottom {
 	top: 30px;
 }
@@ -280,6 +276,11 @@ div.button.disabled:hover {
 
 .tooltip.top {
 	bottom: 30px;
+}
+
+.button .tooltip {
+	width: 100px;
+	font-weight: 400;
 }
 
 *:hover > .tooltip {
@@ -553,12 +554,13 @@ body.noMask #description {
 }
 
 .room-upper-status {
-	height: 18px;
+	white-space: nowrap;
 }
 
 .room-upper-status div {
-	float: left;
+	display: none;
 	margin-right: 15px;
+	opacity: 0;
 }
 
 .cat-icon {

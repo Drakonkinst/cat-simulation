@@ -249,6 +249,10 @@ Room.prototype = {
 
         var foodStatus = this.panel.find(".food-status");
 
+        if(!foodStatus.is(":visible")) {
+            foodStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
+        }
+
         //update text
         foodStatus.text("food: " + this.food.level + "/" + this.food.maximum);
     },
@@ -261,6 +265,11 @@ Room.prototype = {
         }
 
         var waterStatus = this.panel.find(".water-status");
+        
+        if(!waterStatus.is(":visible")) {
+            Logger.log("Called");
+            waterStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
+        }
 
         //update text
         waterStatus.text("water: " + this.water.level + "/" + this.water.maximum);
