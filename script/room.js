@@ -74,6 +74,9 @@ Room.prototype = {
         for(var k in this.cats) {
             this.cats[k].tick(this);
         }
+        }
+    },
+
     addCat: function(cat) {
         cat.room = this;
         this.cats.push(cat);
