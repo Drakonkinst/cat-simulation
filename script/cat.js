@@ -50,6 +50,7 @@ function Cat(properties) {
     this.energy = Cats.MAX_ENERGY;
 
     this.isSleeping = false;
+    this.wantsToLeave = false;
     this.consumedRecently = chance(1 - ((this.hunger + this.thirst) / 20));
     this.room = null;
 
@@ -61,7 +62,11 @@ function Cat(properties) {
 Cat.prototype = {
     //updates the cat
     tick: function() {
-        var wantsToLeave = false;
+        if(this.wantsToLeave) {
+            Logger.log("Skipped " + this.name)
+            this.wantsToLeave = false;
+            return;
+        }
 
         if(this.isSleeping) {
             //exit early if the cat is sleeping
@@ -70,7 +75,7 @@ Cat.prototype = {
 
         //chance for cat to leave the room for no reason
         if(chance(0.005)) {
-            wantsToLeave = true;
+            this.wantsToLeave = true;
         }
 
         //increments energy and hunger
@@ -110,7 +115,7 @@ Cat.prototype = {
         } else if(this.hunger >= 10 && chance(0.65)) {
             //wants to look for food in other rooms
             this.addMorale(5 - Math.floor(this.hunger));
-            wantsToLeave = true;
+            this.wantsToLeave = true;
         }
 
         //add starving/dehyrated? >= 20 - this SHOULD be announced
@@ -128,7 +133,7 @@ Cat.prototype = {
         } else if(this.thirst >= 10 && chance(0.65)) {
             //wants to look for water in other rooms
             this.addMorale(5 - Math.floor(this.thirst));
-            wantsToLeave = true;
+            this.wantsToLeave = true;
         }
 
         if(this.consumedRecently && chance(0.2)) {
@@ -136,8 +141,12 @@ Cat.prototype = {
             this.consumedRecently = false;
         }
 
-        if(wantsToLeave) {
+        if(this.wantsToLeave) {
             this.leaveRoom();
+            var cat = this;
+            Game.setTimeout(function() {
+                cat.wantsToLeave = false;
+            }, 0);
         }
     },
 
