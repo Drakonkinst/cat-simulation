@@ -63,7 +63,6 @@ Cat.prototype = {
     //updates the cat
     tick: function() {
         if(this.wantsToLeave) {
-            Logger.log("Skipped " + this.name)
             this.wantsToLeave = false;
             return;
         }
