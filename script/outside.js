@@ -114,7 +114,7 @@ var Outside = {
                         });
                     })(item);
                     
-                    buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+                    buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location);
 
                     if(!isUndefined(buyItem.availableMsg)) {
                         Notifications.notify(buyItem.availableMsg);
