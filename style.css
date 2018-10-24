@@ -563,10 +563,16 @@ body.noMask #description {
 	opacity: 0;
 }
 
+.cat-list {
+	position: relative;
+	word-wrap: break-word;
+	height: auto;
+}
+
 .cat-icon {
 	position: relative;
-	margin-left: 5px;
 	cursor: pointer;
+	margin-left: 5px;
 }
 
 .cat-icon:hover {
