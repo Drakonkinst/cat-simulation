@@ -46,6 +46,17 @@ var House = {
                 room.water.maximum += 5;
                 room.updateWater();
             }
+        },
+        "litter box": {
+            buildMsg: "litter box installed",
+            maximum: 1,
+            onBuild: function(room) {
+                if(isUndefined(room.litterBox)) {
+                    room.litterBox = 0;
+                    //should this have level/max?
+                }
+                room.updateLitterBox();
+            }
         }
     },
 
