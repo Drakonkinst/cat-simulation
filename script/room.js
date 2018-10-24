@@ -330,6 +330,7 @@ Room.prototype = {
         }
         
         //toggle variable
+        House.usePower(1);
         this.lightsOn = !this.lightsOn;
     },
 
@@ -397,6 +398,17 @@ Room.prototype = {
 
     //attempt to clean litter box
     cleanLitterBox: function() {
+        if(this.litterBox <= 0) {
+            Notifications.notify("litter box is already clean");
+            return false;
+        } else if(this.litterBox < 5) {
+            this.litterBox -= randInt(0, this.litterBox + 1);
+        } else {
+            this.litterBox -= randInt(0,6);
+        }
 
+        Notifications.notify("shovel sifts through fine sand");
+        this.updateLitterBox();
+        return true;
     }
 };
