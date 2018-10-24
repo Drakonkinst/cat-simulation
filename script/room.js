@@ -216,7 +216,8 @@ Room.prototype = {
                     return room.refillFood();
                 }
             });
-            foodButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_refill-food_container"));
+            var container = location.find("#" + this.id + "_refill-food_container");
+            foodButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
         }
 
         //refill water
@@ -230,7 +231,8 @@ Room.prototype = {
                     return room.refillWater();
                 }
             });
-            waterButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_refill-water_container"));
+            var container = location.find("#" + this.id + "_refill-water_container");
+            waterButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
         }
         
         //clear litter box
@@ -244,11 +246,12 @@ Room.prototype = {
                     return room.cleanLitterBox();
                 }
             });
-            litterBoxButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_clean-litter-box_container"));
+            var container = location.find("#" + this.id + "_clean-litter-box_container");
+            litterBoxButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
         }
 
         //light switch
-        if(World.day > 1 && isUndefined(Buttons.getButton(this.id + "_light-toggle"))) {
+        if(House.electric < 70 && isUndefined(Buttons.getButton(this.id + "_light-toggle"))) {
             needsAppend = true;
             var lightButton = new Button({
                 id: this.id + "_light-toggle",
@@ -258,7 +261,8 @@ Room.prototype = {
                     room.toggleLight();
                 }
             });
-            lightButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_toggle-light_container"));
+            var container = location.find("#" + this.id + "_toggle-light_container");
+            lightButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
         }
 
         if(needsAppend) {
@@ -319,7 +323,7 @@ Room.prototype = {
 
     //toggles light switch
     toggleLight: function() {
-        var lightButton = Buttons.getButton(this.id + "_manage_light-toggle");
+        var lightButton = Buttons.getButton(this.id + "_light-toggle");
 
         //TODO - setText() appears to kill the animation for buttons with a cooldown,
         //might want to look into it
