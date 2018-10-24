@@ -11,6 +11,7 @@ var House = {
     rooms: {},          //keymap of Room ids and objects
 
     stores: {},         //house inventory
+    electric: null,
 
     //info table of all buildings
     Buildings: {
@@ -256,6 +257,65 @@ var House = {
         }
     },
 
+    usePower: function(value) {
+        if(this.electric - value <= 0 & this.electric > 0) {
+            this.electric = 0;
+            this.powerOutage();
+        } else {
+            this.electric -= value;
+        }
+    },
+
+    powerOutage: function() {
+        for(var k in House.rooms) {
+            var room = House.rooms[k];
+            var lightButton = Buttons.getButton(room.id + "_light-toggle");
+            var buttonExists = !isUndefined(lightButton);
+
+            if(room.lightsOn) {
+                room.lightsOn = false;
+                if(buttonExists) {
+                    lightButton.setText("lights on");
+                }
+            }
+            if(buttonExists) {
+                lightButton.setDisabled(true);
+            }
+        }
+
+        Events.startEvent({
+            title: "Power Outage",
+            scenes: {
+                "start": {
+                    text: [
+                        "with a loud buzz, the lights flicker out",
+                        "the darkness is absolute"
+                    ],
+                    notification: "the power has gone out",
+                    blink: true,
+                    buttons: {
+                        "continue": {
+                            text: "continue",
+                            nextScene: "end",
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    powerReturn: function() {
+        Notifications.notify("the power is back on");
+        for(var k in House.rooms) {
+            var room = House.rooms[k];
+            var lightButton = Buttons.getButton(room.id + "_light-toggle"); 
+
+            if(!isUndefined(lightButton)) {
+                lightButton.setDisabled(false);
+            }
+        }
+    },
+
     //updates title based on number of cats in house
     updateTitle: function() {
         var title = $("#location_house").text();
@@ -341,6 +401,11 @@ var House = {
     },
 
     nextDay: function() {
+        if(this.electric == 0) {
+            this.powerReturn();
+        }
+        this.electric = 100;
+
         for(var k in House.cats) {
             House.cats[k].nextDay();
         }
