@@ -197,7 +197,7 @@ var Outside = {
         var cost = info.cost();
         
         for(var id in cost) {
-            if(!Game.hasItem(id)) {
+            if(!Game.hasItem(id, cost[id] / 2)) {
                 return false;
             }
         }
