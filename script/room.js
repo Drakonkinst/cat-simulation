@@ -28,7 +28,6 @@ function Room(properties) {
 
     this.onLoad = properties.onLoad || function() {};
 
-    
     //create location in header
     var id = this.id;
     this.tab = $("<div>").attr("id", "room-location_" + this.id)
@@ -50,11 +49,17 @@ function Room(properties) {
     $("<div>").addClass("cat-list-container").append($("<span>").text("cats:")).append($("<span>").addClass("cat-list")).css("opacity", 0).appendTo(roomStatus);
 
     var roomButtons = $("<div>").addClass("room-buttons").appendTo(this.panel);
+    var buildButtons = $("<div>").addClass("build-buttons").attr("data-legend", "build:").css("opacity", 0).appendTo(roomButtons);
+    for(var k in House.Buildings) {
+        var formattedName = k.replace(" ", "-");
+        buildButtons.append($("<div>").attr("id", this.id + "_build_" + formattedName + "_container"));
+    }
+
     $("<div>").addClass("manage-buttons").attr("data-legend", "manage:").css("opacity", 0)
-        .append($("<div>").addClass(this.id + "_refill-food_container"))
-        .append($("<div>").addClass(this.id + "_refill-water_container"))
-        .append($("<div>").addClass(this.id + "_clean-litter-box_container"))
-        .append($("<div>").addClass(this.id + "_toggle-light_container")).appendTo(roomButtons);
+        .append($("<div>").attr("id", this.id + "_refill-food_container"))
+        .append($("<div>").attr("id", this.id + "_refill-water_container"))
+        .append($("<div>").attr("id", this.id + "_clean-litter-box_container"))
+        .append($("<div>").attr("id", this.id + "_toggle-light_container")).appendTo(roomButtons);
     
 }
 Room.prototype = {
@@ -79,6 +84,9 @@ Room.prototype = {
     tick: function() {
         for(var k in this.cats) {
             this.cats[k].tick(this);
+        }
+        if(this.lightsOn) {
+            House.usePower(0.01);
         }
     },
 
@@ -151,32 +159,32 @@ Room.prototype = {
 
     //updates build section (left side)
     updateBuildButtons: function() {
-        var roomButtons = this.panel.find(".room-buttons");
-        var buildContainer = new Container(".build-buttons", "build:", roomButtons);
-        var location = buildContainer.get();
+        var location = this.panel.find(".build-buttons");
+        var needsAppend = false;
         
-        for(var building in House.Buildings) {
-            var buildItem = House.Buildings[building];
-            var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
-            var buildButton = Buttons.getButton(this.id + "_build_" + building);
+        for(var k in House.Buildings) {
+            var buildItem = House.Buildings[k];
+            var formattedName = k.replace(" ", "-");
+            var max = this.buildings.hasOwnProperty(k) && this.buildings[k] >= buildItem.maximum;
+            var buildButton = Buttons.getButton(this.id + "_build_" + formattedName);
             
-
-            if(isUndefined(buildButton) && Game.hasItem(building)) {
+            if(isUndefined(buildButton) && Game.hasItem(k)) {
                 //create build button if one doesn't exist
                 //oh closure, I hate you
                 (function(roomName, building) {
                     buildButton = new Button({
-                        id: roomName + "_build_" + building,
+                        id: roomName + "_build_" + building.replace(" ", "-"),
                         text: building,
                         width: "80px",
                         onClick: function() {
                             House.getCurrentRoom().build(building);
                         }
                     });
-                })(this.id, building);
-                //do this in order? prevItem system?
+                })(this.id, k);
                 
-                buildButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location);
+                var container = location.find("#" + this.id + "_build_" + formattedName + "_container");
+                buildButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+                needsAppend = true;
             } else {
                 //notify if max buildings is reached
                 if(max && !buildButton.get().hasClass("disabled") && !isUndefined(buildItem.maxMsg)) {
@@ -191,8 +199,8 @@ Room.prototype = {
         }
 
         //initialize build container
-        if(buildContainer.needsAppend && buildContainer.exists()) {
-            buildContainer.create().appendTo(roomButtons);
+        if(needsAppend) {
+            location.animate({opacity: 1}, 200, "linear");
         }
 
         //update manage buttons
