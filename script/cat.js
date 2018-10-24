@@ -156,7 +156,7 @@ Cat.prototype = {
         if(this.wantsToLeave) {
             this.leaveRoom();
             var cat = this;
-            
+
             //reset variable at end of update loop
             Game.setTimeout(function() {
                 cat.wantsToLeave = false;
@@ -207,6 +207,25 @@ Cat.prototype = {
                     buttons: {
                         "continue": {
                             text: "move on",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    examine: function() {
+        Events.startEvent({
+            title: this.name,
+            scenes: {
+                "start": {
+                    text: [
+                        this.name + " is a " + this.genderPronoun("male", "female") + " " + this.breed + " cat with " + this.coat + " " + this.color + " fur."
+                    ],
+                    buttons: {
+                        "done": {
+                            text: "done",
                             nextScene: "end"
                         }
                     }

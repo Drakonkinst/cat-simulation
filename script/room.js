@@ -100,7 +100,9 @@ Room.prototype = {
             catListContainer.animate({opacity: 1}, 200, "linear");
         }
 
-        var catIcon = $("<span>").addClass("cat-icon").text("@");
+        var catIcon = $("<span>").addClass("cat-icon").text("@").click(function() {
+            cat.examine();
+        });
         var nameTooltip = new Tooltip("bottom right").append($("<div>").text(cat.name));
         nameTooltip.appendTo(catIcon);
         catList.append($("<span>").attr("id", "cat-"+cat.name).addClass("cat-icon-container").append(catIcon).css("opacity", 0).animate({opacity: 1}, 200, "linear"));
