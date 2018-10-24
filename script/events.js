@@ -61,10 +61,6 @@ var Events = {
             return;
         }
 
-        //prevents user from using keyboard navigation during event
-        Game.keyLock = true;
-        Game.tabNavigation = false;
-
         //adds to event stack
         Events.eventStack.push(event);
 
@@ -90,6 +86,10 @@ var Events = {
     },
 
     initEvent: function() {
+        //prevents user from using keyboard navigation during event
+        Game.keyLock = true;
+        Game.tabNavigation = false;
+
         //begins with the start scene
         Events.loadScene("start", true);
 
@@ -111,25 +111,24 @@ var Events = {
 			Events.eventPanel().remove();
             Events.activeEvent().eventPanel = null;
             Events.activeEvent().context = null;
-            Events.eventStack.shift();
-
-            if(Events.eventStack.length > 0) {
-                Events.initEvent();
-                Logger.log(Events.eventStack.length + " events remaining");
-            }
-            
-            //re-enables keyboard input
-            Game.keyLock = false;
-            Game.tabNavigation = true;
 
             if(!isUndefined(Events.blinkInterval)) {
                 Events.stopTitleBlink();
             }
 
-            //forces refocus on the body for IE
-            $("body").focus();
+            //re-enables keyboard input
+            Game.keyLock = false;
+            Game.tabNavigation = true;
 
-            
+            Events.eventStack.shift();
+
+            if(Events.eventStack.length > 0) {
+                Events.initEvent();
+                Logger.log(Events.eventStack.length + " events remaining");
+            } else {
+                //forces refocus on the body for IE
+                $("body").focus();
+            }
 		});
     },
 
@@ -316,6 +315,10 @@ var Events = {
     //every 3 seconds change title to *** EVENT ***, then change back to the original title 1.5 seconds later
     blinkTitle: function() {
         var title = document.title;
+
+        if(!isUndefined(Events.blinkInterval)) {
+            return;
+        }
 
         //set blinkInterval
         Events.blinkInterval = Game.setInterval(function() {
