@@ -67,6 +67,17 @@ var Outside = {
                     "money": 4
                 };
             }
+        },
+        "litter box": {
+            type: "building",
+            maximum: 5,
+            buyMsg: "good for keeping the smell away",
+            maxMsg: "house won't need any more",
+            cost: function() {
+                return {
+                    "money": 10,
+                }
+            }
         }
     },
     
