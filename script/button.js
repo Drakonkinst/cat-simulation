@@ -68,7 +68,7 @@ Button.prototype = {
 
         //button hax!
         if(Game.options.instantButtons) {
-            cooldown = 100;
+            cooldown = 0;
         } else if(Game.options.fastButtons) {
             cooldown /= 4;
         }
