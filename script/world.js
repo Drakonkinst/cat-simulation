@@ -432,6 +432,12 @@ var World = {
     //called at the start of a new day
     nextDay: function() {
         World.day++;
+        Outside.dailyTimesWorked = 0;
+        var workButton = Buttons.getButton("work");
+        if(!isUndefined(workButton) && !workButton.onCooldown) {
+            workButton.setDisabled(false);
+        }
+
         Notifications.notify(World.weather[World.currentWeather].greeting);
         $("#day-notify").text("day " + World.day + ".").css("opacity", 1).animate({opacity: 0}, 3000, "linear");
         House.nextDay();

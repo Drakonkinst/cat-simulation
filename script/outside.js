@@ -4,6 +4,9 @@
 var Outside = {
     name: "outside",    //module id
 
+    MAX_DAILY_WORK: 10,
+    dailyTimesWorked: 0,
+
     //info table of all items that can be bought
     BuyItems: {
         //pet store
@@ -62,6 +65,8 @@ var Outside = {
             maximum: 100,
             buyMsg: "cats love drinking out of bowls",
             maxMsg: "drinking out of taps works too, you know?",
+            //should this just be tap water - free? maybe like electricity
+            //electricity should only fail when used a LOT per day
             cost: function() {
                 return {
                     "money": 4
@@ -188,6 +193,18 @@ var Outside = {
 
         Outside.updateBuyButtons();
     },
+
+    work: function() {
+        Notifications.notify("hard labor, but necessary");
+        Game.addItem("money", randInt(1, 3));
+        Outside.dailyTimesWorked++;
+        Outside.updateBuyButtons();
+
+        if(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK) {
+            Notifications.notify("done working for the day");
+        }
+    },
+    
     unlocked: function(item) {
         if(Buttons.getButton("buy_" + item)) {
             return true;
@@ -204,9 +221,11 @@ var Outside = {
 
         return true;
     },
+
     updateTitle: function() {
         //A Quiet Town, A Bustling World - as more things unlock
     },
+
     Init: function() {
         this.tab = Game.addLocation("outside", "A Quiet Town", Outside);
         this.panel = $("<div>").attr("id", "outside-panel").addClass("location").appendTo("#location-slider");
@@ -217,10 +236,9 @@ var Outside = {
             text: "go to work",
             cooldown: 4000,
             tooltip: new Tooltip().append($("<div>").text("you need to go to work.")),
-            onClick: function() {
-                Notifications.notify("hard labor, but necessary");
-                Game.addItem("money", randInt(1, 3));
-                Outside.updateBuyButtons();
+            onClick: Outside.work,
+            onFinish: function() {
+                Buttons.getButton("work").setDisabled(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK);
             }
         }).appendTo("#outside-panel");
 
