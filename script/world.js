@@ -223,14 +223,14 @@ var World = {
             },
             scenes: {
                 "start": function(context) {
-                    context = context.start;
+                    var c = context.start;
                     return {
                         text: [
-                            context.intro + ", " + context.action + ".",
-                            context.weather + ".",
-                            context.request + "."
+                            c.intro + ", " + c.action + ".",
+                            c.weather + ".",
+                            c.request + "."
                         ],
-                        notification: context.notification,
+                        notification: c.notification,
                         blink: true,
                         buttons: {
                             "getCloser": {
@@ -245,15 +245,15 @@ var World = {
                     };
                 },
                 "flee": function(context) {
-                    context = context.flee;
+                    var c = context.flee;
                     return {
                         text: [
-                            "cat scampers away, fleeing " + context.location + ".",
+                            "cat scampers away, fleeing " + c.location + ".",
                             "probably won't come back."
                         ],
                         buttons: {
                             "goodbye": {
-                                text: context.goodbye,
+                                text: c.goodbye,
                                 nextScene: "end"
                             }
                         }
@@ -261,14 +261,14 @@ var World = {
                 },
                 "request": function(context) {
                     var cat = context.cat;
-                    var context = context.request;
+                    var c = context.request;
     
                     var line1 = "cat is a " + cat.color + " " + cat.breed + " with " + cat.coat + " fur.";
                     if(cat.coat == "hairless") {
                         line1 = "cat is a " + cat.color + " hairless " + cat.breed + ".";
                     }
-                    var line2 = cat.genderPronoun("he", "she") + " " + context.status + context.weather;
-                    if(cat.hunger <= 10 && context.weather.length > 0) {
+                    var line2 = cat.genderPronoun("he", "she") + " " + c.status + c.weather;
+                    if(cat.hunger <= 10 && c.weather.length > 0) {
                         line2 += " though";
                     }
                     line2 += ".";
@@ -281,7 +281,7 @@ var World = {
                         ],
                         buttons: {
                             "adopt": {
-                                text: context.adopt,
+                                text: c.adopt,
                                 nextScene: {"adoptNamed": 6, "adoptNameless": 5}
                             },
                             "abandon": {
@@ -298,10 +298,11 @@ var World = {
                     };
                 },
                 "adoptNamed": function(context) {
+                    var cat = context.cat;
                     return {
                         text: [
                             "there's a collar around the cat's neck.",
-                            "tag says \"" + context.cat.name + ".\"",
+                            "tag says \"" + cat.name + ".\"",
                             "doesn't seem to have an address."
                         ],
                         buttons: {
@@ -310,13 +311,14 @@ var World = {
                                 nextScene: "end",
                                 click: function() {
                                     Notifications.notify("a new addition to the family");
-                                    House.addCat(context.cat);
+                                    House.addCat(cat);
                                 }
                             }
                         }
                     };
                 },
                 "adoptNameless": function(context) {
+                    var cat = context.cat;
                     return {
                         text: [
                             "cat doesn't seem to have a collar.",
@@ -344,14 +346,14 @@ var World = {
                                 tooltip: new Tooltip("top left").append($("<div>").text("confirm name?")),
                                 click: function() {
                                     Notifications.notify("a new addition to the family");
-                                    context.cat.name = Events.eventPanel().find("input").val();
-                                    House.addCat(context.cat);
+                                    cat.name = Events.eventPanel().find("input").val();
+                                    House.addCat(cat);
                                 }
                             },
                             "random": {
                                 text: "random",
                                 click: function() {
-                                    var namePool = (context.cat.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
+                                    var namePool = (cat.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
                                     Events.eventPanel().find("input").val(Cats.uniqueName(chooseRandom(namePool)));
                                 }
                             }
