@@ -13,7 +13,7 @@ var Events = {
 
     //returns the current event object
     activeEvent: function() {
-        if(Events.eventStack && Events.eventStack.length > 0) {
+        if(Events.eventStack.length > 0) {
             return Events.eventStack[0];
         }
         return null;
@@ -53,13 +53,10 @@ var Events = {
     },
 
     /*
-     * Triggers an event and opens a new event
-     * panel.
-     * 
-     * properties:
-     * - width: custom width of event panel
+     * Called upon event trigger, adds event to
+     * eventStack and initializes it if it is the next one
      * */
-    startEvent: function(event, properties) {
+    startEvent: function(event) {
         if(isUndefined(event)) {
             return;
         }
@@ -68,29 +65,33 @@ var Events = {
         Game.keyLock = true;
         Game.tabNavigation = false;
 
-        //adds to beginning of event stack
-        Events.eventStack.unshift(event);
+        //adds to event stack
+        Events.eventStack.push(event);
 
         //create event panel
         event.eventPanel = $("<div>").attr("id", "event").addClass("event-panel").css("opacity", 0)
-            .append($("<div>").addClass("event-title").text(Events.activeEvent().title))
+            .append($("<div>").addClass("event-title").text(event.title))
             .append($("<div>").attr("id", "description"))
             .append($("<div>").attr("id", "buttons"));
 
-        if(!isUndefined(properties) && !isUndefined(properties.width)) {
-            //sets custom width
-            Events.eventPanel().css("width", properties.width);
-        }
-
         //create context object based on the instant this function is called
         if(typeof event.getContext === "function") {
-            Events.activeEventContext = event.getContext();
-        } else {
-            Events.activeEventContext = {};
+            event.context = event.getContext();
         }
 
+        var startScene = event.scenes.start;
+        if(!isUndefined(startScene.notification)) {
+            Notifications.notify(startScene.notification);
+        }
+
+        if(Events.eventStack.length <= 1) {
+            Events.initEvent();
+        }
+    },
+
+    initEvent: function() {
         //begins with the start scene
-        Events.loadScene("start");
+        Events.loadScene("start", true);
 
         //draw event panel
         $("#wrapper").append(Events.eventPanel());
@@ -101,7 +102,6 @@ var Events = {
             //blinks title to notify AFK players for duration of event
 			Events.blinkTitle();
         }
-
     },
 
     //ends event and clears the event panel
@@ -110,10 +110,14 @@ var Events = {
             //clear all variables
 			Events.eventPanel().remove();
             Events.activeEvent().eventPanel = null;
-            Events.activeEventContext = null;
+            Events.activeEvent().context = null;
             Events.eventStack.shift();
-            Logger.logIf(Events.eventStack.length > 0, Events.eventStack.length + " events remaining");
 
+            if(Events.eventStack.length > 0) {
+                Events.initEvent();
+                Logger.log(Events.eventStack.length + " events remaining");
+            }
+            
             //re-enables keyboard input
             Game.keyLock = false;
             Game.tabNavigation = true;
@@ -124,11 +128,13 @@ var Events = {
 
             //forces refocus on the body for IE
             $("body").focus();
+
+            
 		});
     },
 
     //starts a scene in an event
-    loadScene: function(name) {
+    loadScene: function(name, skipNotification) {
         //sets active scene and grabs scene object from the event
         Logger.log("Loading scene: " + name);
         Events.activeScene = name;
@@ -139,7 +145,7 @@ var Events = {
             scene.onLoad();
         }
 
-        if(!isUndefined(scene.notification)) {
+        if(!isUndefined(scene.notification) && !skipNotification) {
             //notify scene change
             Notifications.notify(scene.notification);
         }
@@ -334,8 +340,7 @@ var Events = {
     getScene: function(name) {
         var scene = Events.activeEvent().scenes[name];
         if(typeof scene === "function") {
-            //call the function passing the context object
-            scene = scene(Events.activeEventContext);
+            return scene(Events.activeEvent().context);
         }
         return scene;
     },
