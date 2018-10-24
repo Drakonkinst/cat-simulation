@@ -213,7 +213,7 @@ var World = {
                 }
     
                 if(cat.hunger > 10) {
-                    context.request.status = "doesn't seem to have eaten for days";
+                    context.request.status = "looks hungry";
                 } else {
                     context.request.status = "seems healthy enough";
                 }
@@ -414,11 +414,6 @@ var World = {
                 //dream system needs improvements - either many messages of this style, or a randomizer with two clauses
                 World.dream();
                 World.nextDay();
-
-                //update rooms so the lights on/off button shows - this should be changed
-                for(var k in House.rooms) {
-                    House.rooms[k].updateManageButtons();
-                }
 
                 //delay weather greeting?
             }, 3000);

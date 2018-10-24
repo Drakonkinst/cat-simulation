@@ -327,6 +327,15 @@ var House = {
             House.rooms[k].tick();
         }
 
+        //update rooms so the lights on/off button shows
+        //this checks for the same thing like 6 times - not best practice, should fix
+        if(House.electric < 70 && isUndefined(Buttons.getButton("bedroom_light-toggle"))) {
+            Notifications.notify("probably should start conserving power", House);
+            for(var k in House.rooms) {
+                House.rooms[k].updateManageButtons();
+            }
+        }
+
         //var end = Game.now();
         //Logger.log("Update took " + (end - start) + "ms");
     },
