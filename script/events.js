@@ -61,6 +61,10 @@ var Events = {
             return;
         }
 
+        //prevents user from using keyboard navigation during event overlay
+        Game.keyLock = true;
+        Game.tabNavigation = false;
+
         //adds to event stack
         Events.eventStack.push(event);
 
@@ -86,10 +90,6 @@ var Events = {
     },
 
     initEvent: function() {
-        //prevents user from using keyboard navigation during event
-        Game.keyLock = true;
-        Game.tabNavigation = false;
-
         //begins with the start scene
         Events.loadScene("start", true);
 
@@ -111,21 +111,21 @@ var Events = {
 			Events.eventPanel().remove();
             Events.activeEvent().eventPanel = null;
             Events.activeEvent().context = null;
-
-            if(!isUndefined(Events.blinkInterval)) {
-                Events.stopTitleBlink();
-            }
-
-            //re-enables keyboard input
-            Game.keyLock = false;
-            Game.tabNavigation = true;
-
             Events.eventStack.shift();
 
             if(Events.eventStack.length > 0) {
                 Events.initEvent();
                 Logger.log(Events.eventStack.length + " events remaining");
             } else {
+                //clears event overlay state
+                if(!isUndefined(Events.blinkInterval)) {
+                    Events.stopTitleBlink();
+                }
+    
+                //re-enables keyboard input
+                Game.keyLock = false;
+                Game.tabNavigation = true;
+
                 //forces refocus on the body for IE
                 $("body").focus();
             }
