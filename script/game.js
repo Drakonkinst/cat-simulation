@@ -432,11 +432,10 @@ var Game = {
         $("<div>").attr("id", "header").appendTo("#main");
         $("<div>").attr("id", "location-slider").appendTo("#main");
         
-
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
-            //.append($("<span>").addClass("version menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))//
+            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString() + "."))
+            .append($("<span>").addClass("github menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
             //.append($("<span>").addClass("menu-btn").text("discord."))
             //.append($("<span>").addClass("menu-btn").text("save."))
             //.append($("<span>").addClass("menu-btn").text("stats."))
