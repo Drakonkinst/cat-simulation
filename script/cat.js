@@ -86,6 +86,10 @@ Cat.prototype = {
             this.addMorale(3 - Math.floor(this.hunger));
         }
 
+        if(!isUndefined(this.room.litterBox) && this.room.litterBox >= 6) {
+            this.addMorale(5 - this.litterBox);
+        }
+
         if(this.energy <= 0) {
             //starts cat napping
             this.startSleep();
@@ -135,14 +139,25 @@ Cat.prototype = {
             this.wantsToLeave = true;
         }
 
+        //litter box
         if(this.consumedRecently && chance(0.2)) {
-            this.action("needs to use the litterbox");
-            this.consumedRecently = false;
+            if(isUndefined(this.room.litterBox)) {
+                if(chance(0.3)) {
+                    this.addMorale(-5);
+                    this.wantsToLeave = true;
+                }
+            } else {
+                this.useLitterBox();
+                this.consumedRecently = false;
+            }
         }
 
+        //makes cat leave room at end of tick
         if(this.wantsToLeave) {
             this.leaveRoom();
             var cat = this;
+            
+            //reset variable at end of update loop
             Game.setTimeout(function() {
                 cat.wantsToLeave = false;
             }, 0);
@@ -283,6 +298,11 @@ Cat.prototype = {
         this.room.updateWater();
         this.addEnergy(2);
         this.consumedRecently = true;
+    },
+
+    useLitterBox: function() {
+        this.room.litterBox++;
+        this.room.updateLitterBox();
     },
 
     //begins a nap
