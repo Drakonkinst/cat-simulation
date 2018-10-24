@@ -159,15 +159,27 @@ body {
 	color: #666;
 	z-index: 10;
 }
-#footer span {
+
+.menu-btn {
 	cursor: pointer;
 	float: right;
 	margin-left: 20px;
 }
-#footer span:hover {
+
+.menu-btn:hover {
 	text-decoration: underline;
 }
+
 .version {
+	cursor: default;
+}
+
+.version:hover {
+	text-decoration: none;
+}
+
+
+.github {
 	font-weight: bold;
 }
 
