@@ -47,9 +47,15 @@ function Room(properties) {
     $("<div>").addClass("food-status").appendTo(upperStatus);
     $("<div>").addClass("water-status").appendTo(upperStatus);
     $("<div>").addClass("litter-box-status").appendTo(upperStatus);
-    $("<div>").addClass("cat-list").append($("<span>").text("cats:")).append($("<span>").addClass("room-cats")).appendTo(roomStatus);
+    $("<div>").addClass("cat-list-container").append($("<span>").text("cats:")).append($("<span>").addClass("cat-list")).css("opacity", 0).appendTo(roomStatus);
 
-    $("<div>").addClass("room-buttons").appendTo(this.panel);
+    var roomButtons = $("<div>").addClass("room-buttons").appendTo(this.panel);
+    $("<div>").addClass("manage-buttons").attr("data-legend", "manage:").css("opacity", 0)
+        .append($("<div>").addClass(this.id + "_refill-food_container"))
+        .append($("<div>").addClass(this.id + "_refill-water_container"))
+        .append($("<div>").addClass(this.id + "_clean-litter-box_container"))
+        .append($("<div>").addClass(this.id + "_toggle-light_container")).appendTo(roomButtons);
+    
 }
 Room.prototype = {
     init: function() {
@@ -79,11 +85,16 @@ Room.prototype = {
     addCat: function(cat) {
         cat.room = this;
         this.cats.push(cat);
-        var catList = this.panel.find(".room-cats");
+        var catList = this.panel.find(".cat-list");
+        var catListContainer = this.panel.find(".cat-list-container");
+
+        if(catListContainer.css("opacity") == 0) {
+            catListContainer.animate({opacity: 1}, 200, "linear");
+        }
+
         var catIcon = $("<span>").addClass("cat-icon").text("@");
         var nameTooltip = new Tooltip("bottom right").append($("<div>").text(cat.name));
         nameTooltip.appendTo(catIcon);
-
         catList.append($("<span>").attr("id", "cat-"+cat.name).addClass("cat-icon-container").append(catIcon).css("opacity", 0).animate({opacity: 1}, 200, "linear"));
     },
 
@@ -165,7 +176,7 @@ Room.prototype = {
                 })(this.id, building);
                 //do this in order? prevItem system?
                 
-                buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+                buildButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location);
             } else {
                 //notify if max buildings is reached
                 if(max && !buildButton.get().hasClass("disabled") && !isUndefined(buildItem.maxMsg)) {
@@ -190,53 +201,68 @@ Room.prototype = {
 
     //updates manage section (middle)
     updateManageButtons: function() {
-        var roomButtons = this.panel.find(".room-buttons");
-        var manageContainer = new Container(".manage-buttons", "manage:", roomButtons);
-        var location = manageContainer.get();
+        var location = this.panel.find(".manage-buttons");
         var room = this;
-
-        //light switch
-        if(World.day > 1 && isUndefined(Buttons.getButton(this.id + "_manage_light-toggle"))) {
-            var lightButton = new Button({
-                id: this.id + "_manage_light-toggle",
-                text: "lights off",
-                //cooldown + setText() appears to be bugged
-                onClick: function() {
-                    room.toggleLight();
-                }
-            });
-            lightButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
-        }
+        var needsAppend = false;
 
         //refill food
-        if(!isUndefined(this.food) && isUndefined(Buttons.getButton(this.id + "_manage_refill-food"))) {
+        if(!isUndefined(this.food) && isUndefined(Buttons.getButton(this.id + "_refill-food"))) {
+            needsAppend = true;
             var foodButton = new Button({
-                id: this.id + "_manage_refill-food",
+                id: this.id + "_refill-food",
                 text: "refill food",
                 cooldown: 4000,
                 onClick: function() {
                     return room.refillFood();
                 }
             });
-            foodButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            foodButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_refill-food_container"));
         }
 
         //refill water
-        if(!isUndefined(this.water) && isUndefined(Buttons.getButton(this.id + "_manage_refill-water"))) {
+        if(!isUndefined(this.water) && isUndefined(Buttons.getButton(this.id + "_refill-water"))) {
+            needsAppend = true;
             var waterButton = new Button({
-                id: this.id + "_manage_refill-water",
+                id: this.id + "_refill-water",
                 text: "refill water",
                 cooldown: 4000,
                 onClick: function() {
                     return room.refillWater();
                 }
             });
-            waterButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            waterButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_refill-water_container"));
+        }
+        
+        //clear litter box
+        if(!isUndefined(this.litterBox) && isUndefined(Buttons.getButton(this.id + "_clean-litter-box"))) {
+            needsAppend = true;
+            var litterBoxButton = new Button({
+                id: this.id + "_clean-litter-box",
+                text: "clean litter box",
+                cooldown: 4000,
+                onClick: function() {
+                    return room.cleanLitterBox();
+                }
+            });
+            litterBoxButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_clean-litter-box_container"));
         }
 
-        //initialize manage container
-        if(manageContainer.needsAppend && manageContainer.exists()) {
-            manageContainer.create().appendTo(roomButtons);
+        //light switch
+        if(World.day > 1 && isUndefined(Buttons.getButton(this.id + "_light-toggle"))) {
+            needsAppend = true;
+            var lightButton = new Button({
+                id: this.id + "_light-toggle",
+                text: "lights off",
+                //cooldown + setText() appears to be bugged
+                onClick: function() {
+                    room.toggleLight();
+                }
+            });
+            lightButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location.find("." + this.id + "_toggle-light_container"));
+        }
+
+        if(needsAppend) {
+            location.animate({opacity: 1}, 200, "linear");
         }
     },
 
@@ -267,12 +293,28 @@ Room.prototype = {
         var waterStatus = this.panel.find(".water-status");
         
         if(!waterStatus.is(":visible")) {
-            Logger.log("Called");
             waterStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
         }
 
         //update text
         waterStatus.text("water: " + this.water.level + "/" + this.water.maximum);
+    },
+
+    //updates litter box
+    updateLitterBox: function() {
+        //exit early if this room doesn't support litter box
+        if(isUndefined(this.litterBox)) {
+            return;
+        }
+
+        var litterBoxStatus = this.panel.find(".litter-box-status");
+
+        if(!litterBoxStatus.is(":visible")) {
+            litterBoxStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
+        }
+
+        //update text
+        litterBoxStatus.text("litter box: " + this.litterBox);
     },
 
     //toggles light switch
@@ -286,6 +328,7 @@ Room.prototype = {
         } else {
             lightButton.setText("lights off");
         }
+        
         //toggle variable
         this.lightsOn = !this.lightsOn;
     },
@@ -350,5 +393,10 @@ Room.prototype = {
         this.updateWater();
         Game.updateEquipment();
         return true;
+    },
+
+    //attempt to clean litter box
+    cleanLitterBox: function() {
+
     }
 };
