@@ -79,7 +79,7 @@ var Events = {
             event.context = event.getContext();
         }
 
-        var startScene = event.scenes.start;
+        var startScene = Events.getScene("start", event);
         if(!isUndefined(startScene.notification)) {
             Notifications.notify(startScene.notification);
         }
@@ -340,10 +340,11 @@ var Events = {
      * calling that function with the context object. Either
      * way, an object should be returned.
      * */
-    getScene: function(name) {
-        var scene = Events.activeEvent().scenes[name];
+    getScene: function(name, event) {
+        event = event || Events.activeEvent();
+        var scene = event.scenes[name];
         if(typeof scene === "function") {
-            return scene(Events.activeEvent().context);
+            return scene(event.context);
         }
         return scene;
     },
