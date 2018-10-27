@@ -438,6 +438,7 @@ var World = {
             workButton.setDisabled(false);
         }
 
+        World.nextWeather(true);
         Notifications.notify(World.weather[World.currentWeather].greeting);
         $("#day-notify").text("day " + World.day + ".").css("opacity", 1).animate({opacity: 0}, 3000, "linear");
         House.nextDay();
