@@ -160,7 +160,7 @@ var Game = {
     //looks through all item lookup tables to find the item's type
     getItemType: function(item) {
         if(Game.Items.hasOwnProperty(item)) {
-            return item.type;
+            return Game.Items[item].type;
         } else if(House.Buildings.hasOwnProperty(item)) {
             return "building";
         }
