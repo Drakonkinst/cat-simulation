@@ -24,6 +24,7 @@ function Room(properties) {
     //stores
     this.food = null;
     this.water = null;
+    this.litterBox = null;
     this.lightsOn = true;
 
     this.onLoad = properties.onLoad || function() {};
