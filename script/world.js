@@ -328,6 +328,7 @@ var World = {
                         input: "give the cat a name",
                         maxinput: 20,
                         valid: function(text) {
+                            text = text.toLowerCase();
                             if(text.length === 0 || /^[\s\'\-\_]+$/g.test(text)) {
                                 return "can't be nothing";
                             }
@@ -347,7 +348,7 @@ var World = {
                                 tooltip: new Tooltip("top left").append($("<div>").text("confirm name?")),
                                 click: function() {
                                     Notifications.notify("a new addition to the family");
-                                    cat.name = Events.eventPanel().find("input").val();
+                                    cat.name = Events.eventPanel().find("input").val().toLowerCase();
                                     House.addCat(cat);
                                 }
                             },
