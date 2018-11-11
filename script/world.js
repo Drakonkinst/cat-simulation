@@ -327,29 +327,29 @@ var World = {
                         ],
                         input: "give the cat a name",
                         maxinput: 20,
-                        valid: function(text) {
-                            text = text.toLowerCase();
-                            if(text.length === 0 || /^[\s\'\-\_]+$/g.test(text)) {
-                                return "can't be nothing";
-                            }
-                            if(text.replace(/[\-\'\s\_]/g, "_").indexOf("__") > -1 || !/^[a-z0-9\-\'\_\s]+$/i.test(text)) {
-                                return "cat doesn't seem to recognize that";
-                            }
-                            if(itemInList(House.cats.map(cat => cat.name), text, true)) {
-                                return "name is taken";
-                            }
-                            return true;
-                        },
                         buttons: {
                             "name": {
                                 text: "name",
                                 nextScene: "end",
-                                checkValid: true,
                                 tooltip: new Tooltip("top left").append($("<div>").text("confirm name?")),
                                 click: function() {
-                                    Notifications.notify("a new addition to the family");
+                                    var name = Events.eventPanel().find("input").val().toLowerCase();
+
+                                    if(name.length === 0 || /^[\s\'\-\_]+$/g.test(name)) {
+                                        return "can't be nothing";
+                                    }
+                                    if(name.replace(/[\-\'\s\_]/g, "_").indexOf("__") > -1 || !/^[a-z0-9\-\'\_\s]+$/i.test(name)) {
+                                        return "cat doesn't seem to recognize that";
+                                    }
+                                    if(itemInList(House.cats.map(cat => cat.name), name, true)) {
+                                        return "name is taken";
+                                    }
+
+                                    //should check valid here and return false if else
                                     cat.name = Events.eventPanel().find("input").val().toLowerCase();
+                                    Notifications.notify("a new addition to the family")
                                     House.addCat(cat);
+                                    return true;
                                 }
                             },
                             "random": {

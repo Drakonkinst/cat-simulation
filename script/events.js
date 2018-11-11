@@ -256,37 +256,36 @@ var Events = {
         var scene = Events.getScene(Events.activeScene);
         var info = scene.buttons[button.id];
 
-        if(info.checkValid && typeof scene.valid === "function" && !isUndefined(scene.input)) {
-            //button should use valid(), get result
-            var text = Events.eventPanel().find("input").val();
-            var result = scene.valid(text);
+        if(!(isUndefined(info.click))) {
+            var result = info.click();
 
-            //if result is anything but true
-            if(typeof result !== "boolean" || !result) {
+            if(!isUndefined(result) && (typeof result !== "boolean" || !result)) {
                 //result is not valid
-                if(typeof result === "string" && Events.eventPanel().find("#input-result").css("opacity") == 0) {
-                    //prints string as error message, as long as the last error message is completely invisible
-                    if(result.length > 0 && ".!? ".indexOf(result.slice(-1)) == -1) {
-                        result += ".";
+                if(typeof result === "string") {
+                    if(isUndefined(scene.input)) {
+                        Notifications.notify(result);
+                    } else {
+                        if(Events.eventPanel().find("#input-result").css("opacity") == 0) {
+                            //prints string as error message
+                            if(result.length > 0 && ".!? ".indexOf(result.slice(-1)) == -1) {
+                                result += ".";
+                            }
+                            Events.eventPanel().find("#input-result").text(result).css("opacity", 1).animate({opacity: 0}, 1500, "linear");
+                        }
                     }
-                    Events.eventPanel().find("#input-result").text(result).css("opacity", 1).animate({opacity: 0}, 1500, "linear");
                 }
                 return;
             }
 
-            //disables selection again now that input no longer needs to be checked
             //TODO what if there are two input scenes in an event?
-            Game.disableSelection();
+            if(!isUndefined(scene.input)) {
+                Game.disableSelection();
+            }   
         }
         
         if(!isUndefined(info.notification)) {
             //notify button click
             Notifications.notify(info.notification);
-        }
-
-        if(!(isUndefined(info.click))) {
-            //run onClick functions
-            info.click();
         }
 
         if(!isUndefined(info.nextScene)) {
