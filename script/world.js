@@ -407,7 +407,7 @@ var World = {
             //set room to bedroom?
 
             //animate onArrival before the screen fades in
-            House.onArrival();
+            Game.moveEquipmentView($("#house"), 0);
 
             //come back after a time delay
             Game.setTimeout(function() {
