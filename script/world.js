@@ -5,7 +5,7 @@
  */
 var World = {
     WEATHER_INTERVAL: [5, 10],  //possible interval between weather updates, in minutes
-    TICK_SPEED: 5000,
+    TICK_SPEED: 5000,           //time in between each tick, in milliseconds
 
     currentWeather: null,       //name of current weather
     day: 0,                     //current day, increments every time the player sleeps
