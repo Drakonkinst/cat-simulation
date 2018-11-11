@@ -488,8 +488,6 @@ var House = {
         Game.updateSlider();
         House.travelTo("hallway");
 
-        Game.setInterval(House.tick, 5000);
-
         House.cats = [];
     }
 };

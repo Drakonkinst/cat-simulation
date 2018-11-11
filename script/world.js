@@ -5,6 +5,7 @@
  */
 var World = {
     WEATHER_INTERVAL: [5, 10],  //possible interval between weather updates, in minutes
+    TICK_SPEED: 5000,
 
     currentWeather: null,       //name of current weather
     day: 0,                     //current day, increments every time the player sleeps
@@ -429,6 +430,10 @@ var World = {
         //if bad/restless, (which should also be calculated in sleep), reduces number of actions player can make on the next day
     },
 
+    tick: function() {
+        House.tick();
+    },
+
     //called at the start of a new day
     nextDay: function() {
         World.day++;
@@ -450,5 +455,7 @@ var World = {
         //World.currentWeather = chooseRandom(keysAsList(World.weather)); - move somewhere else
         World.WeatherTask.scheduleNext();
         World.nextDay();
+
+        Game.setInterval(World.tick, 5000);
     }
 };
