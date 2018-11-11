@@ -366,9 +366,9 @@ var World = {
 
     //attempts to change the weather based on the current weather
     nextWeather: function(hideAnnouncement) {
-        var possibilities = World.weather[World.currentWeather].causes;
+        var possibilities = World.currentWeather ? World.weather[World.currentWeather].causes : { "sunny": { weight: 1 }};
         var nextWeather = chooseWeighted(possibilities, "weight");
-        var notification = possibilities[nextWeather].notification
+        var notification = possibilities[nextWeather].notification;
 
         //play notification if the weather changes
         if(!isUndefined(notification) && !hideAnnouncement) {
@@ -447,8 +447,7 @@ var World = {
     Init: function() {
         World.WeatherTask = new Task("weather", World.nextWeather, World.WEATHER_INTERVAL[0], World.WEATHER_INTERVAL[1]);
         
-        //World.currentWeather = chooseRandom(keysAsList(World.weather));
-        World.currentWeather = chooseRandom(["sunny", "cloudy", "snow"]);
+        //World.currentWeather = chooseRandom(keysAsList(World.weather)); - move somewhere else
         World.WeatherTask.scheduleNext();
         World.nextDay();
     }
