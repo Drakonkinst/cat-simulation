@@ -33,6 +33,7 @@ var Game = {
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
+        warn: true              //warn if user tries to close browser
     },
     
     //game states
@@ -446,6 +447,12 @@ var Game = {
         //register listeners
         $("body").off("keydown").keydown(Game.keyDown);
         $("body").off("keyup").keyup(Game.keyUp);
+
+        $(window).on("beforeunload", function() {
+            if(Game.options.warn) {
+                return confirm();
+            }
+        });
 
         Game.equipment = {};
 
