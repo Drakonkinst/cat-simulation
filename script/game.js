@@ -244,7 +244,7 @@ var Game = {
         //update all perks
         for(var perk in Game.perks) {
             if(Game.hasPerk(perk)) {
-                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().append($("<div>").text(Game.perks[perk].desc)));
+                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().addText(Game.perks[perk].desc));
             }
         }
 

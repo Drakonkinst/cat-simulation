@@ -114,7 +114,7 @@ var Outside = {
                     var tooltip = new Tooltip(location.children().length > 10 ? "top left" : "bottom left");
 
                     for(var id in cost) {
-                        tooltip.append($("<div>").addClass("row_key").text(id)).append($("<div>").addClass("row_val").text(cost[id]));
+                        tooltip.addCost(id, cost[id]);
                     }
 
                     //closure is important
@@ -235,7 +235,7 @@ var Outside = {
             id: "work",
             text: "go to work",
             cooldown: 4000,
-            tooltip: new Tooltip().append($("<div>").text("you need to go to work.")),
+            tooltip: new Tooltip().addText("you need to go to work."),
             onClick: Outside.work,
             onFinish: function() {
                 Buttons.getButton("work").setDisabled(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK);

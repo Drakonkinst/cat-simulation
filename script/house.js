@@ -442,7 +442,7 @@ var House = {
                         id: "door",
                         text: "open door",
                         cooldown: 8000,
-                        tooltip: new Tooltip().append($("<div>").text("someone's knocking.")),
+                        tooltip: new Tooltip().addText("someone's here."),
                         onClick: function() {
                             if(World.events[0].isAvailable()) {
                                 Events.startEvent(World.events[0]);
