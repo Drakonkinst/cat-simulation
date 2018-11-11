@@ -450,7 +450,7 @@ var Game = {
 
         $(window).on("beforeunload", function() {
             if(Game.options.warn) {
-                return confirm();
+                return true;
             }
         });
 
