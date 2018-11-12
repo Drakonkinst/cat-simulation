@@ -408,6 +408,7 @@ var World = {
 
             //animate onArrival before the screen fades in
             Game.moveEquipmentView($("#house"), 0);
+            House.travelTo("bedroom");
 
             //come back after a time delay
             Game.setTimeout(function() {
