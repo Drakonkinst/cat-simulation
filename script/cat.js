@@ -185,30 +185,49 @@ Cat.prototype = {
     //called upon the start of a new day
     nextDay: function() {
         if(this.morale == 0 && chance(0.9)) {
-            this.runAway();
+            this.runAway(true);
         }
     },
 
     //removes cat from house
-    runAway: function() {
+    runAway: function(isNight) {
         this.room.removeCat(this);
         House.cats.splice(House.cats.indexOf(this), 1);
         Game.addItem("cat", -1);
+        var cat = this;
+
         Events.startEvent({
             title: "A Disappearance",
+            getContext: function() {
+                var context = {};
+                context.name = cat.name;
+
+                if(isNight) {
+                    context.text1 = cat.name + " disappeared in the night.";
+                    context.text2 = "doesn't seem likely " + this.genderPronoun("he", "she") + "'ll return.";
+                    location = " last night";
+                } else {
+                    context.text1 = cat.name + " has disappeared.";
+                    context.text2 = "hopefully " + cat.genderPronoun("he", "she") + "'ll have better luck in the wild.";
+                    context.location = "";
+                }
+
+                return context;
+            },
             scenes: {
-                "start": {
-                    text: [
-                        this.name + " disappeared in the night.",
-                        //how did the cat get out? OR if other cats, then say they are sad or something lol
-                        "doesn't seem likely " + this.genderPronoun("he", "she") + "'ll return."
-                    ],
-                    notification: this.name + " ran away last night",
-                    blink: true,
-                    buttons: {
-                        "continue": {
-                            text: "move on",
-                            nextScene: "end"
+                "start": function(c) {
+                    return {
+                        text: [
+                            c.text1,
+                            c.text2
+                        ],
+                        notification: c.name + " ran away" + c.location,
+                        blink: true,
+                        buttons: {
+                            "continue": {
+                                text: "move on",
+                                nextScene: "end"
+                            }
                         }
                     }
                 }
