@@ -25,33 +25,36 @@ function Cat(properties) {
     var breed = Cats.BREEDS[this.breed];
 
     //70% chance to retain each tendency
-    this.traits = [];
-    for(var i in breed.tendencies) {
-        if(chance(0.7)) {
-            this.traits.push(breed.tendencies[i]);
+    this.traits = properties.traits || [];
+    if(this.traits.length == 0) {
+        for(var i in breed.tendencies) {
+            if(chance(0.7)) {
+                this.traits.push(breed.tendencies[i]);
+            }
         }
     }
+    
 
     //set weight based on gender and breed
     var weightRange = this.isFemale ? breed.weight.f : breed.weight.m;
     this.weight = properties.weight || randInt(weightRange[0], weightRange[1]);
     
     //set color, coat, and eyeColor based on breed
-    this.color = chooseRandom(breed.colors);
-    this.coat = chooseRandom(breed.coats);
-    this.eyeColor = chooseRandom(breed.eyeColors);
+    this.color = properties.color || chooseRandom(breed.colors);
+    this.coat = properties.coat || chooseRandom(breed.coats);
+    this.eyeColor = properties.eyeColor || chooseRandom(breed.eyeColors);
 
     //sets random hunger upon spawn
-    this.hunger = randInt(0, 11);
-    this.thirst = randInt(0, 11);
-    this.morale = randInt(0, Cats.MoraleEnum.morales.length);
-    this.moralePoints = 50;
-    this.energy = Cats.MAX_ENERGY;
+    this.hunger = properties.hunger || randInt(0, 11);
+    this.thirst = properties.thirst || randInt(0, 11);
+    this.morale = properties.morale || randInt(0, Cats.MoraleEnum.morales.length);
+    this.moralePoints = properties.moralePoints || 50;
+    this.energy = properties.energy || Cats.MAX_ENERGY;
 
-    this.isSleeping = false;
-    this.wantsToLeave = false;
-    this.consumedRecently = chance(1 - ((this.hunger + this.thirst) / 20));
-    this.room = null;
+    this.isSleeping = isUndefined(properties.isSleeping) ? false : properties.isSleeping;
+    this.wantsToLeave = isUndefined(properties.wantsToLeave) ? false : properties.wantsToLeave;
+    this.consumedRecently = isUndefined(properties.consumedRecently) ? chance(1 - ((this.hunger + this.thirst) / 20)) : properties.consumedRecently;
+    this.room = properties.room || null;
 
     var cat = this;
     this.wakeUpTask = new Task("[" + cat.name + " - wake up]", function() {
