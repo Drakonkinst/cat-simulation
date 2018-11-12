@@ -23,13 +23,13 @@ var Game = {
         beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  7,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    6,  //increments for every unstable build tested, resets on every release
+        release:  8,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        build:    1,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
     options: {
-        debug: false,            //print debug messages
+        debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
