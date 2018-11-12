@@ -420,7 +420,7 @@ var Game = {
         Game.travelTo(House);
         
         //tester
-        Game.addItem("money", 9001);
+        //by end of intro, should have 1 cat and game begins
         House.addCat();
 
         var end = Game.now();
