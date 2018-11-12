@@ -19,7 +19,7 @@ var House = {
             //should space be based on single buildings or overall? maybe
             //assign weight to each structure and have each room cap..
             //for later.
-            buildMsg: "very shiny bowls, needs food though",
+            buildMsg: "shiny bowls, needs food though",
             maxMsg: "no more space for more bowls",
             maximum: 5,
             onBuild: function(room) {
@@ -183,9 +183,24 @@ var House = {
     },
 
     //called when player travels to this location
-    onArrival: function(transitionDiff) {
+    onArrival: function(transitionDiff, newDay) {
         House.updateTitle();
 
+        for(var i = 0; i < House.cats.length; i++) {
+            var cat = House.cats[i];
+
+            if(cat.morale == 0 && chance(0.9) && !newDay) {
+                cat.runAway(false);
+            } else {
+                if(cat.hunger > 15) {
+                    cat.action("is starving", true);
+                }
+    
+                if(cat.thirst > 15) {
+                    cat.action("is dehydrated", true);
+                }
+            }
+        }
         //moves main inventory to accomodate for house inventory display
         Game.moveEquipmentView($("#house"), transitionDiff);
     },
