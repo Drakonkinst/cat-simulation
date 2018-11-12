@@ -249,10 +249,34 @@ Cat.prototype = {
     },
     
     /* Sounds */
-    meow: function(volume) {
+    meow: function(volume, target, noRepeat) {
         var loudness = volume || randInt(-4, 5);
-        this.makeSound("meows", loudness, "quietly", "loudly");
-        //do repetitive meowing here
+        target = target || null;
+
+        if(chance(0.5) && isUndefined(target)) {
+            var possibilities = [ "you" ];
+            if(this.room.cats.length > 1) {
+                for(var i = 0; i < this.room.cats.length; i++) {
+                    var catName = this.room.cats[i].name;
+                    if(catName != this.name) {
+                        possibilities.push(catName);
+                    }
+                }
+            }
+            target = chooseRandom(possibilities);
+        }
+
+        if(!this.traits.includes("quiet") && chance(0.1) && loudness == 4 && !noRepeat) {
+            var numTimes = randInt(1,5);
+            var cat = this;
+            for(var i = 0; i < numTimes; i++) {
+                Game.setTimeout(function() {
+                    cat.meow(4, target, true);
+                }, 3000 * i);
+            }
+        } else {
+            this.makeSound("meows", loudness, "quietly", "loudly", target);
+        }
     },
 
     purr: function(volume) {
