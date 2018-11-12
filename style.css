@@ -303,7 +303,7 @@ div.button.disabled:hover {
 	display: none !important;
 }
 
-.disabled:hover > .tooltip, .button.free:hover > .tooltip {
+.disabled:hover > .tooltip {
 	display: none;
 }
 
