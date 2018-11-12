@@ -18,14 +18,14 @@ function Task(name, task, minInterval, maxInterval) {
 Task.prototype = {
     //schedules the next task, usually called at the end of the task function
     scheduleNext: function(scale) {
-        var interval = Math.floor(randNum(this.minInterval, this.maxInterval));
+        var interval = randInt(this.minInterval, this.maxInterval);
         if(scale > 0) {
             interval *= scale;
         }
         if(Game.options.fastEvents) {
             interval /= 8;
         }
-        Logger.log("Next " + this.name + " scheduled in " + interval + " minutes");
+        Logger.log("Next " + this.name + " event scheduled in " + interval + " minutes");
         
         if(this.eventTimeout) {
             clearTimeout(this.eventTimeout);

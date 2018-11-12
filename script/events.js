@@ -13,7 +13,7 @@ var Events = {
 
     //returns the current event object
     activeEvent: function() {
-        if(Events.eventStack && Events.eventStack.length > 0) {
+        if(Events.eventStack.length > 0) {
             return Events.eventStack[0];
         }
         return null;
@@ -53,44 +53,45 @@ var Events = {
     },
 
     /*
-     * Triggers an event and opens a new event
-     * panel.
-     * 
-     * properties:
-     * - width: custom width of event panel
+     * Called upon event trigger, adds event to
+     * eventStack and initializes it if it is the next one
      * */
-    startEvent: function(event, properties) {
+    startEvent: function(event) {
         if(isUndefined(event)) {
             return;
         }
 
-        //prevents user from using keyboard navigation during event
+        //prevents user from using keyboard navigation during event overlay
         Game.keyLock = true;
         Game.tabNavigation = false;
 
-        //adds to beginning of event stack
-        Events.eventStack.unshift(event);
+        //adds to event stack
+        Events.eventStack.push(event);
 
         //create event panel
         event.eventPanel = $("<div>").attr("id", "event").addClass("event-panel").css("opacity", 0)
-            .append($("<div>").addClass("event-title").text(Events.activeEvent().title))
+            .append($("<div>").addClass("event-title").text(event.title))
             .append($("<div>").attr("id", "description"))
             .append($("<div>").attr("id", "buttons"));
 
-        if(!isUndefined(properties) && !isUndefined(properties.width)) {
-            //sets custom width
-            Events.eventPanel().css("width", properties.width);
-        }
-
         //create context object based on the instant this function is called
         if(typeof event.getContext === "function") {
-            Events.activeEventContext = event.getContext();
-        } else {
-            Events.activeEventContext = {};
+            event.context = event.getContext();
         }
 
+        var startScene = Events.getScene("start", event);
+        if(!isUndefined(startScene.notification)) {
+            Notifications.notify(startScene.notification);
+        }
+
+        if(Events.eventStack.length <= 1) {
+            Events.initEvent();
+        }
+    },
+
+    initEvent: function() {
         //begins with the start scene
-        Events.loadScene("start");
+        Events.loadScene("start", true);
 
         //draw event panel
         $("#wrapper").append(Events.eventPanel());
@@ -101,7 +102,6 @@ var Events = {
             //blinks title to notify AFK players for duration of event
 			Events.blinkTitle();
         }
-
     },
 
     //ends event and clears the event panel
@@ -110,25 +110,30 @@ var Events = {
             //clear all variables
 			Events.eventPanel().remove();
             Events.activeEvent().eventPanel = null;
-            Events.activeEventContext = null;
+            Events.activeEvent().context = null;
             Events.eventStack.shift();
-            Logger.logIf(Events.eventStack.length > 0, Events.eventStack.length + " events remaining");
 
-            //re-enables keyboard input
-            Game.keyLock = false;
-            Game.tabNavigation = true;
+            if(Events.eventStack.length > 0) {
+                Events.initEvent();
+                Logger.log(Events.eventStack.length + " events remaining");
+            } else {
+                //clears event overlay state
+                if(!isUndefined(Events.blinkInterval)) {
+                    Events.stopTitleBlink();
+                }
+    
+                //re-enables keyboard input
+                Game.keyLock = false;
+                Game.tabNavigation = true;
 
-            if(!isUndefined(Events.blinkInterval)) {
-                Events.stopTitleBlink();
+                //forces refocus on the body for IE
+                $("body").focus();
             }
-
-            //forces refocus on the body for IE
-            $("body").focus();
 		});
     },
 
     //starts a scene in an event
-    loadScene: function(name) {
+    loadScene: function(name, skipNotification) {
         //sets active scene and grabs scene object from the event
         Logger.log("Loading scene: " + name);
         Events.activeScene = name;
@@ -139,7 +144,7 @@ var Events = {
             scene.onLoad();
         }
 
-        if(!isUndefined(scene.notification)) {
+        if(!isUndefined(scene.notification) && !skipNotification) {
             //notify scene change
             Notifications.notify(scene.notification);
         }
@@ -220,10 +225,6 @@ var Events = {
                 cooldown: info.cooldown     //sets initial cooldown, since cooldown after click is irrelevant
             }).appendTo(btns);
 
-            if(!isUndefined(info.available) && !info.available()) {
-                //disables button if it should not be clickable
-                button.setDisabled(true);
-            }
             if(!isUndefined(info.cooldown)) {
                 //button starts cooling down so player can not press it immediately
                 button.startCooldown();
@@ -231,19 +232,20 @@ var Events = {
             //btnList.push(button);
         }
 
-        //Events.updateButtons();
+        Events.updateButtons();
     },
 
-    /* //no use currently
     updateButtons: function() {
-        var btns = Events.activeEvent().scenes[Events.activeScene].buttons;
+        var btns = Events.getScene(Events.activeScene).buttons;
+        
         for(var id in btns) {
-            var button = btns[id];
-            var element = $("#" + id, Events.eventPanel());
-            //check cost and availability, disable if needed
+            var button = Buttons.getButton(id);
+            var info = btns[id];
+            if(!isUndefined(info.available) && !info.available()) {
+                button.setDisabled(true);
+            }
         }
     },
-    */
 
     //handles when the player clicks a button, changes scene or ends event
     buttonClick: function(button) {
@@ -251,37 +253,38 @@ var Events = {
         var scene = Events.getScene(Events.activeScene);
         var info = scene.buttons[button.id];
 
-        if(info.checkValid && typeof scene.valid === "function" && !isUndefined(scene.input)) {
-            //button should use valid(), get result
-            var text = Events.eventPanel().find("input").val();
-            var result = scene.valid(text);
+        if(!(isUndefined(info.click))) {
+            var result = info.click();
 
-            //if result is anything but true
-            if(typeof result !== "boolean" || !result) {
+            if(!isUndefined(result) && (typeof result !== "boolean" || !result)) {
                 //result is not valid
-                if(typeof result === "string" && Events.eventPanel().find("#input-result").css("opacity") == 0) {
-                    //prints string as error message, as long as the last error message is completely invisible
-                    if(result.length > 0 && ".!? ".indexOf(result.slice(-1)) == -1) {
-                        result += ".";
+                if(typeof result === "string") {
+                    if(isUndefined(scene.input)) {
+                        Notifications.notify(result);
+                    } else {
+                        if(Events.eventPanel().find("#input-result").css("opacity") == 0) {
+                            //prints string as error message
+                            if(result.length > 0 && ".!? ".indexOf(result.slice(-1)) == -1) {
+                                result += ".";
+                            }
+                            Events.eventPanel().find("#input-result").text(result).css("opacity", 1).animate({opacity: 0}, 1500, "linear");
+                        }
                     }
-                    Events.eventPanel().find("#input-result").text(result).css("opacity", 1).animate({opacity: 0}, 1500, "linear");
                 }
                 return;
             }
 
-            //disables selection again now that input no longer needs to be checked
             //TODO what if there are two input scenes in an event?
-            Game.disableSelection();
+            if(!isUndefined(scene.input)) {
+                Game.disableSelection();
+            }   
         }
+
+        Events.updateButtons();
         
         if(!isUndefined(info.notification)) {
             //notify button click
             Notifications.notify(info.notification);
-        }
-
-        if(!(isUndefined(info.click))) {
-            //run onClick functions
-            info.click();
         }
 
         if(!isUndefined(info.nextScene)) {
@@ -311,6 +314,10 @@ var Events = {
     blinkTitle: function() {
         var title = document.title;
 
+        if(!isUndefined(Events.blinkInterval)) {
+            return;
+        }
+
         //set blinkInterval
         Events.blinkInterval = Game.setInterval(function() {
             document.title = "*** EVENT ***";
@@ -331,11 +338,11 @@ var Events = {
      * calling that function with the context object. Either
      * way, an object should be returned.
      * */
-    getScene: function(name) {
-        var scene = Events.activeEvent().scenes[name];
+    getScene: function(name, event) {
+        event = event || Events.activeEvent();
+        var scene = event.scenes[name];
         if(typeof scene === "function") {
-            //call the function passing the context object
-            scene = scene(Events.activeEventContext);
+            return scene(event.context);
         }
         return scene;
     },
@@ -349,7 +356,7 @@ var Events = {
         );
 
         //start random event task
-        Events.Task = new Task("random event", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
+        Events.Task = new Task("random", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
         Events.Task.scheduleNext();
     }
 };

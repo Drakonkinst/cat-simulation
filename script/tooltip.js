@@ -17,6 +17,16 @@ Tooltip.prototype = {
         this.element.append(element);
         return this;
     },
+
+    //adds text to the tooltip
+    addText: function(text) {
+        return this.append($("<div>").text(text));
+    },
+    
+    //adds cost to the tooltip, display only
+    addCost: function(item, quantity) {
+        return this.append($("<div>").addClass("row_key").text(item)).append($("<div>").addClass("row_val").text(quantity));
+    },
     
     //appends Tooltip to element
     appendTo: function(element) {
@@ -27,12 +37,5 @@ Tooltip.prototype = {
     //returns whether the Tooltip has any text to show
     exists: function() {
         return this.element.children().length > 0;
-    },
-
-    /*
-    //returns the Tooltip's element
-    get: function() {
-        return this.element;
     }
-    */
 };

@@ -68,7 +68,7 @@ Button.prototype = {
 
         //button hax!
         if(Game.options.instantButtons) {
-            cooldown = 100;
+            cooldown = 0;
         } else if(Game.options.fastButtons) {
             cooldown /= 4;
         }
@@ -84,8 +84,8 @@ Button.prototype = {
         this.element.find(".cooldown").width("100%").animate({width:"0%"}, cooldown, "linear", function() {
             //callbacks are fun
             var button = Buttons.getButton($(this).parent().attr("id"));
-            button.onFinish();
             button.clearCooldown();
+            button.onFinish();
         });
         this.onCooldown = true;
         this.setDisabled(true);

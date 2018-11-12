@@ -19,15 +19,16 @@ function Room(properties) {
     };*/
     this.buildings = {};
 
-    //this.cats = [];                 //section of House.cats that are currently in this room
+    this.cats = [];                 //section of House.cats that are currently in this room
 
     //stores
-    //this.food = null;
+    this.food = null;
+    this.water = null;
+    this.litterBox = null;
     this.lightsOn = true;
 
     this.onLoad = properties.onLoad || function() {};
 
-    
     //create location in header
     var id = this.id;
     this.tab = $("<div>").attr("id", "room-location_" + this.id)
@@ -40,8 +41,27 @@ function Room(properties) {
     
     //create panel element
     this.panel = $("<div>").attr("id", "room_" + this.id).addClass("room");
-    $("<div>").addClass("room-status").appendTo(this.panel);
-    $("<div>").addClass("room-buttons").appendTo(this.panel);
+
+    var roomStatus = $("<div>").addClass("room-status").appendTo(this.panel);
+    var upperStatus = $("<div>").addClass("room-upper-status").appendTo(roomStatus);
+    $("<div>").addClass("food-status").appendTo(upperStatus);
+    $("<div>").addClass("water-status").appendTo(upperStatus);
+    $("<div>").addClass("litter-box-status").appendTo(upperStatus);
+    $("<div>").addClass("cat-list-container").append($("<span>").text("cats:")).append($("<span>").addClass("cat-list")).css("opacity", 0).appendTo(roomStatus);
+
+    var roomButtons = $("<div>").addClass("room-buttons").appendTo(this.panel);
+    var buildButtons = $("<div>").addClass("build-buttons").attr("data-legend", "build:").css("opacity", 0).appendTo(roomButtons);
+    for(var k in House.Buildings) {
+        var formattedName = k.replace(" ", "-");
+        buildButtons.append($("<div>").attr("id", this.id + "_build_" + formattedName + "_container"));
+    }
+
+    $("<div>").addClass("manage-buttons").attr("data-legend", "manage:").css("opacity", 0)
+        .append($("<div>").attr("id", this.id + "_refill-food_container"))
+        .append($("<div>").attr("id", this.id + "_refill-water_container"))
+        .append($("<div>").attr("id", this.id + "_clean-litter-box_container"))
+        .append($("<div>").attr("id", this.id + "_toggle-light_container")).appendTo(roomButtons);
+    
 }
 Room.prototype = {
     init: function() {
@@ -62,6 +82,45 @@ Room.prototype = {
         this.updateFood();
     },
 
+    tick: function() {
+        for(var k in this.cats) {
+            this.cats[k].tick(this);
+        }
+        if(this.lightsOn) {
+            House.usePower(0.01);
+        }
+    },
+
+    addCat: function(cat) {
+        cat.room = this;
+        this.cats.push(cat);
+        var catList = this.panel.find(".cat-list");
+        var catListContainer = this.panel.find(".cat-list-container");
+
+        if(catListContainer.css("opacity") == 0) {
+            catListContainer.animate({opacity: 1}, 200, "linear");
+        }
+
+        var catIcon = $("<span>").addClass("cat-icon").text("@").click(function() {
+            cat.examine();
+        });
+        var nameTooltip = new Tooltip("bottom right").append($("<div>").text(cat.name));
+        nameTooltip.appendTo(catIcon);
+        catList.append($("<span>").attr("id", "cat-"+cat.name).addClass("cat-icon-container").append(catIcon).css("opacity", 0).animate({opacity: 1}, 200, "linear"));
+    },
+
+    removeCat: function(cat) {
+        cat.room = null;
+        this.cats.splice(this.cats.indexOf(cat), 1);
+        var catIconContainer = this.panel.find($("#cat-" + cat.name));
+        if(catIconContainer.length) {
+            var pseudoIcon = $("<span>").addClass("cat-icon").text("@").css("opacity", 1);
+            catIconContainer.replaceWith(pseudoIcon.animate({opacity: 0}, 200, "linear", function() {
+                pseudoIcon.remove();
+            }));
+        }
+    },
+
     //places a building in this room
     build: function(id) {
         var building = House.Buildings[id];
@@ -79,20 +138,18 @@ Room.prototype = {
         }
 
         //exit early if not enough resources
-        if(!Game.hasItem(id)) {
+        if(!$SM.hasItem(id)) {
             Notifications.notify("not enough " + id);
             return;
         }
 
         //initialize & increment values
-        Game.addItem(id, -1);
-        if(!House.stores.hasOwnProperty(id)) {
-            House.stores[id] = 0;
-        }
+        $SM.addItem(id, -1);
+        $SM.add("house.stores[" + id + "]", 1);
+
         if(!this.buildings.hasOwnProperty(id)) {
             this.buildings[id] = 0;
         }
-        House.stores[id]++;
         this.buildings[id]++;
 
         //update & initialize
@@ -104,30 +161,35 @@ Room.prototype = {
 
     //updates build section (left side)
     updateBuildButtons: function() {
-        var roomButtons = this.panel.find(".room-buttons");
-        var buildContainer = new Container(".build-buttons", "build:", roomButtons);
+        var location = this.panel.find(".build-buttons");
+        var needsAppend = false;
         
-        for(var building in House.Buildings) {
-            var buildItem = House.Buildings[building];
-            var max = this.buildings.hasOwnProperty(building) && this.buildings[building] >= buildItem.maximum;
-            var buildButton = Buttons.getButton(this.id + "_build_" + building);
-
-            if(isUndefined(buildButton) && Game.hasItem(building)) {
+        for(var k in House.Buildings) {
+            var buildItem = House.Buildings[k];
+            var formattedName = k.replace(" ", "-");
+            var max = this.buildings.hasOwnProperty(k) && this.buildings[k] >= buildItem.maximum;
+            var buildButton = Buttons.getButton(this.id + "_build_" + formattedName);
+            
+            if(isUndefined(buildButton) && $SM.hasItem(k)) {
                 //create build button if one doesn't exist
-                var location = buildContainer.get();
-                buildButton = new Button({
-                    id: this.id + "_build_" + building,
-                    text: building,
-                    width: "80px",
-                    onClick: function() {
-                        House.getCurrentRoom().build(building);
-                    }
-                });
-
-                buildButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+                //oh closure, I hate you
+                (function(roomName, building) {
+                    buildButton = new Button({
+                        id: roomName + "_build_" + building.replace(" ", "-"),
+                        text: building,
+                        width: "80px",
+                        onClick: function() {
+                            House.getCurrentRoom().build(building);
+                        }
+                    });
+                })(this.id, k);
+                
+                var container = location.find("#" + this.id + "_build_" + formattedName + "_container");
+                buildButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+                needsAppend = true;
             } else {
                 //notify if max buildings is reached
-                if(max && !buildButton.get().hasClass("disabled")) {
+                if(max && !buildButton.get().hasClass("disabled") && !isUndefined(buildItem.maxMsg)) {
                     Notifications.notify(buildItem.maxMsg);
                 }
             }
@@ -139,8 +201,8 @@ Room.prototype = {
         }
 
         //initialize build container
-        if(buildContainer.needsAppend && buildContainer.exists()) {
-            buildContainer.create().appendTo(roomButtons);
+        if(needsAppend) {
+            location.animate({opacity: 1}, 200, "linear");
         }
 
         //update manage buttons
@@ -149,40 +211,72 @@ Room.prototype = {
 
     //updates manage section (middle)
     updateManageButtons: function() {
-        var roomButtons = this.panel.find(".room-buttons");
-        var manageContainer = new Container(".manage-buttons", "manage:", roomButtons);
-        var location = manageContainer.get();
+        var location = this.panel.find(".manage-buttons");
         var room = this;
-
-        //light switch
-        if(World.day > 1 && isUndefined(Buttons.getButton(this.id + "_manage_light-toggle"))) {
-            var lightButton = new Button({
-                id: this.id + "_manage_light-toggle",
-                text: "lights off",
-                //cooldown + setText() appears to be bugged
-                onClick: function() {
-                    room.toggleLight();
-                }
-            });
-            lightButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
-        }
+        var needsAppend = false;
 
         //refill food
-        if(!isUndefined(this.food) && isUndefined(Buttons.getButton(this.id + "_manage_refill-food"))) {
+        if(!isUndefined(this.food) && isUndefined(Buttons.getButton(this.id + "_refill-food"))) {
+            needsAppend = true;
             var foodButton = new Button({
-                id: this.id + "_manage_refill-food",
+                id: this.id + "_refill-food",
                 text: "refill food",
                 cooldown: 4000,
                 onClick: function() {
                     return room.refillFood();
                 }
             });
-            foodButton.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+            var container = location.find("#" + this.id + "_refill-food_container");
+            foodButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
         }
 
-        //initialize manage container
-        if(manageContainer.needsAppend && manageContainer.exists()) {
-            manageContainer.create().appendTo(roomButtons);
+        //refill water
+        if(!isUndefined(this.water) && isUndefined(Buttons.getButton(this.id + "_refill-water"))) {
+            needsAppend = true;
+            var waterButton = new Button({
+                id: this.id + "_refill-water",
+                text: "refill water",
+                cooldown: 4000,
+                onClick: function() {
+                    return room.refillWater();
+                }
+            });
+            var container = location.find("#" + this.id + "_refill-water_container");
+            waterButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+        }
+        
+        //clear litter box
+        if(!isUndefined(this.litterBox) && isUndefined(Buttons.getButton(this.id + "_clean-litter-box"))) {
+            needsAppend = true;
+            var litterBoxButton = new Button({
+                id: this.id + "_clean-litter-box",
+                text: "clean litter box",
+                cooldown: 4000,
+                onClick: function() {
+                    return room.cleanLitterBox();
+                }
+            });
+            var container = location.find("#" + this.id + "_clean-litter-box_container");
+            litterBoxButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+        }
+
+        //light switch
+        if(House.electric < 70 && isUndefined(Buttons.getButton(this.id + "_light-toggle"))) {
+            needsAppend = true;
+            var lightButton = new Button({
+                id: this.id + "_light-toggle",
+                text: "lights off",
+                //cooldown + setText() appears to be bugged
+                onClick: function() {
+                    room.toggleLight();
+                }
+            });
+            var container = location.find("#" + this.id + "_toggle-light_container");
+            lightButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+        }
+
+        if(needsAppend) {
+            location.animate({opacity: 1}, 200, "linear");
         }
     },
 
@@ -193,22 +287,53 @@ Room.prototype = {
             return;
         }
 
-        var status = this.panel.find(".room-status");
-        var foodEl = status.find(".food");
+        var foodStatus = this.panel.find(".food-status");
 
-        if(!foodEl.length) {
-            //create food status element
-            foodEl = $("<div>").addClass("food");
-            foodEl.appendTo(status);
+        if(!foodStatus.is(":visible")) {
+            foodStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
         }
 
         //update text
-        foodEl.text("food: " + this.food.level + "/" + this.food.maximum);
+        foodStatus.text("food: " + this.food.level + "/" + this.food.maximum);
+    },
+
+    //updates water status
+    updateWater: function() {
+        //exit early if this room doesn't support water
+        if(isUndefined(this.water)) {
+            return;
+        }
+
+        var waterStatus = this.panel.find(".water-status");
+        
+        if(!waterStatus.is(":visible")) {
+            waterStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
+        }
+
+        //update text
+        waterStatus.text("water: " + this.water.level + "/" + this.water.maximum);
+    },
+
+    //updates litter box
+    updateLitterBox: function() {
+        //exit early if this room doesn't support litter box
+        if(isUndefined(this.litterBox)) {
+            return;
+        }
+
+        var litterBoxStatus = this.panel.find(".litter-box-status");
+
+        if(!litterBoxStatus.is(":visible")) {
+            litterBoxStatus.css("display", "inline-block").animate({opacity: 1}, 200, "linear");
+        }
+
+        //update text
+        litterBoxStatus.text("litter box: " + this.litterBox);
     },
 
     //toggles light switch
     toggleLight: function() {
-        var lightButton = Buttons.getButton(this.id + "_manage_light-toggle");
+        var lightButton = Buttons.getButton(this.id + "_light-toggle");
 
         //TODO - setText() appears to kill the animation for buttons with a cooldown,
         //might want to look into it
@@ -217,14 +342,16 @@ Room.prototype = {
         } else {
             lightButton.setText("lights off");
         }
+        
         //toggle variable
+        House.usePower(1);
         this.lightsOn = !this.lightsOn;
     },
 
     //attempts to refill food
     refillFood: function() {
         var foodDifference = this.food.maximum - this.food.level;
-        var foodStores = Game.equipment["cat food"] || 0;
+        var foodStores = $SM.get("character.equipment[cat food]", true);
 
         if(foodDifference === 0) {
             //bowl is already full, exit early
@@ -237,18 +364,65 @@ Room.prototype = {
         } else if(foodStores - foodDifference >= 0) {
             //successfully topped off
             Notifications.notify("food topped off");
-            Game.equipment["cat food"] -= foodDifference;
+            $SM.add("character.equipment[cat food]", -foodDifference);
             this.food.level = this.food.maximum;
         } else /*if(foodStores - foodDifference) < 0)*/{
             //not enough to fill bowl completely
             Notifications.notify("filled the bowl with the last of the stock");
-            Game.equipment["cat food"] = 0;
+            $SM.set("character.equipment[cat food]", 0);
             this.food.level += foodStores;
         }
 
         //updates
         this.updateFood();
         Game.updateEquipment();
+        return true;
+    },
+
+    //attempt to refill water
+    refillWater: function() {
+        var waterDifference = this.water.maximum - this.water.level;
+        var waterStores = $SM.get("character.equipment[water]", true);
+
+        if(waterDifference === 0) {
+            //bowl is already full, exit early
+            Notifications.notify("bowl's already near overflowing");
+            return false;
+        } else if(waterStores <= 0) {
+            //not enough water, exit early
+            Notifications.notify("not enough water");
+            return false;
+        } else if(waterStores - waterDifference >= 0) {
+            //successfully topped off
+            Notifications.notify("water replenished");
+            $SM.add("character.equipment[water]", -waterDifference)
+            this.water.level = this.water.maximum;
+        } else /*if(waterStores - waterDifference) < 0)*/{
+            //not enough to fill bowl completely
+            Notifications.notify("filled the bowl with the last of the stock");
+            $SM.set("character.equipment[water]", 0)
+            this.water.level += waterStores;
+        }
+
+        //updates
+        this.updateWater();
+        Game.updateEquipment();
+        return true;
+    },
+
+    //attempt to clean litter box
+    cleanLitterBox: function() {
+        if(this.litterBox <= 0) {
+            Notifications.notify("litter box is already clean");
+            return false;
+        } else if(this.litterBox < 5) {
+            this.litterBox -= randInt(0, this.litterBox + 1);
+        } else {
+            this.litterBox -= randInt(0,6);
+        }
+
+        Notifications.notify("shovel sifts through fine sand");
+        this.updateLitterBox();
         return true;
     }
 };

@@ -13,7 +13,6 @@ function Container(selector, title, context) {
         this.element = context.find(selector);
     }
        
-
     if(!this.element.length) {
         //element does not exist, create pseudoelement
         this.element = $("<div>").css("opacity", 0);
@@ -37,7 +36,7 @@ function Container(selector, title, context) {
 Container.prototype = {
     //animates the element into view and returns it for appending
     create: function() {
-        this.element.animate({opacity: 1}, 300, "linear");
+        this.element.animate({opacity: 1}, 200, "linear");
         return this.element;
     },
 

@@ -23,7 +23,7 @@ var Game = {
         beta: false,  //beta phase, mutually exclusive with alpha
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  6,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        release:  7,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
         build:    6,  //increments for every unstable build tested, resets on every release
     },
 
@@ -33,12 +33,16 @@ var Game = {
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
+        warn: true              //warn if user tries to close browser
     },
     
     //game states
     pressed: false,         //key is being pressed
     keyLock: false,         //keys do not function
     tabNavigation: true,    //tab navigation does not function
+
+    //State Object
+    State: null,
 
     //parses Game.version into a legible string
     getVersionString: function() {
@@ -121,74 +125,11 @@ var Game = {
     }, 
 
     //character perks
-    perks: {
+    Perks: {
         "heartless": {
             desc: "incurred the wrath of your subjects",
             notify: "learned to turn that beating heart to stone"
         }
-    },
-
-    //character inventory
-    equipment: null,
-
-    //adds (or subtracts if negative) a quantity of an item to/from Game.equipment
-    addItem: function(name, value) {
-
-        //initializes value if it does not exist
-        if(!(name in Game.equipment)) {
-            Game.equipment[name] = 0;
-        }
-
-        Game.equipment[name] += value;
-        if(Game.getItemType(name) == "building") {
-            House.updateHouse();
-        } else {
-            Game.updateEquipment();
-        }
-    },
-
-    /*
-     * Returns if the player's inventory contains an item.
-     * If a value is specified, returns if the player's inventory
-     * contains at least that many of the item.
-     * */
-    hasItem: function(name, value) {
-        value = value || 1;
-        return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
-    },
-
-    //looks through all item lookup tables to find the item's type
-    getItemType: function(item) {
-        if(Game.Items.hasOwnProperty(item)) {
-            return item.type;
-        } else if(House.Buildings.hasOwnProperty(item)) {
-            return "building";
-        }
-        return null;
-    },
-
-    //adds a perk to the character
-    addPerk: function(name) {
-        //perk must be defined in Game.perks
-        if(isUndefined(Game.perks[name])) {
-            Logger.warn("Tried to add perk \"" + name + "\" that doesn't exist!");
-            return;
-        }
-
-        //perks can only be added once
-        if(Game.hasPerk(name)) {
-            return;
-        }
-
-        //adds perk
-        Game.perks[name].owned = true;
-        Notifications.notify(Game.perks[name].notify);
-        Game.updatePerks();
-    },
-
-    //returns if the character has the specified perk
-    hasPerk: function(name) {
-        return Game.perks[name].owned;
     },
 
     //updates general equipment inventory
@@ -200,25 +141,24 @@ var Game = {
 
         //switch lookup
         var locations = {
-            "resource": null,
-            "building": null,
+            //"resource": null,
+            //"building": null,
             "special": special,
             "inventory": inventory,
             "default": inventory
         };
 
-        //update all items in Game.equipment
-        for(var item in Game.equipment) {
+        //update all items in equipment
+        for(var item in $SM.get("character.equipment")) {
             //get location for item
-            var type = Game.getItemType(item) || "default";
-            var location = locations[type];
-
-            if(isUndefined(location)) {
-                //do not display
+            if(House.Buildings.hasOwnProperty(item)) {
                 continue;
             }
+
+            var type = Game.Items.hasOwnProperty(item) ? Game.Items[item].type : "default";
+            var location = locations[type];
             
-            Game.updateRow(item, Game.equipment[item], location.get());
+            Game.updateRow(item, $SM.get("character.equipment[" + item + "]"), location.get());
         }
 
         //initialize containers
@@ -233,6 +173,11 @@ var Game = {
         if(equipment.needsAppend && equipment.get().find(".row").length > 0) {
             equipment.create().prependTo("#equipment-container");
         }
+
+        //sphaghet.
+        if(equipment.get().find(".row").length == 0) {
+            equipment.get().animate({opacity: 0}, 300, "linear");
+        }
     },
 
     //updates perk inventory
@@ -241,9 +186,9 @@ var Game = {
         var perks = new Container("#perks", "perks");
 
         //update all perks
-        for(var perk in Game.perks) {
-            if(Game.hasPerk(perk)) {
-                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().append($("<div>").text(Game.perks[perk].desc)));
+        for(var perk in Game.Perks) {
+            if($SM.hasPerk(perk)) {
+                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().addText(Game.Perks[perk].desc));
             }
         }
 
@@ -389,7 +334,7 @@ var Game = {
         (keys[e.which] || keys["default"])();
     },
 
-    /* ====== Document Modifiers? ====== */
+    /* ====== Document Modifiers ====== */
     //cancels all mouse clicks except for menu buttons
     disableSelection: function() {
         function eventNullifier(e) {
@@ -412,6 +357,12 @@ var Game = {
 
     /* ====== Game Initialization ====== */
     Init: function() {
+        Logger.log("Version is " + Game.getVersionString());
+
+        Game.State = {};
+        $SM.Init(Game.State);
+        Logger.log("State manager initialized!");
+
         /* Check Browser */
         if(!Game.browserValid()) {
             //window.location = //set to browser warning window
@@ -430,12 +381,11 @@ var Game = {
         $("<div>").attr("id", "header").appendTo("#main");
         $("<div>").attr("id", "location-slider").appendTo("#main");
         
-
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString()).click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
-            //.append($("<span>").addClass("version menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))//
-            //.append($("<span>").addClass("menu-btn").text("discord."))
+            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString()))
+            .append($("<span>").addClass("github menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
+            .append($("<span>").addClass("menu-btn").text("discord.").click(function() { window.open("https://discord.gg/Wrp7Fre"); }))
             //.append($("<span>").addClass("menu-btn").text("save."))
             //.append($("<span>").addClass("menu-btn").text("stats."))
             .appendTo("body");
@@ -446,11 +396,11 @@ var Game = {
         $("body").off("keydown").keydown(Game.keyDown);
         $("body").off("keyup").keyup(Game.keyUp);
 
-        Game.equipment = {};
-
-        for(var perk in Game.perks) {
-            Game.perks[perk].owned = false;
-        }
+        $(window).on("beforeunload", function() {
+            if(Game.options.warn) {
+                return true;
+            }
+        });
         
         Notifications.Init();
         World.Init();
@@ -463,23 +413,24 @@ var Game = {
 
     /* ====== Prepare For Launch! ===== */
     Launch: function() {
-        Logger.log("Game initialized!");
-
+        var start = Game.now();
+        Logger.log("Game initializing...");
+        
         Game.Init();
         Game.travelTo(House);
         
-        //Game.addItem("lettuce", 16);
-        //Game.addItem("money", 9001);
-        //House.addCat();
-        //Game.addPerk("heartless");
-    
-        Logger.log("Version is " + Game.getVersionString());
+        //tester
+        //by end of intro, should have 1 cat and game begins
+        House.addCat();
+
+        var end = Game.now();
+        Logger.log("Game initialized! (took " + (end - start) + "ms)");
     }
 };
 
 //Let's do this!
 $(document).ready(function() {
-    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!"]));
+    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!", "we've been expecting you, mr. anderson"]));
     try {
         Game.Launch();
     } catch(err) {

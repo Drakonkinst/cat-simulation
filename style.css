@@ -159,15 +159,27 @@ body {
 	color: #666;
 	z-index: 10;
 }
-#footer span {
+
+.menu-btn {
 	cursor: pointer;
 	float: right;
 	margin-left: 20px;
 }
-#footer span:hover {
+
+.menu-btn:hover {
 	text-decoration: underline;
 }
+
 .version {
+	cursor: default;
+}
+
+.version:hover {
+	text-decoration: none;
+}
+
+
+.github {
 	font-weight: bold;
 }
 
@@ -262,10 +274,6 @@ div.button.disabled:hover {
 	z-index: 999;
 }
 
-.button .tooltip {
-	width: 100px;
-}
-
 .tooltip.bottom {
 	top: 30px;
 }
@@ -282,15 +290,20 @@ div.button.disabled:hover {
 	bottom: 30px;
 }
 
-*:hover > div.tooltip {
+.button .tooltip {
+	width: 100px;
+	font-weight: 400;
+}
+
+*:hover > .tooltip {
 	display: block;
 }
 
-div.tooltip:hover {
+.tooltip:hover {
 	display: none !important;
 }
 
-.disabled:hover > div.tooltip, .button.free:hover > div.tooltip {
+.disabled:hover > .tooltip {
 	display: none;
 }
 
@@ -518,13 +531,6 @@ body.noMask #description {
 	top: -5px;
 }
 
-.room-status {
-	position: absolute;
-	width: 100px;
-	left: 160px;
-	/* food at 150, water at 150, cats either 1st or last row */
-}
-
 .build-buttons {
 	position: absolute;
 	top: 75px;
@@ -550,6 +556,45 @@ body.noMask #description {
 .room-button.selected, .room-button.selected:hover {
 	cursor: default;
 	text-decoration: underline;
+}
+
+/* Room Status */
+.room-status {
+	position: absolute;
+	width: 300px;
+	left: 160px;
+}
+
+.room-upper-status {
+	white-space: nowrap;
+}
+
+.room-upper-status div {
+	display: none;
+	margin-right: 15px;
+	opacity: 0;
+}
+
+.cat-list {
+	position: relative;
+	word-wrap: break-word;
+	height: auto;
+}
+
+.cat-icon {
+	position: relative;
+	cursor: pointer;
+	margin-left: 5px;
+}
+
+.cat-icon:hover {
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+.cat-icon .tooltip {
+	font-family: 'Times New Roman', Times, serif;
+	font-weight: 400;
 }
 
 /* Outside */

@@ -4,6 +4,9 @@
 var Outside = {
     name: "outside",    //module id
 
+    MAX_DAILY_WORK: 10,
+    dailyTimesWorked: 0,
+
     //info table of all items that can be bought
     BuyItems: {
         //pet store
@@ -14,35 +17,71 @@ var Outside = {
             maxMsg: "more treats won't help now",
             cost: function() {
                 return {
-                    "money": 3
+                    "money": 4
                 };
             }
         },
         "cat food": {
             type: "resource",
             maximum: 1000,
-            //availableMsg: "get some food for your cats!",
             buyMsg: "cans of kibble to keep the hunger away",
             maxMsg: "pantry won't be able to hold any more",
             cost: function() {
                 return {
-                    "money" : 1
+                    "money" : 8
                 };
             },
             quantity: function() {
-                return 10;
+                return 25;
+            }
+        },
+        "water": {
+            type: "resource",
+            maximum: 1000,
+            buyMsg: "water is good for you",
+            maxMsg: "too much water is bad for you",
+            cost: function() {
+                return {
+                    "money": 6
+                }
+            },
+            quantity: function() {
+                return 30;
             }
         },
         "food bowl": {
             type: "building",
             maximum: 100,
-            //availableMsg: "get a container to hold the cat food.",
             buyMsg: "more bowls means more food",
             maxMsg: "more bowls won't help now",
             cost: function() {
                 return {
-                    "money": 4
+                    "money": 12
                 };
+            }
+        },
+        "water bowl": {
+            type: "building",
+            maximum: 100,
+            buyMsg: "cats love drinking out of bowls",
+            maxMsg: "drinking out of taps works too, you know?",
+            //should this just be tap water - free? maybe like electricity
+            //electricity should only fail when used a LOT per day
+            cost: function() {
+                return {
+                    "money": 12
+                };
+            }
+        },
+        "litter box": {
+            type: "building",
+            maximum: 5,
+            buyMsg: "good for keeping the smell away",
+            maxMsg: "house won't need any more",
+            cost: function() {
+                return {
+                    "money": 20,
+                }
             }
         }
     },
@@ -65,7 +104,7 @@ var Outside = {
             //determine whether item has hit max limit, if any
             var max = false;
             if(!isUndefined(buyItem.maximum)) {
-                max = Game.hasItem(item, buyItem.maximum);
+                max = $SM.hasItem(item, buyItem.maximum);
             }
 
             if(isUndefined(buyItem.button)) {
@@ -75,21 +114,23 @@ var Outside = {
                     var tooltip = new Tooltip(location.children().length > 10 ? "top left" : "bottom left");
 
                     for(var id in cost) {
-                        tooltip.append($("<div>").addClass("row_key").text(id)).append($("<div>").addClass("row_val").text(cost[id]));
+                        tooltip.addCost(id, cost[id]);
                     }
 
-                    buyItem.button = new Button({
-                        id: "buy_" + item,
-                        text: item,
-                        width: "80px",
-                        tooltip: tooltip,
-                        onClick: function() {
-                            //Outside.buy(item);
-                            Outside.buy(this.id.substring(4));
-                        }
-                    });
-
-                    buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 300, "linear").appendTo(location);
+                    //closure is important
+                    (function(item) {
+                        buyItem.button = new Button({
+                            id: "buy_" + item,
+                            text: item,
+                            width: "80px",
+                            tooltip: tooltip,
+                            onClick: function() {
+                                Outside.buy(item);
+                            }
+                        });
+                    })(item);
+                    
+                    buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location);
 
                     if(!isUndefined(buyItem.availableMsg)) {
                         Notifications.notify(buyItem.availableMsg);
@@ -114,7 +155,7 @@ var Outside = {
     //attempts to buy an item
     buy: function(item) {
         var info = Outside.BuyItems[item];
-        var num = Game.equipment[item] || 0;
+        var num = $SM.get("character.equipment[" + item + "]", true);
 
         if(info.maximum <= num) {
             return;
@@ -122,24 +163,24 @@ var Outside = {
 
         var cost = info.cost();
         for(var id in cost) {
-            if(Game.hasItem(id, cost[id])) {
-                Game.addItem(id, -cost[id]);
+            if($SM.hasItem(id, cost[id])) {
+                $SM.addItem(id, -cost[id]);
             } else {
                 Notifications.notify("not enough " + id);
                 return;
             }
         }
 
-        if(info.type == "building" && isUndefined(House.stores[item])) {
-            House.stores[item] = 0;
+        if(info.type == "building" && !$SM.get("house.stores[" + item + "]")) {
+            $SM.set("house.stores[" + item + "]", 0);
         }
 
         Notifications.notify(info.buyMsg);
 
         if(isUndefined(info.quantity)) {
-            Game.addItem(item, 1);
+            $SM.addItem(item, 1);
         } else {
-            Game.addItem(item, info.quantity());
+            $SM.addItem(item, info.quantity());
         }
         
         if(info.type == "building") {
@@ -152,6 +193,18 @@ var Outside = {
 
         Outside.updateBuyButtons();
     },
+
+    work: function() {
+        Notifications.notify("hard labor, but necessary");
+        $SM.addItem("money", randInt(5, 9));
+        Outside.dailyTimesWorked++;
+        Outside.updateBuyButtons();
+
+        if(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK) {
+            Notifications.notify("done working for the day");
+        }
+    },
+    
     unlocked: function(item) {
         if(Buttons.getButton("buy_" + item)) {
             return true;
@@ -161,16 +214,18 @@ var Outside = {
         var cost = info.cost();
         
         for(var id in cost) {
-            if(!Game.hasItem(id)) {
+            if(!$SM.hasItem(id, cost[id] / 2)) {
                 return false;
             }
         }
 
         return true;
     },
+
     updateTitle: function() {
         //A Quiet Town, A Bustling World - as more things unlock
     },
+
     Init: function() {
         this.tab = Game.addLocation("outside", "A Quiet Town", Outside);
         this.panel = $("<div>").attr("id", "outside-panel").addClass("location").appendTo("#location-slider");
@@ -178,13 +233,12 @@ var Outside = {
 
         new Button({
             id: "work",
-            text: "go to work",
+            text: "find work",
             cooldown: 4000,
-            tooltip: new Tooltip().append($("<div>").text("you need to go to work.")),
-            onClick: function() {
-                Notifications.notify("hard labor, but necessary");
-                Game.addItem("money", Math.floor(randNum(1, 7)));
-                Outside.updateBuyButtons();
+            tooltip: new Tooltip().addText("you need to fend for yourself."),
+            onClick: Outside.work,
+            onFinish: function() {
+                Buttons.getButton("work").setDisabled(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK);
             }
         }).appendTo("#outside-panel");
 
