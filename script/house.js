@@ -29,7 +29,7 @@ var House = {
                         maximum: 0
                     };
                 }
-                room.food.maximum += 5;
+                room.food.maximum += 10;
                 room.updateFood();
             }
         },
@@ -44,7 +44,7 @@ var House = {
                         maximum: 0
                     };
                 }
-                room.water.maximum += 5;
+                room.water.maximum += 10;
                 room.updateWater();
             }
         },
