@@ -239,7 +239,6 @@ var Events = {
         //Events.updateButtons();
     },
 
-    /* //no use currently
     updateButtons: function() {
         var btns = Events.activeEvent().scenes[Events.activeScene].buttons;
         for(var id in btns) {
@@ -248,7 +247,6 @@ var Events = {
             //check cost and availability, disable if needed
         }
     },
-    */
 
     //handles when the player clicks a button, changes scene or ends event
     buttonClick: function(button) {

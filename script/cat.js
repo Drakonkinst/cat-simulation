@@ -46,7 +46,6 @@ function Cat(properties) {
     this.thirst = randInt(0, 11);
     this.morale = randInt(0, Cats.MoraleEnum.morales.length);
     this.moralePoints = 50;
-    //points until cat wants to leave room?
     this.energy = Cats.MAX_ENERGY;
 
     this.isSleeping = false;
@@ -80,6 +79,7 @@ Cat.prototype = {
         //increments energy and hunger
         this.energy -= 0.1;
         this.hunger += 0.05;
+        this.thirst += 0.06;
 
         //if cat has eaten recently, increase morale
         if(this.hunger < 3) {
@@ -120,8 +120,6 @@ Cat.prototype = {
             this.addMorale(5 - Math.floor(this.hunger));
             this.wantsToLeave = true;
         }
-
-        //add starving/dehyrated? >= 20 - this SHOULD be announced
 
         //water
         if(!isUndefined(this.room.water)) {
