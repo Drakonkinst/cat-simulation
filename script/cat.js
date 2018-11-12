@@ -279,21 +279,27 @@ Cat.prototype = {
         }
     },
 
-    purr: function(volume) {
+    purr: function(volume, target) {
         var loudness = volume || randInt(-4, 5);
-        this.makeSound("purrs", loudness, "softly", "loudly");
+        target = target || null;
+
+        if(chance(0.3) && isUndefined(target)) {
+            target = "you";
+        }
+        this.makeSound("purrs", loudness, "softly", "loudly", target);
     },
 
-    hiss: function(volume) {
+    hiss: function(volume, target) {
         var loudness = volume || randInt(-4, 5);
         this.makeSound("hisses", loudness, "quietly", "loudly");
     },
 
     //constructs sound message given arguments
-    makeSound: function(sound, loudness, softStr, loudStr) {
+    makeSound: function(sound, loudness, softStr, loudStr, target) {
         //hisses/meows AT "you" or another cat, code later
         const intensities = [" somewhat ", " ", " rather ", " very "];
         var suffix = loudStr;
+        var targetStr = "";
 
         if(loudness < -4 || loudness > 4) {
             this.action("makes a strange sound");
@@ -309,7 +315,11 @@ Cat.prototype = {
             suffix = softStr;
         }
 
-        this.action(sound + intensities[Math.abs(loudness) - 1] + suffix);
+        if(!isUndefined(target)) {
+            targetStr = " at " + target;
+        }
+
+        this.action(sound + intensities[Math.abs(loudness) - 1] + suffix + targetStr);
     },
 
     /* Normal Actions */
