@@ -47,7 +47,7 @@ function Cat(properties) {
     //sets random hunger upon spawn
     this.hunger = properties.hunger || randInt(0, 11);
     this.thirst = properties.thirst || randInt(0, 11);
-    this.morale = properties.morale || randInt(0, Cats.MoraleEnum.morales.length);
+    this.morale = properties.morale || randInt(2, Cats.MoraleEnum.morales.length);
     this.moralePoints = properties.moralePoints || 50;
     this.energy = properties.energy || Cats.MAX_ENERGY;
 
