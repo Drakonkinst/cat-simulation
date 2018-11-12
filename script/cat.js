@@ -156,12 +156,6 @@ Cat.prototype = {
         //makes cat leave room at end of tick
         if(this.wantsToLeave) {
             this.leaveRoom();
-            var cat = this;
-
-            //reset variable at end of update loop
-            Game.setTimeout(function() {
-                cat.wantsToLeave = false;
-            }, 0);
         }
     },
 
