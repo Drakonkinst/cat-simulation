@@ -34,7 +34,6 @@ function Cat(properties) {
         }
     }
     
-
     //set weight based on gender and breed
     var weightRange = this.isFemale ? breed.weight.f : breed.weight.m;
     this.weight = properties.weight || randInt(weightRange[0], weightRange[1]);
@@ -69,8 +68,8 @@ Cat.prototype = {
             return;
         }
 
-        if(this.isSleeping) {
-            //exit early if the cat is sleeping
+        if(this.isSleeping || this.isExamining) {
+            //exit early if the cat is sleeping or being examined
             return;
         }
 
@@ -229,26 +228,30 @@ Cat.prototype = {
 
     examine: function() {
         var self = this;
+        this.isExamining = true;
+        var moraleBoostsRemaining = 3;
         Events.startEvent({
             title: this.name,
             scenes: {
                 "start": function() {
-                    var description;
+                    var description, action;
                     if(self.coat == "hairless") {
                         description = self.color + " hairless " + self.genderPronoun("male", "female") + " " + self.breed;
                     } else {
                         description = self.genderPronoun("male", "female") + " " + self.breed + " with " + self.coat + " " + self.color + " fur";
                     }
+
+                    if(self.traits.includes("playful")) {
+                        action = "looks up at you inquisitively";
+                    } else {
+                        action = "meows as you approach"
+                    }
                     return {
                         text: [
                             self.name + " is a " + description + ".",
-                            self.genderPronoun("he", "she") + " " + "text to be added"
+                            self.genderPronoun("he", "she") + " " + action + "."
                         ],
                         buttons: {
-                            "done": {
-                                text: "done",
-                                nextScene: "end"
-                            },
                             "pick up": {
                                 text: "pick up",
                                 nextScene: {"pickUp": 5, "failPickUp": 1}
@@ -256,25 +259,66 @@ Cat.prototype = {
                             },
                             "treat": {
                                 text: "give treat",
+                                available: function() {
+                                    return $SM.hasItem("cat treat");
+                                },
                                 tooltip: new Tooltip().addCost("cat treat", 1),
                                 click: function() {
-                                    if(!$SM.hasItem("cat treat")) {
-                                        return "not enough cat treat";
+                                    $SM.addItem("cat treat", -1);
+                                    self.action("eats a treat");
+                                    if(moraleBoostsRemaining > 0) {
+                                        self.addMorale(10);
+                                        moraleBoostsRemaining--;
+                                    }
+                                    if(self.morale >= 3) {
+                                        self.purr();
                                     }
                                     return true;
                                 }
+                            },
+                            "pet": {
+                                text: "pet",
+                                click: function() {
+                                    if(moraleBoostsRemaining > 0) {
+                                        self.addMorale(1);
+                                        moraleBoostsRemaining--;
+                                    }
+                                    if(self.morale >= 3) {
+                                        self.purr();
+                                    } else {
+                                        self.meow();
+                                    }
+                                }
+                            },
+                            "done": {
+                                text: "done",
+                                click: function() {
+                                    self.isExamining = false;
+                                },
+                                nextScene: "end"
                             }
                         }
                     };
                 },
                 "pickUp": function() {
+                    var status = self.genderPronoun("he", "she") + " sits comfortably in your arms";
+                    if(self.hunger >= 15) {
+                        status = "looks like " + self.genderPronoun("he", "she") + " hasn't eaten in days";
+                    } else if(self.hunger >= 10) {
+                        status = "probably lighter than " + self.genderPronoun("he", "she") + " should be";
+                    }
+
                     return {
                         text: [
-                            "text to be added"
+                            self.name + " looks " + Cats.MoraleEnum.fromInt(self.morale) + " right now.",
+                            status + "."
                         ],
                         buttons: {
                             "put down": {
                                 text: "put down",
+                                click: function() {
+                                    self.isExamining = false;
+                                },
                                 nextScene: "end"
                             }
                         }
@@ -282,11 +326,18 @@ Cat.prototype = {
                 },
                 "failPickUp": {
                     text: [
-                        this.name + " jumps out of your arms before you can grab " + this.genderPronoun("him", "her")
+                        this.name + " scampers away before you can grab " + this.genderPronoun("him", "her")
                     ],
+                    onLoad: function() {
+                        this.leaveRoom();
+                        this.wantsToLeave = true;
+                    },
                     buttons: {
                         "continue": {
                             text: "continue",
+                            click: function() {
+                                self.isExamining = false;
+                            },
                             nextScene: "end"
                         }
                     }
