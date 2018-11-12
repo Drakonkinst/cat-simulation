@@ -450,8 +450,8 @@ Cat.prototype = {
 
 var Cats = {
     MAX_ENERGY: 20,
-    DEFAULT_MALE_NAMES: [ "garfield", "salem", "tom", "azrael", "whiskers", "felix", "oscar", "edgar", "sox", "ollie", "leo", "snickers", "charcoal", "prince", "toby", "mikesch", "buddy", "romeo", "loki", "gavin", "momo", "illia", "theodore", "eliot", "milo", "max", "monty" ],
-    DEFAULT_FEMALE_NAMES: [ "miso", "tara", "nala", "mistie", "misty", "coco", "tasha", "raven", "valencia", "princess", "cherry", "chloe", "felicia", "olivia", "emma", "belle", "luna", "minerva", "ellie", "athena", "artemis", "poppy", "venus", "calypso"],
+    DEFAULT_MALE_NAMES: [ "garfield", "orpheus", "salem", "tom", "azrael", "whiskers", "felix", "oscar", "edgar", "sox", "ollie", "leo", "snickers", "charcoal", "prince", "toby", "mikesch", "buddy", "romeo", "loki", "gavin", "momo", "illia", "theodore", "eliot", "milo", "max", "monty", "zeke" ],
+    DEFAULT_FEMALE_NAMES: [ "miso", "lola", "mcgonagall", "tara", "nala", "mistie", "misty", "coco", "tasha", "raven", "valencia", "princess", "cherry", "chloe", "felicia", "olivia", "emma", "belle", "luna", "minerva", "ellie", "athena", "artemis", "poppy", "venus", "calypso", "elise", "kathy", "elizabeth", "hope" ],
     DEFAULT_NEUTRAL_NAMES: [ "lolcat", "sesame", "unagi", "avocado", "mango", "oreo", "swirly", "striped", "alpha", "beta", "gamma", "lucky", "mittens", "angel", "dakota", "ginger", "tippy", "snickers", "fish", "smokey", "muffin", "fuzzy", "nibbles", "chaser" ],
     //http://www.catbreedslist.com/all-cat-breeds/
     //secondary source - https://www.hillspet.com/cat-care/cat-breeds/
