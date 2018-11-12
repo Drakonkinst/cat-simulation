@@ -230,16 +230,65 @@ Cat.prototype = {
     },
 
     examine: function() {
+        var self = this;
         Events.startEvent({
             title: this.name,
             scenes: {
-                "start": {
+                "start": function() {
+                    var description;
+                    if(self.coat == "hairless") {
+                        description = self.color + " hairless " + self.genderPronoun("male", "female") + " " + self.breed;
+                    } else {
+                        description = self.genderPronoun("male", "female") + " " + self.breed + " with " + self.coat + " " + self.color + " fur";
+                    }
+                    return {
+                        text: [
+                            self.name + " is a " + description + ".",
+                            self.genderPronoun("he", "she") + " " + "text to be added"
+                        ],
+                        buttons: {
+                            "done": {
+                                text: "done",
+                                nextScene: "end"
+                            },
+                            "pick up": {
+                                text: "pick up",
+                                nextScene: {"pickUp": 5, "failPickUp": 1}
+                                //probabilities can be decided earlier!
+                            },
+                            "treat": {
+                                text: "give treat",
+                                tooltip: new Tooltip().addCost("cat treat", 1),
+                                click: function() {
+                                    if(!Game.hasItem("cat treat")) {
+                                        return "not enough cat treat";
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    };
+                },
+                "pickUp": function() {
+                    return {
+                        text: [
+                            "text to be added"
+                        ],
+                        buttons: {
+                            "put down": {
+                                text: "put down",
+                                nextScene: "end"
+                            }
+                        }
+                    }
+                },
+                "failPickUp": {
                     text: [
-                        this.name + " is a " + this.genderPronoun("male", "female") + " " + this.breed + " cat with " + this.coat + " " + this.color + " fur."
+                        this.name + " jumps out of your arms before you can grab " + this.genderPronoun("him", "her")
                     ],
                     buttons: {
-                        "done": {
-                            text: "done",
+                        "continue": {
+                            text: "continue",
                             nextScene: "end"
                         }
                     }
