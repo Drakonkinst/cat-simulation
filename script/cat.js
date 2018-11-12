@@ -325,7 +325,6 @@ Cat.prototype = {
                     }
                 },
                 "failPickUp": function() {
-                    var self = this;
                     return {
                         text: [
                             self.name + " scampers away before you can grab " + self.genderPronoun("him", "her")
