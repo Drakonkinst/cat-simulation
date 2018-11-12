@@ -390,7 +390,7 @@ var Game = {
         (keys[e.which] || keys["default"])();
     },
 
-    /* ====== Document Modifiers? ====== */
+    /* ====== Document Modifiers ====== */
     //cancels all mouse clicks except for menu buttons
     disableSelection: function() {
         function eventNullifier(e) {
@@ -435,7 +435,7 @@ var Game = {
         
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString() + "."))
+            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString()))
             .append($("<span>").addClass("github menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
             .append($("<span>").addClass("menu-btn").text("discord.").click(function() { window.open("https://discord.gg/Wrp7Fre"); }))
             //.append($("<span>").addClass("menu-btn").text("save."))
@@ -488,7 +488,7 @@ var Game = {
 
 //Let's do this!
 $(document).ready(function() {
-    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!"]));
+    console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!", "we've been expecting you, mr. anderson"]));
     try {
         Game.Launch();
     } catch(err) {
