@@ -233,7 +233,7 @@ var Outside = {
 
         new Button({
             id: "work",
-            text: "do odd jobs",
+            text: "find work",
             cooldown: 4000,
             tooltip: new Tooltip().addText("you need to fend for yourself."),
             onClick: Outside.work,
