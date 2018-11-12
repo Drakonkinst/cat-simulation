@@ -17,7 +17,7 @@ var Outside = {
             maxMsg: "more treats won't help now",
             cost: function() {
                 return {
-                    "money": 3
+                    "money": 5
                 };
             }
         },
@@ -28,7 +28,7 @@ var Outside = {
             maxMsg: "pantry won't be able to hold any more",
             cost: function() {
                 return {
-                    "money" : 1
+                    "money" : 7
                 };
             },
             quantity: function() {
@@ -42,7 +42,7 @@ var Outside = {
             maxMsg: "too much water is bad for you",
             cost: function() {
                 return {
-                    "money": 2
+                    "money": 5
                 }
             },
             quantity: function() {
@@ -56,7 +56,7 @@ var Outside = {
             maxMsg: "more bowls won't help now",
             cost: function() {
                 return {
-                    "money": 4
+                    "money": 10
                 };
             }
         },
@@ -69,7 +69,7 @@ var Outside = {
             //electricity should only fail when used a LOT per day
             cost: function() {
                 return {
-                    "money": 4
+                    "money": 10
                 };
             }
         },
@@ -80,7 +80,7 @@ var Outside = {
             maxMsg: "house won't need any more",
             cost: function() {
                 return {
-                    "money": 10,
+                    "money": 15,
                 }
             }
         }
@@ -196,7 +196,7 @@ var Outside = {
 
     work: function() {
         Notifications.notify("hard labor, but necessary");
-        Game.addItem("money", randInt(1, 3));
+        Game.addItem("money", randInt(5, 9));
         Outside.dailyTimesWorked++;
         Outside.updateBuyButtons();
 
@@ -233,9 +233,9 @@ var Outside = {
 
         new Button({
             id: "work",
-            text: "go to work",
+            text: "do odd jobs",
             cooldown: 4000,
-            tooltip: new Tooltip().addText("you need to go to work."),
+            tooltip: new Tooltip().addText("you need to fend for yourself."),
             onClick: Outside.work,
             onFinish: function() {
                 Buttons.getButton("work").setDisabled(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK);
