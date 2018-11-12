@@ -443,8 +443,8 @@ Cat.prototype = {
     },
 
     //returns male or female string based on gender
-    genderPronoun: function(male, female) {
-        return this.isFemale ? female : male;
+    genderPronoun: function(maleStr, femaleStr) {
+        return this.isFemale ? femaleStr : maleStr;
     }
 };
 
