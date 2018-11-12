@@ -29,7 +29,7 @@ var Game = {
 
     //cheaty options! no non-cheaty options yet.
     options: {
-        debug: true,            //print debug messages
+        debug: false,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
