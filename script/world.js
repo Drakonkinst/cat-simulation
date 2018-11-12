@@ -289,8 +289,8 @@ var World = {
                                 text: "leave it",
                                 click: function() {
                                     World.catsAbandoned++;
-                                    if(World.catsAbandoned >= 10 && !Game.hasPerk("heartless")) {
-                                        Game.addPerk("heartless");
+                                    if(World.catsAbandoned >= 10 && !$SM.hasPerk("heartless")) {
+                                        $SM.addPerk("heartless");
                                     }
                                 },
                                 nextScene: "end"

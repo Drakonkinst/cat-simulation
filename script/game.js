@@ -41,6 +41,9 @@ var Game = {
     keyLock: false,         //keys do not function
     tabNavigation: true,    //tab navigation does not function
 
+    //State Object
+    State: null,
+
     //parses Game.version into a legible string
     getVersionString: function() {
         var prefix = Game.version.alpha ? "alpha " : Game.version.beta ? "beta " : "";
@@ -122,7 +125,7 @@ var Game = {
     }, 
 
     //character perks
-    perks: {
+    Perks: {
         "heartless": {
             desc: "incurred the wrath of your subjects",
             notify: "learned to turn that beating heart to stone"
@@ -166,30 +169,6 @@ var Game = {
             return "building";
         }
         return null;
-    },
-
-    //adds a perk to the character
-    addPerk: function(name) {
-        //perk must be defined in Game.perks
-        if(isUndefined(Game.perks[name])) {
-            Logger.warn("Tried to add perk \"" + name + "\" that doesn't exist!");
-            return;
-        }
-
-        //perks can only be added once
-        if(Game.hasPerk(name)) {
-            return;
-        }
-
-        //adds perk
-        Game.perks[name].owned = true;
-        Notifications.notify(Game.perks[name].notify);
-        Game.updatePerks();
-    },
-
-    //returns if the character has the specified perk
-    hasPerk: function(name) {
-        return Game.perks[name].owned;
     },
 
     //updates general equipment inventory
@@ -247,9 +226,9 @@ var Game = {
         var perks = new Container("#perks", "perks");
 
         //update all perks
-        for(var perk in Game.perks) {
-            if(Game.hasPerk(perk)) {
-                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().addText(Game.perks[perk].desc));
+        for(var perk in Game.Perks) {
+            if($SM.hasPerk(perk)) {
+                Game.updateRow(perk, 1, perks.get(), true, new Tooltip().addText(Game.Perks[perk].desc));
             }
         }
 
@@ -420,6 +399,10 @@ var Game = {
     Init: function() {
         Logger.log("Version is " + Game.getVersionString());
 
+        Game.State = {};
+        $SM.Init(Game.State);
+        Logger.log("State manager initialized!");
+
         /* Check Browser */
         if(!Game.browserValid()) {
             //window.location = //set to browser warning window
@@ -460,10 +443,6 @@ var Game = {
         });
 
         Game.equipment = {};
-
-        for(var perk in Game.perks) {
-            Game.perks[perk].owned = false;
-        }
         
         Notifications.Init();
         World.Init();
