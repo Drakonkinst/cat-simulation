@@ -280,7 +280,7 @@ Cat.prototype = {
                                 text: "pet",
                                 click: function() {
                                     if(moraleBoostsRemaining > 0) {
-                                        self.addMorale(1);
+                                        self.addMorale(5);
                                         moraleBoostsRemaining--;
                                     }
                                     if(self.morale >= 3) {
