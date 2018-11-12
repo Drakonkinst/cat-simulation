@@ -481,7 +481,7 @@ var House = {
                         text: "watch tv",
                         cooldown: 10000,
                         onClick: function() {
-                            
+                            Notifications.notify("watched tv");
                         }
                     }).appendTo(this.panel.find(".room-buttons"));
                 }
