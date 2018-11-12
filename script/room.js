@@ -119,10 +119,10 @@ Room.prototype = {
         this.cats.splice(this.cats.indexOf(cat), 1);
         var catIconContainer = this.panel.find($("#cat-" + cat.name));
         if(catIconContainer.length) {
-            //smooth sliding animation later? only needed for removal
-            catIconContainer.animate({opacity: 0}, 200, "linear", function() {
-                this.remove();
-            })
+            var pseudoIcon = $("<span>").addClass("cat-icon").text("@").css("opacity", 1);
+            catIconContainer.replaceWith(pseudoIcon.animate({opacity: 0}, 200, "linear", function() {
+                pseudoIcon.remove();
+            }));
         }
     },
 
