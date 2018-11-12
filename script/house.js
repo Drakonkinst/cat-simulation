@@ -456,7 +456,7 @@ var House = {
                     new Button({
                         id: "door",
                         text: "open door",
-                        cooldown: 8000,
+                        cooldown: 300000,
                         tooltip: new Tooltip().addText("someone's here."),
                         onClick: function() {
                             if(World.events[0].isAvailable()) {
@@ -465,6 +465,9 @@ var House = {
                                 Notifications.notify("probably shouldn't open the door right now");
                                 return false;
                             }
+                        },
+                        onFinish: function() {
+                            Notifications.notify("something's scratching at the door", House)
                         }
                     }).appendTo(this.panel.find(".room-buttons"));
                 }
