@@ -173,7 +173,7 @@ Cat.prototype = {
         } else {
             message = "doesn't seem to mind this place";
         }
-        Notifications.notify(this.name + " sniffs around, " + message, House);
+        this.action("sniffs around, " + message, true);
     },
 
     //called upon the start of a new day
@@ -431,14 +431,14 @@ Cat.prototype = {
     },
 
     //plays a notification if the player is in the room
-    action: function(actionMsg, noName) {
+    action: function(actionMsg, important, noName) {
         if(!noName) {
             actionMsg = this.name + " " + actionMsg;
         }
 
-        if(House.currentRoom == this.room.id) {
-            //message only plays if player is in the House AND in the same room
-            Notifications.notify(actionMsg, House, true);
+        if(isUndefined(this.room) || House.currentRoom == this.room.id || important) {
+            //message only plays if player is in the House AND in the same room by default
+            Notifications.notify(actionMsg, House, !important);
         }
     },
 
