@@ -92,6 +92,11 @@ Room.prototype = {
     },
 
     addCat: function(cat) {
+        //this is being called multiple times for some reason
+        if(!isUndefined(cat.room)) {
+            return;
+        }
+
         cat.room = this;
         this.cats.push(cat);
         var catList = this.panel.find(".cat-list");
@@ -110,6 +115,7 @@ Room.prototype = {
     },
 
     removeCat: function(cat) {
+        cat.room = null;
         this.cats.splice(this.cats.indexOf(cat), 1);
         var catIconContainer = this.panel.find($("#cat-" + cat.name));
         if(catIconContainer.length) {
