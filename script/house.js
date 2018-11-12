@@ -66,7 +66,7 @@ var House = {
         {   //Noises Outside - gain stuff
             title: "Noises",
             isAvailable: function() {
-                return Game.activeModule == House;
+                return Game.activeModule == House && !["rain", "storm", "lightning", "hail"].includes(World.currentWeather);
             },
             scenes: {
                 "start": {
