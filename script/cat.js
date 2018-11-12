@@ -324,21 +324,24 @@ Cat.prototype = {
                         }
                     }
                 },
-                "failPickUp": {
-                    text: [
-                        this.name + " scampers away before you can grab " + this.genderPronoun("him", "her")
-                    ],
-                    onLoad: function() {
-                        this.leaveRoom();
-                        this.wantsToLeave = true;
-                    },
-                    buttons: {
-                        "continue": {
-                            text: "continue",
-                            click: function() {
-                                self.isExamining = false;
-                            },
-                            nextScene: "end"
+                "failPickUp": function() {
+                    var self = this;
+                    return {
+                        text: [
+                            self.name + " scampers away before you can grab " + self.genderPronoun("him", "her")
+                        ],
+                        onLoad: function() {
+                            self.leaveRoom();
+                            self.wantsToLeave = true;
+                        },
+                        buttons: {
+                            "continue": {
+                                text: "continue",
+                                click: function() {
+                                    self.isExamining = false;
+                                },
+                                nextScene: "end"
+                            }
                         }
                     }
                 }
