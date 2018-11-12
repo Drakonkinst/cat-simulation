@@ -92,13 +92,15 @@ var House = {
                         "a basket full of warm bread sits on the doorstep.",
                         "the streets are silent."
                     ],
+                    onLoad: function() {
+                        Game.addItem("bread", 5);
+                    },
                     buttons: {
                         "leave": {
                             text: "close the door",
                             nextScene: "end"
                         }
                     }
-
                 },
                 "treats": {
                     text: [
