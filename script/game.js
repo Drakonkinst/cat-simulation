@@ -24,7 +24,7 @@ var Game = {
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  7,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    3,  //increments for every unstable build tested, resets on every release
+        build:    4,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -233,6 +233,11 @@ var Game = {
 
         if(equipment.needsAppend && equipment.get().find(".row").length > 0) {
             equipment.create().prependTo("#equipment-container");
+        }
+
+        //sphaghet.
+        if(equipment.get().find(".row").length == 0) {
+            equipment.get().animate({opacity: 0}, 300, "linear");
         }
     },
 
