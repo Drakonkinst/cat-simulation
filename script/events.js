@@ -225,10 +225,6 @@ var Events = {
                 cooldown: info.cooldown     //sets initial cooldown, since cooldown after click is irrelevant
             }).appendTo(btns);
 
-            if(!isUndefined(info.available) && !info.available()) {
-                //disables button if it should not be clickable
-                button.setDisabled(true);
-            }
             if(!isUndefined(info.cooldown)) {
                 //button starts cooling down so player can not press it immediately
                 button.startCooldown();
@@ -236,15 +232,18 @@ var Events = {
             //btnList.push(button);
         }
 
-        //Events.updateButtons();
+        Events.updateButtons();
     },
 
     updateButtons: function() {
-        var btns = Events.activeEvent().scenes[Events.activeScene].buttons;
+        var btns = Events.getScene(Events.activeScene).buttons;
+        
         for(var id in btns) {
-            var button = btns[id];
-            var element = $("#" + id, Events.eventPanel());
-            //check cost and availability, disable if needed
+            var button = Buttons.getButton(id);
+            var info = btns[id];
+            if(!isUndefined(info.available) && !info.available()) {
+                button.setDisabled(true);
+            }
         }
     },
 
@@ -280,6 +279,8 @@ var Events = {
                 Game.disableSelection();
             }   
         }
+
+        Events.updateButtons();
         
         if(!isUndefined(info.notification)) {
             //notify button click
