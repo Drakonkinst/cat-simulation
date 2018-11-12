@@ -17,7 +17,7 @@ var Outside = {
             maxMsg: "more treats won't help now",
             cost: function() {
                 return {
-                    "money": 5
+                    "money": 4
                 };
             }
         },
@@ -28,11 +28,11 @@ var Outside = {
             maxMsg: "pantry won't be able to hold any more",
             cost: function() {
                 return {
-                    "money" : 7
+                    "money" : 8
                 };
             },
             quantity: function() {
-                return 10;
+                return 25;
             }
         },
         "water": {
@@ -42,11 +42,11 @@ var Outside = {
             maxMsg: "too much water is bad for you",
             cost: function() {
                 return {
-                    "money": 5
+                    "money": 6
                 }
             },
             quantity: function() {
-                return 10;
+                return 30;
             }
         },
         "food bowl": {
@@ -56,7 +56,7 @@ var Outside = {
             maxMsg: "more bowls won't help now",
             cost: function() {
                 return {
-                    "money": 10
+                    "money": 12
                 };
             }
         },
@@ -69,7 +69,7 @@ var Outside = {
             //electricity should only fail when used a LOT per day
             cost: function() {
                 return {
-                    "money": 10
+                    "money": 12
                 };
             }
         },
@@ -80,7 +80,7 @@ var Outside = {
             maxMsg: "house won't need any more",
             cost: function() {
                 return {
-                    "money": 15,
+                    "money": 20,
                 }
             }
         }
