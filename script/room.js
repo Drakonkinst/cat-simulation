@@ -143,20 +143,18 @@ Room.prototype = {
         }
 
         //exit early if not enough resources
-        if(!Game.hasItem(id)) {
+        if(!$SM.hasItem(id)) {
             Notifications.notify("not enough " + id);
             return;
         }
 
         //initialize & increment values
-        Game.addItem(id, -1);
-        if(!House.stores.hasOwnProperty(id)) {
-            House.stores[id] = 0;
-        }
+        $SM.addItem(id, -1);
+        $SM.add("house.stores[" + id + "]", 1);
+
         if(!this.buildings.hasOwnProperty(id)) {
             this.buildings[id] = 0;
         }
-        House.stores[id]++;
         this.buildings[id]++;
 
         //update & initialize
@@ -177,7 +175,7 @@ Room.prototype = {
             var max = this.buildings.hasOwnProperty(k) && this.buildings[k] >= buildItem.maximum;
             var buildButton = Buttons.getButton(this.id + "_build_" + formattedName);
             
-            if(isUndefined(buildButton) && Game.hasItem(k)) {
+            if(isUndefined(buildButton) && $SM.hasItem(k)) {
                 //create build button if one doesn't exist
                 //oh closure, I hate you
                 (function(roomName, building) {
@@ -358,7 +356,7 @@ Room.prototype = {
     //attempts to refill food
     refillFood: function() {
         var foodDifference = this.food.maximum - this.food.level;
-        var foodStores = Game.equipment["cat food"] || 0;
+        var foodStores = $SM.get("character.equipment[cat food]", true);
 
         if(foodDifference === 0) {
             //bowl is already full, exit early
@@ -371,12 +369,12 @@ Room.prototype = {
         } else if(foodStores - foodDifference >= 0) {
             //successfully topped off
             Notifications.notify("food topped off");
-            Game.equipment["cat food"] -= foodDifference;
+            $SM.add("character.equipment[cat food]", -foodDifference);
             this.food.level = this.food.maximum;
         } else /*if(foodStores - foodDifference) < 0)*/{
             //not enough to fill bowl completely
             Notifications.notify("filled the bowl with the last of the stock");
-            Game.equipment["cat food"] = 0;
+            $SM.set("character.equipment[cat food]", 0);
             this.food.level += foodStores;
         }
 
@@ -389,7 +387,7 @@ Room.prototype = {
     //attempt to refill water
     refillWater: function() {
         var waterDifference = this.water.maximum - this.water.level;
-        var waterStores = Game.equipment["water"] || 0;
+        var waterStores = $SM.get("character.equipment[water]", true);
 
         if(waterDifference === 0) {
             //bowl is already full, exit early
@@ -402,12 +400,12 @@ Room.prototype = {
         } else if(waterStores - waterDifference >= 0) {
             //successfully topped off
             Notifications.notify("water replenished");
-            Game.equipment["water"] -= waterDifference;
+            $SM.add("character.equipment[water]", -waterDifference)
             this.water.level = this.water.maximum;
         } else /*if(waterStores - waterDifference) < 0)*/{
             //not enough to fill bowl completely
             Notifications.notify("filled the bowl with the last of the stock");
-            Game.equipment["water"] = 0;
+            $SM.set("character.equipment[water]", 0)
             this.water.level += waterStores;
         }
 

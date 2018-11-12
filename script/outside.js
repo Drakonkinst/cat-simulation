@@ -104,7 +104,7 @@ var Outside = {
             //determine whether item has hit max limit, if any
             var max = false;
             if(!isUndefined(buyItem.maximum)) {
-                max = Game.hasItem(item, buyItem.maximum);
+                max = $SM.hasItem(item, buyItem.maximum);
             }
 
             if(isUndefined(buyItem.button)) {
@@ -155,7 +155,7 @@ var Outside = {
     //attempts to buy an item
     buy: function(item) {
         var info = Outside.BuyItems[item];
-        var num = Game.equipment[item] || 0;
+        var num = $SM.get("character.equipment[" + item + "]", true);
 
         if(info.maximum <= num) {
             return;
@@ -163,24 +163,24 @@ var Outside = {
 
         var cost = info.cost();
         for(var id in cost) {
-            if(Game.hasItem(id, cost[id])) {
-                Game.addItem(id, -cost[id]);
+            if($SM.hasItem(id, cost[id])) {
+                $SM.addItem(id, -cost[id]);
             } else {
                 Notifications.notify("not enough " + id);
                 return;
             }
         }
 
-        if(info.type == "building" && isUndefined(House.stores[item])) {
-            House.stores[item] = 0;
+        if(info.type == "building" && !$SM.get("house.stores[" + item + "]")) {
+            $SM.set("house.stores[" + item + "]", 0);
         }
 
         Notifications.notify(info.buyMsg);
 
         if(isUndefined(info.quantity)) {
-            Game.addItem(item, 1);
+            $SM.addItem(item, 1);
         } else {
-            Game.addItem(item, info.quantity());
+            $SM.addItem(item, info.quantity());
         }
         
         if(info.type == "building") {
@@ -196,7 +196,7 @@ var Outside = {
 
     work: function() {
         Notifications.notify("hard labor, but necessary");
-        Game.addItem("money", randInt(5, 9));
+        $SM.addItem("money", randInt(5, 9));
         Outside.dailyTimesWorked++;
         Outside.updateBuyButtons();
 
@@ -214,7 +214,7 @@ var Outside = {
         var cost = info.cost();
         
         for(var id in cost) {
-            if(!Game.hasItem(id, cost[id] / 2)) {
+            if(!$SM.hasItem(id, cost[id] / 2)) {
                 return false;
             }
         }

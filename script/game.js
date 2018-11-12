@@ -24,7 +24,7 @@ var Game = {
         major:    0,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  7,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    4,  //increments for every unstable build tested, resets on every release
+        build:    5,  //increments for every unstable build tested, resets on every release
     },
 
     //cheaty options! no non-cheaty options yet.
@@ -132,45 +132,6 @@ var Game = {
         }
     },
 
-    //character inventory
-    equipment: null,
-
-    //adds (or subtracts if negative) a quantity of an item to/from Game.equipment
-    addItem: function(name, value) {
-
-        //initializes value if it does not exist
-        if(!(name in Game.equipment)) {
-            Game.equipment[name] = 0;
-        }
-
-        Game.equipment[name] += value;
-        if(Game.getItemType(name) == "building") {
-            House.updateHouse();
-        } else {
-            Game.updateEquipment();
-        }
-    },
-
-    /*
-     * Returns if the player's inventory contains an item.
-     * If a value is specified, returns if the player's inventory
-     * contains at least that many of the item.
-     * */
-    hasItem: function(name, value) {
-        value = value || 1;
-        return Game.equipment.hasOwnProperty(name) && Game.equipment[name] >= value;
-    },
-
-    //looks through all item lookup tables to find the item's type
-    getItemType: function(item) {
-        if(Game.Items.hasOwnProperty(item)) {
-            return Game.Items[item].type;
-        } else if(House.Buildings.hasOwnProperty(item)) {
-            return "building";
-        }
-        return null;
-    },
-
     //updates general equipment inventory
     updateEquipment: function() {
         //creates Containers
@@ -180,25 +141,24 @@ var Game = {
 
         //switch lookup
         var locations = {
-            "resource": null,
-            "building": null,
+            //"resource": null,
+            //"building": null,
             "special": special,
             "inventory": inventory,
             "default": inventory
         };
 
-        //update all items in Game.equipment
-        for(var item in Game.equipment) {
+        //update all items in equipment
+        for(var item in $SM.get("character.equipment")) {
             //get location for item
-            var type = Game.getItemType(item) || "default";
-            var location = locations[type];
-
-            if(isUndefined(location)) {
-                //do not display
+            if(House.Buildings.hasOwnProperty(item)) {
                 continue;
             }
+
+            var type = Game.Items.hasOwnProperty(item) ? Game.Items[item].type : "default";
+            var location = locations[type];
             
-            Game.updateRow(item, Game.equipment[item], location.get());
+            Game.updateRow(item, $SM.get("character.equipment[" + item + "]"), location.get());
         }
 
         //initialize containers
@@ -441,8 +401,6 @@ var Game = {
                 return true;
             }
         });
-
-        Game.equipment = {};
         
         Notifications.Init();
         World.Init();
