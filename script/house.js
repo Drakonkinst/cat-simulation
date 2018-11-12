@@ -93,7 +93,7 @@ var House = {
                         "the streets are silent."
                     ],
                     onLoad: function() {
-                        Game.addItem("bread", 5);
+                        $SM.addItem("bread", 5);
                     },
                     buttons: {
                         "leave": {
@@ -108,7 +108,7 @@ var House = {
                         "the streets are silent."
                     ],
                     onLoad: function() {
-                        Game.addItem("cat treat", 3);
+                        $SM.addItem("cat treat", 3);
                     },
                     buttons: {
                         "leave": {
@@ -123,7 +123,7 @@ var House = {
             //A Disturbance - Lost Stuff
             title: "A Disturbance",
             isAvailable: function() {
-                return House.cats.length > 0 && Game.hasItem("cat food") && Game.activeModule == House;  //later should require pantry
+                return House.cats.length > 0 && $SM.hasItem("cat food") && Game.activeModule == House;  //later should require pantry
             },
             scenes: {
                 "start": {
@@ -166,7 +166,7 @@ var House = {
                         "some of the food is missing."
                     ],
                     onLoad: function() {
-                        Game.addItem("cat food", -10);
+                        $SM.addItem("cat food", -10);
                     },
                     buttons: {
                         "leave": {
@@ -215,17 +215,17 @@ var House = {
         var buildings = new Container("#buildings");
         var equipment = $("#equipment-container");
 
-        //TODO - needs to include items that exist in Game.equipment but are not built in room yet
-        //update all items in House.stores
-        for(var item in House.stores) {
+        //TODO - needs to include items that exist in equipment but are not built in room yet
+        //update all items in house.stores
+        for(var item in $SM.get("house.stores")) {
             var location = stores;
             if(!isUndefined(House.Buildings[item])) {
                 location = buildings;
             }
             
             //section could use some reworking
-            var text = House.stores[item];
-            var maxValue = text + Game.equipment[item];
+            var text = $SM.get("house.stores[" + item + "]");
+            var maxValue = text + $SM.get("character.equipment[" + item + "]");
             if(!isUndefined(maxValue)) {
                 text += "/" + maxValue;
             }
@@ -263,7 +263,7 @@ var House = {
         House.cats.push(cat);
         House.updateTitle();
         House.rooms["hallway"].addCat(cat);
-        Game.addItem("cat", 1);
+        $SM.addItem("cat", 1);
 
         //triggers Outside panel after a delay - this will be changed eventually
         if(!$("#outside-panel").length && isUndefined(House._initOutside)) {

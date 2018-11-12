@@ -185,7 +185,7 @@ Cat.prototype = {
     runAway: function(isNight) {
         this.room.removeCat(this);
         House.cats.splice(House.cats.indexOf(this), 1);
-        Game.addItem("cat", -1);
+        $SM.addItem("cat", -1);
         var cat = this;
 
         Events.startEvent({
@@ -258,7 +258,7 @@ Cat.prototype = {
                                 text: "give treat",
                                 tooltip: new Tooltip().addCost("cat treat", 1),
                                 click: function() {
-                                    if(!Game.hasItem("cat treat")) {
+                                    if(!$SM.hasItem("cat treat")) {
                                         return "not enough cat treat";
                                     }
                                     return true;

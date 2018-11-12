@@ -94,6 +94,27 @@ var StateManager = {
     //returns if the character has the specified perk
     hasPerk: function(name) {
         return $SM.get("character.perks[" + name + "]");
+    },
+
+    //
+    addItem: function(name, value) {
+        $SM.add("character.equipment[" + name + "]", value);
+
+        if(House.Buildings.hasOwnProperty(name)) {
+            House.updateHouse();
+        } else {
+            Game.updateEquipment(); 
+        }
+    },
+
+    /*
+     * Returns if the player's inventory contains an item.
+     * If a value is specified, returns if the player's inventory
+     * contains at least that many of the item.
+     * */
+    hasItem: function(name, value) {
+        value = value || 1;
+        return $SM.get("character.equipment[" + name + "]", true) >= value;
     }
 };
 var $SM = StateManager;
