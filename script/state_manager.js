@@ -72,6 +72,16 @@ var StateManager = {
         $SM.set(stateName, old + value);
     },
 
+    setM: function(parentName, list) {
+        if(isUndefined($SM.get(parentName))) {
+            $SM.set(parentName, {});
+        }
+
+        for(var k in list) {
+            $SM.set(parentName + "[\"" + k + "\"]", list[k]);
+        }
+    },
+
     /* ====== Specific State Functions ====== */
     addPerk: function(name) {
         //perks must be defined in Game.Perks
