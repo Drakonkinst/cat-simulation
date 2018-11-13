@@ -96,6 +96,7 @@ Room.prototype = {
         this.cats.push(cat);
         var catList = this.panel.find(".cat-list");
         var catListContainer = this.panel.find(".cat-list-container");
+        var formattedName = cat.name.replace(" ", "-");
 
         if(catListContainer.css("opacity") == 0) {
             catListContainer.animate({opacity: 1}, 200, "linear");
@@ -106,13 +107,14 @@ Room.prototype = {
         });
         var nameTooltip = new Tooltip("bottom right").append($("<div>").text(cat.name));
         nameTooltip.appendTo(catIcon);
-        catList.append($("<span>").attr("id", "cat-"+cat.name).addClass("cat-icon-container").append(catIcon).css("opacity", 0).animate({opacity: 1}, 200, "linear"));
+        catList.append($("<span>").attr("id", "cat_" + formattedName).addClass("cat-icon-container").append(catIcon).css("opacity", 0).animate({opacity: 1}, 200, "linear"));
     },
 
     removeCat: function(cat) {
         cat.room = null;
         this.cats.splice(this.cats.indexOf(cat), 1);
-        var catIconContainer = this.panel.find($("#cat-" + cat.name));
+        var formattedName = cat.name.replace(" ", "-");
+        var catIconContainer = this.panel.find($("#cat_" + formattedName));
         if(catIconContainer.length) {
             var pseudoIcon = $("<span>").addClass("cat-icon").text("@").css("opacity", 1);
             catIconContainer.replaceWith(pseudoIcon.animate({opacity: 0}, 200, "linear", function() {
