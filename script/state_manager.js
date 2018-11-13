@@ -2,7 +2,7 @@ var StateManager = {
     State: null,
 
     Init: function(stateObject) {
-        this.State = stateObject;
+        $SM.State = stateObject;
     },
 
     //returns iterable array of the property path of input
@@ -22,8 +22,8 @@ var StateManager = {
 
     //create all parents then set state
     createState: function(stateName, value) {
-        var path = this.getPath(stateName);
-        var obj = this.State;
+        var path = $SM.getPath(stateName);
+        var obj = $SM.State;
         var w = null;
 
         for(var i = 0; i < path.length - 1; i++) {
@@ -38,8 +38,8 @@ var StateManager = {
     },
 
     get: function(stateName, requestZero) {
-        var path = this.getPath(stateName);
-        var obj = this.State;
+        var path = $SM.getPath(stateName);
+        var obj = $SM.State;
         var w = null;
 
         for(var i = 0; i < path.length; i++) {
@@ -86,19 +86,19 @@ var StateManager = {
         }
 
         //adds perk
-        $SM.set("character.perks[" + name + "]", true);
+        $SM.set("character.perks[\"" + name + "\"]", true);
         Notifications.notify(Game.Perks[name].notify);
         Game.updatePerks();
     },
 
     //returns if the character has the specified perk
     hasPerk: function(name) {
-        return $SM.get("character.perks[" + name + "]");
+        return $SM.get("character.perks[\"" + name + "\"]");
     },
 
     //
     addItem: function(name, value) {
-        $SM.add("character.equipment[" + name + "]", value);
+        $SM.add("character.equipment[\"" + name + "\"]", value);
 
         if(House.Buildings.hasOwnProperty(name)) {
             House.updateHouse();
@@ -114,7 +114,7 @@ var StateManager = {
      * */
     hasItem: function(name, value) {
         value = value || 1;
-        return $SM.get("character.equipment[" + name + "]", true) >= value;
+        return $SM.get("character.equipment[\"" + name + "\"]", true) >= value;
     }
 };
 var $SM = StateManager;
