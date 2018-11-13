@@ -383,6 +383,23 @@ var Game = {
         }
     },
 
+    /* ====== Import / Export ====== */
+    import64: function(str64) {
+        Game.disableSelection();
+        str64 = str64.replace(/[\s\.\n]/g, "");
+        var decodedSave = Base64.decode(str64);
+        localStorage.gameState = decodedSave;
+        location.reload();
+    },
+
+    export64: function() {
+        Game.saveGame();
+        Game.enableSelection();
+        var str64 = Base64.encode(localStorage.gameState);
+        str64 = str64.replace(/[\s\.\n]/g, "");
+        return str64;
+    },
+
     /* ====== Game Initialization ====== */
     Init: function() {
         Logger.log("Game initializing...");
