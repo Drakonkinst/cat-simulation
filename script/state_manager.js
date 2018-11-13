@@ -79,12 +79,17 @@ var StateManager = {
         return obj;
     },
 
-    set: function(stateName, value) {
+    set: function(stateName, value, noUpdate) {
         //space to check value validity
         $SM.createState(stateName, value);
+
+        if(!noUpdate) {
+            Game.saveGame();
+            $SM.fireUpdate(stateName);
+        }
     },
 
-    add: function(stateName, value) {
+    add: function(stateName, value, noUpdate) {
         var old = $SM.get(stateName, true);
 
         if(isNaN(old)) {
@@ -95,10 +100,10 @@ var StateManager = {
             return;
         }
 
-        $SM.set(stateName, old + value);
+        $SM.set(stateName, old + value, noUpdate);
     },
 
-    setM: function(parentName, list) {
+    setM: function(parentName, list, noUpdate) {
         if(isUndefined($SM.get(parentName))) {
             $SM.set(parentName, {});
         }
@@ -108,14 +113,19 @@ var StateManager = {
             var value = list[k];
 
             if(!isUndefined(value) && typeof value === "object") {
-                $SM.setM(state, value);
+                $SM.setM(state, value, true);
             } else {
-                $SM.set(state, value);
+                $SM.set(state, value, true);
             }
+        }
+
+        if(!noUpdate) {
+            Game.saveGame();
+            $SM.fireUpdate(parentName);
         }
     },
 
-    remove: function(stateName, noEvent) {
+    remove: function(stateName, noUpdate) {
         var path = $SM.getPath(stateName);
 
         if(isUndefined(path) || isUndefined(path[0]) || !Game.State.hasOwnProperty(path[0])) {
@@ -124,7 +134,7 @@ var StateManager = {
             delete Game.State[path[0]];
         }
 
-        if(!noEvent) {
+        if(!noUpdate) {
             Game.saveGame();
             $SM.fireUpdate(stateName);
         }
