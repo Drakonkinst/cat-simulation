@@ -1,10 +1,4 @@
 var StateManager = {
-    State: null,
-
-    Init: function(stateObject) {
-        $SM.State = stateObject;
-    },
-
     //returns iterable array of the property path of input
     getPath: function(input) {
         var path = input.split(/[.\[\]'"]+/);
@@ -23,7 +17,7 @@ var StateManager = {
     //create all parents then set state
     createState: function(stateName, value) {
         var path = $SM.getPath(stateName);
-        var obj = $SM.State;
+        var obj = Game.State;
         var w = null;
 
         for(var i = 0; i < path.length - 1; i++) {
@@ -39,7 +33,7 @@ var StateManager = {
 
     get: function(stateName, requestZero) {
         var path = $SM.getPath(stateName);
-        var obj = $SM.State;
+        var obj = Game.State;
         var w = null;
 
         for(var i = 0; i < path.length; i++) {
