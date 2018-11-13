@@ -38,7 +38,7 @@ var Outside = {
         "water": {
             type: "resource",
             maximum: 1000,
-            buyMsg: "water is good for you",
+            buyMsg: "water means life",
             maxMsg: "too much water is bad for you",
             cost: function() {
                 return {
