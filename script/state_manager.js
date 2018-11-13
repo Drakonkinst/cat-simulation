@@ -72,7 +72,14 @@ var StateManager = {
         }
 
         for(var k in list) {
-            $SM.set(parentName + "[\"" + k + "\"]", list[k]);
+            var state = parentName + "[\"" + k + "\"]";
+            var value = list[k];
+
+            if(!isUndefined(value) && typeof value === "object") {
+                $SM.setM(state, value);
+            } else {
+                $SM.set(state, value);
+            }
         }
     },
 
