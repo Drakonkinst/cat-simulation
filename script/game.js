@@ -370,6 +370,17 @@ var Game = {
             $SM.setM("version", Game.version);
         }
     },
+
+    deleteSave: function(noReload) {
+        if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+            Game.State = {};
+            localStorage.clear();
+        }
+        if(!noReload) {
+            location.reload();
+        }
+    },
+
     /* ====== Game Initialization ====== */
     Init: function() {
         Logger.log("Game initializing...");
