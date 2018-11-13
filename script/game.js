@@ -19,11 +19,11 @@
 var Game = {
     /* ====== Variables and Presets ====== */
     version: {
-        alpha: true,  //alpha phase, mutually exclusive with beta
-        beta: false,  //beta phase, mutually exclusive with alpha
-        major:    0,  //increments for every major update
+        alpha: false, //alpha phase, mutually exclusive with beta
+        beta: true,   //beta phase, mutually exclusive with alpha
+        major:    1,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
-        release:  8,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
+        release:  0,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
         build:    1,  //increments for every unstable build tested, resets on every release
     },
 
