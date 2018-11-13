@@ -83,6 +83,21 @@ var StateManager = {
         }
     },
 
+    remove: function(stateName, noEvent) {
+        var path = $SM.getPath(stateName);
+
+        if(isUndefined(path) || isUndefined(path[0]) || !Game.State.hasOwnProperty(path[0])) {
+            Logger.warn("Tried to remove non-existent state \"" + stateName + "\"");
+        } else {
+            delete Game.State[path[0]];
+        }
+
+        if(!noEvent) {
+            Game.saveGame();
+            $SM.fireUpdate(stateName);
+        }
+    },
+
     /* ====== Specific State Functions ====== */
     addPerk: function(name) {
         //perks must be defined in Game.Perks
