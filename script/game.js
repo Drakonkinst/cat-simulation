@@ -18,6 +18,8 @@
   * */
 var Game = {
     /* ====== Variables and Presets ====== */
+    SAVE_INTERVAL: 30 * 1000,
+
     version: {
         alpha: false, //alpha phase, mutually exclusive with beta
         beta: true,   //beta phase, mutually exclusive with alpha
@@ -359,6 +361,14 @@ var Game = {
     },
 
     /* ====== Saving / Loading ===== */
+    saveGame: function() {
+        if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+            if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
+            }
+            localStorage.gameState = JSON.stringify(Game.State);
+        }
+    },
+    
     loadGame: function() {
         try {
             var savedState = JSON.parse(localStorage.gameState);
