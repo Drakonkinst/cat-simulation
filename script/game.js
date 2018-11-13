@@ -27,7 +27,7 @@ var Game = {
         build:    1,  //increments for every unstable build tested, resets on every release
     },
 
-    //cheaty options! no non-cheaty options yet.
+    //developer options
     options: {
         debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
@@ -35,7 +35,7 @@ var Game = {
         fastEvents: false,      //scheduled tasks happen much more quickly
         warn: true              //warn if user tries to close browser
     },
-    
+
     //game states
     pressed: false,         //key is being pressed
     keyLock: false,         //keys do not function
