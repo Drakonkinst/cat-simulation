@@ -117,6 +117,14 @@ body {
 	position: absolute;
 }
 
+#save-notify {
+	position: absolute;
+    top: 20px;
+    right: 55px;
+	background: white;
+	opacity: 0;
+}
+
 #header {
 	padding-bottom: 20px;
 	height: 20px;

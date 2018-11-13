@@ -364,6 +364,8 @@ var Game = {
     saveGame: function() {
         if(!isUndefined(Storage) && !isUndefined(localStorage)) {
             if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
+                $("#save-notify").css("opacity", 1).animate({opacity: 0}, 1000, "linear");
+                Game.lastSave = Game.now();
             }
             localStorage.gameState = JSON.stringify(Game.State);
         }
@@ -430,6 +432,7 @@ var Game = {
         $("#main").empty();
 
         $("<div>").attr("id", "day-notify").appendTo("#wrapper");
+        $("<div>").attr("id", "save-notify").text("saved.").appendTo("#wrapper");
 
         $("<div>").attr("id", "equipment-container").appendTo("#main");
         $("<div>").attr("id", "header").appendTo("#main");
