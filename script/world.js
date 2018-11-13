@@ -439,7 +439,7 @@ var World = {
     //called at the start of a new day
     nextDay: function() {
         World.day++;
-        Outside.dailyTimesWorked = 0;
+        $SM.set("game.dailyWorked", 0);
         var workButton = Buttons.getButton("work");
         if(!isUndefined(workButton) && !workButton.onCooldown) {
             workButton.setDisabled(false);
