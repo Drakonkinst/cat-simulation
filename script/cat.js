@@ -617,7 +617,7 @@ var Cats = {
     },
 
     MoraleEnum: {
-        morales: ["depressed", "very unhappy", "unhappy", "indifferent", "happy", "very happy", "content"],
+        morales: ["depressed", "very unhappy", "unhappy", "indifferent", "content", "happy", "very happy"],
         fromInt: function(value) {
 			if(value < 0) {
                 return this.morales[0];
