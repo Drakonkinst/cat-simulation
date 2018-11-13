@@ -46,9 +46,10 @@ var Game = {
 
     //parses Game.version into a legible string
     getVersionString: function() {
-        var prefix = Game.version.alpha ? "alpha " : Game.version.beta ? "beta " : "";
-        Logger.warnIf(Game.version.alpha && Game.version.beta, "This build is marked as both alpha and beta!");
-        return prefix + "v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
+        var v = Game.version;
+        var prefix = v.alpha ? "alpha " : v.beta ? "beta " : "";
+        Logger.warnIf(v.alpha && v.beta, "This build is marked as both alpha and beta!");
+        return prefix + "v" + v.major + "." + v.minor + v.release + v.build;
     },
 
     /* ======= Utils ======= */
