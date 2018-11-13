@@ -108,13 +108,20 @@ Cat.prototype = {
         }
 
         //food
-        if(!isUndefined(this.room.food) && this.hunger < 10) {
-            if(this.room.food.level > 0 && this.hunger >= 3) {
+        if(!isUndefined(this.room.food) && this.hunger >= 3) {
+            if(this.room.food.level > 0) {
                 if(chance(0.35)) {
                     this.eatFood();
                 }
-            } else if(this.hunger >= 6 && chance(0.05)) {
-                this.action("looks at the empty food bowl despondently");
+            } else {
+                if(this.hunger >= 10 && chance(0.65)) {
+                    //wants to look for food in other rooms
+                    this.addMorale(5 - Math.floor(this.hunger));
+                    this.wantsToLeave = true;
+                } else if(this.hunger >= 6 && chance(0.05)) {
+                    this.action("looks at the empty food bowl despondently");
+                }
+                
             }
         } else if(this.hunger >= 10 && chance(0.65)) {
             //wants to look for food in other rooms
@@ -123,13 +130,19 @@ Cat.prototype = {
         }
 
         //water
-        if(!isUndefined(this.room.water) && this.thirst < 10) {
-            if(this.room.water.level > 0 && this.thirst >= 3) {
+        if(!isUndefined(this.room.water) && this.thirst >= 3) {
+            if(this.room.water.level > 0) {
                 if(chance(0.35)) {
                     this.drinkWater();
                 }
-            } else if(this.thirst >= 6 && chance(0.05)) {
-                this.action("looks at the dry water bowl sadly");
+            } else {
+                if(this.thirst >= 10 && chance(0.65)) {
+                    //wants to look for water in other rooms
+                    this.addMorale(5 - Math.floor(this.thirst));
+                    this.wantsToLeave = true;
+                } else if(this.thirst >= 6 && chance(0.05)) {
+                    this.action("looks at the dry water bowl sadly");
+                }
             }
         } else if(this.thirst >= 10 && chance(0.65)) {
             //wants to look for water in other rooms
