@@ -355,13 +355,26 @@ var Game = {
         document.onmousedown = eventPassThrough;
     },
 
+    /* ====== Saving / Loading ===== */
+    loadGame: function() {
+        try {
+            var savedState = JSON.parse(localStorage.gameState);
+            if(!isUndefined(savedState)) {
+                Game.State = savedState;
+                Logger.log("Save loaded!");
+            }
+        } catch(e) {
+            Game.State = {};
+            Logger.log($SM.State);
+            $SM.setM("version", Game.version);
+        }
+    },
     /* ====== Game Initialization ====== */
     Init: function() {
+        Logger.log("Game initializing...");
+        Game.loadGame();
+        
         Logger.log("Version is " + Game.getVersionString());
-
-        Game.State = {};
-        $SM.Init(Game.State);
-        Logger.log("State manager initialized!");
 
         /* Check Browser */
         if(!Game.browserValid()) {
@@ -414,9 +427,8 @@ var Game = {
     /* ====== Prepare For Launch! ===== */
     Launch: function() {
         var start = Game.now();
-        Logger.log("Game initializing...");
-        
         Game.Init();
+
         Game.travelTo(House);
         
         //tester
