@@ -275,7 +275,7 @@ var Events = {
             }
 
             //TODO what if there are two input scenes in an event?
-            if(!isUndefined(scene.input)) {
+            if(!isUndefined(scene.input) && info.nextScene == "end") {
                 Game.disableSelection();
             }   
         }
