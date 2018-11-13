@@ -31,6 +31,38 @@ var StateManager = {
         //return obj;
     },
 
+    fireUpdate: function(stateName, save) {
+        var category = $SM.getCategory(stateName);
+        $.Dispatch("stateUpdate").publish({
+            "category": category,
+            "stateName": stateName
+        });
+
+        if(save) {
+            Game.saveGame();
+        }
+    },
+
+    getCategory: function(stateName) {
+        var firstBracket = stateName.indexOf("[");
+        var firstDot = stateName.indexOf(".");
+        var cutoff = null;
+
+        if(firstBracket == -1 || firstDot == -1) {
+            cutoff = Math.max(firstBracket, firstDot);
+        } else {
+            cutoff = Math.min(firstBracket, firstDot);
+        }
+
+        if(cutoff == -1) {
+            return stateName;
+        }
+        
+        var category = stateName.substr(0, cutoff)
+        Logger.log("Found category " + category + " from " + stateName);
+        return category;
+    },
+
     get: function(stateName, requestZero) {
         var path = $SM.getPath(stateName);
         var obj = Game.State;

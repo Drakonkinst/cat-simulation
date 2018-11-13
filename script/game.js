@@ -41,6 +41,8 @@ var Game = {
     keyLock: false,         //keys do not function
     tabNavigation: true,    //tab navigation does not function
 
+    eventTopics: {},
+
     //State Object
     State: null,
 
@@ -451,6 +453,26 @@ var Game = {
         Logger.log("Game initialized! (took " + (end - start) + "ms)");
     }
 };
+
+//create jQuery Callbacks() to handle object events
+$.Dispatch = function(id) {
+    var callbacks;
+    var topic = id && Game.eventTopics[id];
+
+    if(!topic) {
+        callbacks = jQuery.Callbacks();
+        topic = {
+            publish: callbacks.fire,
+            subscribe: callbacks.add,
+            unsubscribe: callbacks.remove
+        };
+        if(id) {
+            Game.eventTopics[id] = topic;
+        }
+    }
+
+    return topic;
+}
 
 //Let's do this!
 $(document).ready(function() {
