@@ -199,7 +199,7 @@ var Outside = {
         $SM.add("game.dailyWorked", 1);
         Outside.updateBuyButtons();
 
-        if(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK) {
+        if($SM.get("game.dailyWorked", true) >= Outside.MAX_DAILY_WORK) {
             Notifications.notify("done working for the day");
         }
     },
