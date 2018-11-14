@@ -21,7 +21,7 @@ var House = {
             //for later.
             buildMsg: "shiny bowls, needs food though",
             maxMsg: "no more space for more bowls",
-            maximum: 10,
+            maximum: 5,
             onBuild: function(room) {
                 if(isUndefined(room.food)) {
                     room.food = {
@@ -35,8 +35,8 @@ var House = {
         },
         "water bowl": {
             buildMsg: "new water bowl, but it looks dry",
-            maxMsg: "too many water bowls",
-            maximum: 10,
+            maxMsg: "that's enough water bowls for now",
+            maximum: 5,
             onBuild: function(room) {
                 if(isUndefined(room.water)) {
                     room.water = {
