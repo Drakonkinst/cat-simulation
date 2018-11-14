@@ -117,14 +117,6 @@ body {
 	position: absolute;
 }
 
-#save-notify {
-	position: absolute;
-    top: 20px;
-    right: 55px;
-	background: white;
-	opacity: 0;
-}
-
 #header {
 	padding-bottom: 20px;
 	height: 20px;
@@ -193,6 +185,47 @@ body {
 
 .clear {
 	clear: both;
+}
+
+/* End */
+#end-overlay {
+	background: #000;
+	border: 2px solid transparent;
+	position: absolute;
+	z-index: 9;
+	top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#center-text {
+	padding-top: 10%;
+	text-align: center;
+}
+
+#end-title {
+	font-size: 48px;
+	color: #fff;
+	display: block;
+}
+
+#end-subtitle {
+	font-size: 24px;
+	color: #fff;
+	display: block;
+}
+
+#end-buttons {
+	margin-top: 5%;
+	font-size: 32px;
+	color: #fff;
+	cursor: pointer;
+	display: block;
+}
+
+#end-buttons:hover {
+	text-decoration: underline;
 }
 
 /* Day */
@@ -616,13 +649,4 @@ body.noMask #description {
 	position: absolute;
 	top: 50px;
 	left: 0px;
-}
-
-/* Problems */
-.problem {
-	margin-bottom: 12px;
-}
-.problem-solve {
-	margin-top: -25px;
-	margin-left: 300px;
 }

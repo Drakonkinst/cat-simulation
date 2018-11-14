@@ -5,6 +5,7 @@ var Outside = {
     name: "outside",    //module id
 
     MAX_DAILY_WORK: 10,
+    dailyTimesWorked: 0,
 
     //info table of all items that can be bought
     BuyItems: {
@@ -22,7 +23,7 @@ var Outside = {
         },
         "cat food": {
             type: "resource",
-            maximum: 1000,
+            maximum: 500,
             buyMsg: "cans of kibble to keep the hunger away",
             maxMsg: "pantry won't be able to hold any more",
             cost: function() {
@@ -36,8 +37,8 @@ var Outside = {
         },
         "water": {
             type: "resource",
-            maximum: 1000,
-            buyMsg: "water is good for you",
+            maximum: 500,
+            buyMsg: "water means life",
             maxMsg: "too much water is bad for you",
             cost: function() {
                 return {
@@ -50,7 +51,7 @@ var Outside = {
         },
         "food bowl": {
             type: "building",
-            maximum: 100,
+            maximum: 15,
             buyMsg: "more bowls means more food",
             maxMsg: "more bowls won't help now",
             cost: function() {
@@ -61,11 +62,9 @@ var Outside = {
         },
         "water bowl": {
             type: "building",
-            maximum: 100,
+            maximum: 15,
             buyMsg: "cats love drinking out of bowls",
             maxMsg: "drinking out of taps works too, you know?",
-            //should this just be tap water - free? maybe like electricity
-            //electricity should only fail when used a LOT per day
             cost: function() {
                 return {
                     "money": 12
@@ -74,7 +73,7 @@ var Outside = {
         },
         "litter box": {
             type: "building",
-            maximum: 5,
+            maximum: 3,
             buyMsg: "good for keeping the smell away",
             maxMsg: "house won't need any more",
             cost: function() {
@@ -196,10 +195,10 @@ var Outside = {
     work: function() {
         Notifications.notify("hard labor, but necessary");
         $SM.addItem("money", randInt(5, 9));
-        $SM.add("game.dailyWorked", 1);
+        Outside.dailyTimesWorked++;
         Outside.updateBuyButtons();
 
-        if($SM.get("game.dailyWorked", true) >= Outside.MAX_DAILY_WORK) {
+        if(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK) {
             Notifications.notify("done working for the day");
         }
     },
@@ -237,7 +236,7 @@ var Outside = {
             tooltip: new Tooltip().addText("you need to fend for yourself."),
             onClick: Outside.work,
             onFinish: function() {
-                Buttons.getButton("work").setDisabled($SM.get("game.dailyWorked", true) >= Outside.MAX_DAILY_WORK);
+                Buttons.getButton("work").setDisabled(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK);
             }
         }).appendTo("#outside-panel");
 

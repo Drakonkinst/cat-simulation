@@ -21,7 +21,7 @@ var House = {
             //for later.
             buildMsg: "shiny bowls, needs food though",
             maxMsg: "no more space for more bowls",
-            maximum: 10,
+            maximum: 5,
             onBuild: function(room) {
                 if(isUndefined(room.food)) {
                     room.food = {
@@ -35,8 +35,8 @@ var House = {
         },
         "water bowl": {
             buildMsg: "new water bowl, but it looks dry",
-            maxMsg: "too many water bowls",
-            maximum: 10,
+            maxMsg: "that's enough water bowls for now",
+            maximum: 5,
             onBuild: function(room) {
                 if(isUndefined(room.water)) {
                     room.water = {
@@ -428,12 +428,15 @@ var House = {
         }
     },
 
-    initRooms: function() {
-        $("#house-panel").empty();
+    Init: function() {
+        this.tab = Game.addLocation("house", "A Lonely House", House);
+        this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
+
+        //creates a mini-content tab inside of the house panel, including its own subheader bar
         $("<div>").attr("id", "house-header").appendTo(this.panel);
         $("<div>").attr("id", "house-content").appendTo(this.panel);
         $("<div>").attr("id", "room-slider").appendTo("#house-content");
-
+        
         this.rooms = {
             "bedroom": new Room({
                 id: "bedroom",
@@ -496,19 +499,15 @@ var House = {
                 onLoad: function() {}
             })
         };
-
-        House.unlockRoom("hallway", "Hallway");
+        
         House.unlockRoom("bedroom", "Bedroom");
+        House.unlockRoom("hallway", "Hallway");
         House.unlockRoom("living-room", "Living Room");
         //House.unlockRoom("kitchen", "Kitchen");
         //House.unlockRoom("dining-room", "Dining Room");
         Game.updateSlider();
         House.travelTo("hallway");
-    },
 
-    Init: function() {
-        this.tab = Game.addLocation("house", "A Lonely House", House);
-        this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
         House.cats = [];
     }
 };
