@@ -617,3 +617,12 @@ body.noMask #description {
 	top: 50px;
 	left: 0px;
 }
+
+/* Problems */
+.problem {
+	margin-bottom: 12px;
+}
+.problem-solve {
+	margin-top: -25px;
+	margin-left: 300px;
+}
