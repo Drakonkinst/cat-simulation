@@ -445,6 +445,30 @@ var Game = {
             .append($("<span>").addClass("menu-btn").text("discord.").click(function() { window.open("https://discord.gg/Wrp7Fre"); }))
             //.append($("<span>").addClass("menu-btn").text("save."))
             //.append($("<span>").addClass("menu-btn").text("stats."))
+            .append($("<span>").addClass("menu-btn").text("restart.").click(function() {
+                Events.startEvent({
+                    title: "Restart?",
+                    scenes: {
+                        "start": {
+                            text: ["restart simulation?"],
+                            buttons: {
+                                "yes": {
+                                    text: "yes",
+                                    nextScene: "end",
+                                    click: function() {
+                                        Game.options.warn = false;
+                                        Game.deleteSave();
+                                    }
+                                },
+                                "no": {
+                                    text: "no",
+                                    nextScene: "end"
+                                }
+                            }
+                        }
+                    }
+                })
+            }))
             .appendTo("body");
             
         Game.disableSelection();
