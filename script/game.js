@@ -470,7 +470,9 @@ var Game = {
                     }
                 })
             }))
-            .appendTo("body");
+            //.append($("<span>").addClass("menu-btn").text("share."))
+        .appendTo("body");
+            
             
         Game.disableSelection();
 
