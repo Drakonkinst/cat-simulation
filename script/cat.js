@@ -322,8 +322,12 @@ Cat.prototype = {
                     var status = self.genderPronoun("he", "she") + " sits comfortably in your arms";
                     if(self.hunger >= 15) {
                         status = "looks like " + self.genderPronoun("he", "she") + " hasn't eaten in days";
+                    } else if(self.thirst >= 15) {
+                        status = self.genderPronoun("he", "she") + " needs to drink something soon."
                     } else if(self.hunger >= 10) {
                         status = "probably lighter than " + self.genderPronoun("he", "she") + " should be";
+                    } else if(self.thirst >= 10) {
+                        status = self.genderPronoun("he", "she") + " stares forward listlessly."
                     }
 
                     return {
