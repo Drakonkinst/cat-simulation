@@ -59,7 +59,6 @@ var StateManager = {
         }
         
         var category = stateName.substr(0, cutoff)
-        Logger.log("Found category " + category + " from " + stateName);
         return category;
     },
 
