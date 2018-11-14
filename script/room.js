@@ -418,9 +418,9 @@ Room.prototype = {
             Notifications.notify("litter box is already clean");
             return false;
         } else if(this.litterBox < 5) {
-            this.litterBox -= randInt(0, this.litterBox + 1);
+            this.litterBox -= randInt(1, this.litterBox + 1);
         } else {
-            this.litterBox -= randInt(0,6);
+            this.litterBox -= randInt(1,6);
         }
 
         Notifications.notify("shovel sifts through fine sand");
