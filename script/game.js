@@ -484,11 +484,11 @@ var Game = {
         });
         
         Notifications.Init();
-        World.Init();
+        //World.Init();
 
         //modules
         Events.Init();
-        House.Init();
+        //House.Init();
         //Outside.Init();
     },
 
@@ -497,11 +497,7 @@ var Game = {
         var start = Game.now();
         Game.Init();
 
-        Game.travelTo(House);
-        
-        //tester
-        //by end of intro, should have 1 cat and game begins
-        House.addCat();
+        Problems.Init();
 
         var end = Game.now();
         Logger.log("Game initialized! (took " + (end - start) + "ms)");
