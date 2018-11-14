@@ -18,6 +18,8 @@
   * */
 var Game = {
     /* ====== Variables and Presets ====== */
+    SAVE_INTERVAL: 30 * 1000,
+
     version: {
         alpha: false, //alpha phase, mutually exclusive with beta
         beta: true,   //beta phase, mutually exclusive with alpha
@@ -27,28 +29,32 @@ var Game = {
         build:    1,  //increments for every unstable build tested, resets on every release
     },
 
-    //cheaty options! no non-cheaty options yet.
+    //developer options
     options: {
-        debug: false,            //print debug messages
+        debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
         fastButtons: false,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
         warn: true              //warn if user tries to close browser
     },
-    
+
     //game states
     pressed: false,         //key is being pressed
     keyLock: false,         //keys do not function
     tabNavigation: true,    //tab navigation does not function
+    gameOver: false,
+
+    eventTopics: {},
 
     //State Object
     State: null,
 
     //parses Game.version into a legible string
     getVersionString: function() {
-        var prefix = Game.version.alpha ? "alpha " : Game.version.beta ? "beta " : "";
-        Logger.warnIf(Game.version.alpha && Game.version.beta, "This build is marked as both alpha and beta!");
-        return prefix + "v" + Game.version.major + "." + Game.version.minor + Game.version.release + Game.version.build;
+        var v = Game.version;
+        var prefix = v.alpha ? "alpha " : v.beta ? "beta " : "";
+        Logger.warnIf(v.alpha && v.beta, "This build is marked as both alpha and beta!");
+        return prefix + "v" + v.major + "." + v.minor + v.release + v.build;
     },
 
     /* ======= Utils ======= */
@@ -355,36 +361,64 @@ var Game = {
         document.onmousedown = eventPassThrough;
     },
 
-    /* ====== Game End ====== */
-    End: function() {
-        $("<div>").attr("id", "end-overlay").css("opacity", 0)
-            .append($("<div>").attr("id", "center-text")
-                .append($("<div>").attr("id", "end-title").text("game over").css("opacity", 0))
-                .append($("<div>").attr("id", "end-subtitle").text("you are left miserable and alone, left in the company of humans and other unfortunate creatures that are not cats.").css("opacity", 0))
-                .append($("<div>").attr("id", "end-buttons").text("restart.").css("opacity", 0).click(function() {
-                    Game.options.warn = false;
-                    location.reload();
-                })))
-            .animate({opacity: 1}, 3000, "linear", function() {
-                $("#end-title").animate({opacity: 1}, 1500, "linear");
-                $("#end-subtitle").animate({opacity: 1}, 1500, "linear");
-                $("#end-buttons").delay(1500).animate({opacity: 1}, 1500, "linear");
-            })
-            .appendTo("body");
+    /* ====== Saving / Loading ===== */
+    saveGame: function() {
+        if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+            if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
+                $("#save-notify").css("opacity", 1).animate({opacity: 0}, 1000, "linear");
+                Game.lastSave = Game.now();
+            }
+            localStorage.gameState = JSON.stringify(Game.State);
+        }
+    },
+    
+    loadGame: function() {
+        try {
+            var savedState = JSON.parse(localStorage.gameState);
+            if(!isUndefined(savedState)) {
+                Game.State = savedState;
+                Logger.log("Save loaded!");
+            }
+        } catch(e) {
+            Game.State = {};
+            Logger.log($SM.State);
+            $SM.setM("version", Game.version);
+        }
+    },
 
-        $("#wrapper").animate({opacity: 0}, 3000, "linear");
+    deleteSave: function(noReload) {
+        if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+            Game.State = {};
+            localStorage.clear();
+        }
+        if(!noReload) {
+            location.reload();
+        }
+    },
 
-        //System.out.println("You are left miserable and alone, left with the company of humans and other unfortunate creatures that are not cats.");
-		//System.out.println("GAME OVER!");
+    /* ====== Import / Export ====== */
+    import64: function(str64) {
+        Game.disableSelection();
+        str64 = str64.replace(/[\s\.\n]/g, "");
+        var decodedSave = Base64.decode(str64);
+        localStorage.gameState = decodedSave;
+        location.reload();
+    },
+
+    export64: function() {
+        Game.saveGame();
+        Game.enableSelection();
+        var str64 = Base64.encode(localStorage.gameState);
+        str64 = str64.replace(/[\s\.\n]/g, "");
+        return str64;
     },
 
     /* ====== Game Initialization ====== */
     Init: function() {
+        Logger.log("Game initializing...");
+        Game.loadGame();
+        
         Logger.log("Version is " + Game.getVersionString());
-
-        Game.State = {};
-        $SM.Init(Game.State);
-        Logger.log("State manager initialized!");
 
         /* Check Browser */
         if(!Game.browserValid()) {
@@ -399,6 +433,7 @@ var Game = {
         $("#main").empty();
 
         $("<div>").attr("id", "day-notify").appendTo("#wrapper");
+        $("<div>").attr("id", "save-notify").text("saved.").appendTo("#wrapper");
 
         $("<div>").attr("id", "equipment-container").appendTo("#main");
         $("<div>").attr("id", "header").appendTo("#main");
@@ -411,7 +446,33 @@ var Game = {
             .append($("<span>").addClass("menu-btn").text("discord.").click(function() { window.open("https://discord.gg/Wrp7Fre"); }))
             //.append($("<span>").addClass("menu-btn").text("save."))
             //.append($("<span>").addClass("menu-btn").text("stats."))
-            .appendTo("body");
+            .append($("<span>").addClass("menu-btn").text("restart.").click(function() {
+                Events.startEvent({
+                    title: "Restart?",
+                    scenes: {
+                        "start": {
+                            text: ["restart simulation?"],
+                            buttons: {
+                                "yes": {
+                                    text: "yes",
+                                    nextScene: "end",
+                                    click: function() {
+                                        Game.options.warn = false;
+                                        Game.deleteSave();
+                                    }
+                                },
+                                "no": {
+                                    text: "no",
+                                    nextScene: "end"
+                                }
+                            }
+                        }
+                    }
+                })
+            }))
+            //.append($("<span>").addClass("menu-btn").text("share."))
+        .appendTo("body");
+            
             
         Game.disableSelection();
 
@@ -426,30 +487,45 @@ var Game = {
         });
         
         Notifications.Init();
-        World.Init();
+        //World.Init();
 
         //modules
         Events.Init();
-        House.Init();
+        //House.Init();
         //Outside.Init();
     },
 
     /* ====== Prepare For Launch! ===== */
     Launch: function() {
         var start = Game.now();
-        Logger.log("Game initializing...");
-        
         Game.Init();
-        Game.travelTo(House);
-        
-        //tester
-        //by end of intro, should have 1 cat and game begins
-        House.addCat();
+
+        Problems.Init();
 
         var end = Game.now();
         Logger.log("Game initialized! (took " + (end - start) + "ms)");
     }
 };
+
+//create jQuery Callbacks() to handle object events
+$.Dispatch = function(id) {
+    var callbacks;
+    var topic = id && Game.eventTopics[id];
+
+    if(!topic) {
+        callbacks = jQuery.Callbacks();
+        topic = {
+            publish: callbacks.fire,
+            subscribe: callbacks.add,
+            unsubscribe: callbacks.remove
+        };
+        if(id) {
+            Game.eventTopics[id] = topic;
+        }
+    }
+
+    return topic;
+}
 
 //Let's do this!
 $(document).ready(function() {
