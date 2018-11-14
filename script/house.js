@@ -428,15 +428,12 @@ var House = {
         }
     },
 
-    Init: function() {
-        this.tab = Game.addLocation("house", "A Lonely House", House);
-        this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
-
-        //creates a mini-content tab inside of the house panel, including its own subheader bar
+    initRooms: function() {
+        $("#house-panel").empty();
         $("<div>").attr("id", "house-header").appendTo(this.panel);
         $("<div>").attr("id", "house-content").appendTo(this.panel);
         $("<div>").attr("id", "room-slider").appendTo("#house-content");
-        
+
         this.rooms = {
             "bedroom": new Room({
                 id: "bedroom",
@@ -499,15 +496,19 @@ var House = {
                 onLoad: function() {}
             })
         };
-        
-        House.unlockRoom("bedroom", "Bedroom");
+
         House.unlockRoom("hallway", "Hallway");
+        House.unlockRoom("bedroom", "Bedroom");
         House.unlockRoom("living-room", "Living Room");
         //House.unlockRoom("kitchen", "Kitchen");
         //House.unlockRoom("dining-room", "Dining Room");
         Game.updateSlider();
         House.travelTo("hallway");
+    },
 
+    Init: function() {
+        this.tab = Game.addLocation("house", "A Lonely House", House);
+        this.panel = $("<div>").attr("id", "house-panel").addClass("location").appendTo("#location-slider");
         House.cats = [];
     }
 };

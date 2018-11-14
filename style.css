@@ -117,6 +117,14 @@ body {
 	position: absolute;
 }
 
+#save-notify {
+	position: absolute;
+    top: 20px;
+    right: 55px;
+	background: white;
+	opacity: 0;
+}
+
 #header {
 	padding-bottom: 20px;
 	height: 20px;
@@ -649,4 +657,13 @@ body.noMask #description {
 	position: absolute;
 	top: 50px;
 	left: 0px;
+}
+
+/* Problems */
+.problem {
+	margin-bottom: 12px;
+}
+.problem-solve {
+	margin-top: -25px;
+	margin-left: 300px;
 }
