@@ -42,6 +42,7 @@ var Game = {
     pressed: false,         //key is being pressed
     keyLock: false,         //keys do not function
     tabNavigation: true,    //tab navigation does not function
+    gameOver: false,
 
     eventTopics: {},
 
