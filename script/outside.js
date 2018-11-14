@@ -5,6 +5,7 @@ var Outside = {
     name: "outside",    //module id
 
     MAX_DAILY_WORK: 10,
+    dailyTimesWorked: 0,
 
     //info table of all items that can be bought
     BuyItems: {
@@ -194,10 +195,10 @@ var Outside = {
     work: function() {
         Notifications.notify("hard labor, but necessary");
         $SM.addItem("money", randInt(5, 9));
-        $SM.add("game.dailyWorked", 1);
+        Outside.dailyTimesWorked++;
         Outside.updateBuyButtons();
 
-        if($SM.get("game.dailyWorked", true) >= Outside.MAX_DAILY_WORK) {
+        if(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK) {
             Notifications.notify("done working for the day");
         }
     },
@@ -235,7 +236,7 @@ var Outside = {
             tooltip: new Tooltip().addText("you need to fend for yourself."),
             onClick: Outside.work,
             onFinish: function() {
-                Buttons.getButton("work").setDisabled($SM.get("game.dailyWorked", true) >= Outside.MAX_DAILY_WORK);
+                Buttons.getButton("work").setDisabled(Outside.dailyTimesWorked >= Outside.MAX_DAILY_WORK);
             }
         }).appendTo("#outside-panel");
 
