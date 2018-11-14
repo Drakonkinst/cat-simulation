@@ -230,7 +230,12 @@ Cat.prototype = {
                         buttons: {
                             "continue": {
                                 text: "move on",
-                                nextScene: "end"
+                                nextScene: "end",
+                                click: function() {
+                                    if(House.cats.length <= 0) {
+                                        Game.End();
+                                    }
+                                }
                             }
                         }
                     }

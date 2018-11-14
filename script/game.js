@@ -355,6 +355,29 @@ var Game = {
         document.onmousedown = eventPassThrough;
     },
 
+    /* ====== Game End ====== */
+    End: function() {
+        $("<div>").attr("id", "end-overlay").css("opacity", 0)
+            .append($("<div>").attr("id", "center-text")
+                .append($("<div>").attr("id", "end-title").text("game over").css("opacity", 0))
+                .append($("<div>").attr("id", "end-subtitle").text("you are left miserable and alone, left in the company of humans and other unfortunate creatures that are not cats.").css("opacity", 0))
+                .append($("<div>").attr("id", "end-buttons").text("restart.").css("opacity", 0).click(function() {
+                    Game.options.warn = false;
+                    location.reload();
+                })))
+            .animate({opacity: 1}, 3000, "linear", function() {
+                $("#end-title").animate({opacity: 1}, 1500, "linear");
+                $("#end-subtitle").animate({opacity: 1}, 1500, "linear");
+                $("#end-buttons").delay(1500).animate({opacity: 1}, 1500, "linear");
+            })
+            .appendTo("body");
+
+        $("#wrapper").animate({opacity: 0}, 3000, "linear");
+
+        //System.out.println("You are left miserable and alone, left with the company of humans and other unfortunate creatures that are not cats.");
+		//System.out.println("GAME OVER!");
+    },
+
     /* ====== Game Initialization ====== */
     Init: function() {
         Logger.log("Version is " + Game.getVersionString());
