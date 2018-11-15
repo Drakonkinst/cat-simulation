@@ -510,12 +510,16 @@ var Game = {
         });
         
         Notifications.Init();
-        //World.Init();
-
-        //modules
         Events.Init();
-        //House.Init();
+
+        if($SM.get("features.location.house")) {
+            House.Init();
+            Game.travelTo(House);
+        }
+
+        //World.Init();
         //Outside.Init();
+        
     },
 
     /* ====== Prepare For Launch! ===== */
