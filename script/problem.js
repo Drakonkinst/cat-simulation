@@ -21,11 +21,19 @@ function Problem(properties) {
     var tooltip = new Tooltip();
 
     for(var k in this.awards) {
-        tooltip.addCost(this.awards, "+" + this.awards[k]);
+        if(this.awards[k] > 1) {
+            tooltip.addText("+" + this.awards[k] + " " + k);
+        } else {
+            tooltip.addText("+" + k);
+        }
     }
 
     for(var k in this.costs) {
-        tooltip.addCost(this.costs, "-" + this.costs[k]);
+        if(this.costs[k] > 1) {
+            tooltip.addText("-" + this.costs[k] + " " + k);
+        } else {
+            tooltip.addText("-" + k);
+        }
     }
 
     this.button = new Button({
