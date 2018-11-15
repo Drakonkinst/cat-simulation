@@ -268,7 +268,7 @@ var Game = {
         }
     },
 
-    /* ====== Browser Checks ====== */
+    /* ====== Browser Checks ====== 
     //thanks, doublespeak games!
 
     //checks if the browser supports CSS3 and HTML5
@@ -432,8 +432,6 @@ var Game = {
 
         $("#wrapper").animate({opacity: 0}, 3000, "linear");
 
-        //System.out.println("You are left miserable and alone, left with the company of humans and other unfortunate creatures that are not cats.");
-		//System.out.println("GAME OVER!");
     },
     
     /* ====== Game Initialization ====== */
@@ -443,14 +441,14 @@ var Game = {
         
         Logger.log("Version is " + Game.getVersionString());
 
-        /* Check Browser */
+        /* Check Browser
         if(!Game.browserValid()) {
             //window.location = //set to browser warning window
         }
 
         if(Game.isMobile()) {
             //window.location = //set to mobile warning window
-        }
+        }//*/
 
         /* Layout */
         $("#main").empty();
@@ -495,7 +493,6 @@ var Game = {
             }))
             //.append($("<span>").addClass("menu-btn").text("share."))
         .appendTo("body");
-            
             
         Game.disableSelection();
 
