@@ -62,21 +62,20 @@ function Problem(properties) {
 Problem.prototype = {
     //inserts problem inside element
     insertIn: function(element) {
-        this.addProblem().appendTo(element);
+        this.isSolving = false;
+        var activeProblems = $SM.get("problems.activeProblems");
+        activeProblems.push(this.id);
+        $SM.set("problems.activeProblems", activeProblems);
+        this.element.appendTo(element);
     },
 
     //inserts problem after element
-    insertAfter: function(element) {
-        this.addProblem().insertAfter(element)
-    },
-
-    //activates problem
-    addProblem: function() {
+    insertAfter: function(prevElement) {
         this.isSolving = false;
         var activeProblems = $SM.get("problems.activeProblems");
-        activeProblems.unshift(this.id);
+        activeProblems.splice(activeProblems.indexOf(prevElement.attr("id")) + 1, 0, this.id);
         $SM.set("problems.activeProblems", activeProblems);
-        return this.element;
+        this.element.insertAfter(prevElement)
     },
 
     attemptSolve: function() {
@@ -250,8 +249,8 @@ var Problems = {
             causes: ["ignorefriend"]
         },
         "ignorefriend": {
-            text: "you need to be ignored",
-            button: "be let down",
+            text: "you need to be let down",
+            button: "be ignored",
             duration: 3000,
             notification: {"a friend that only stays when the sun is bright is no friend at all": 1},
             causes: ["losefriend"],
@@ -266,8 +265,8 @@ var Problems = {
     },
 
     getProblemFromEl: function(element) {
-        var elID = $(element).attr("id");
-        var id = elID.substring(4, elID.length - 6);
+        var elId = $(element).attr("id");
+        var id = elId.substring(4, elId.length - 6);
         return Problems.ProblemList[id];
     },
 
