@@ -47,7 +47,9 @@ function Problem(properties) {
         },
         onFinish: function() {
             var problem = Problems.getProblemFromEl(this);
-            problem.solved();
+            if(problem.isActive()) {
+                problem.solved();
+            }
         }
     });
 
