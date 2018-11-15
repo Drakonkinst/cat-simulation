@@ -125,6 +125,7 @@ body {
 	opacity: 0;
 }
 
+/* Header */
 #header {
 	padding-bottom: 20px;
 	height: 20px;
@@ -160,6 +161,7 @@ body {
 	width: 700px;
 }
 
+/* Footer */
 #footer {
 	position: fixed;
 	right: 30px;
@@ -195,7 +197,7 @@ body {
 	clear: both;
 }
 
-/* End */
+/* End Screen */
 #end-overlay {
 	background: #000;
 	border: 2px solid transparent;
@@ -255,6 +257,7 @@ body {
 	left: 0px;
 	margin-bottom: 10px;
 }
+
 #notify-gradient {
 	position: absolute;
 	top: 0px;
@@ -272,6 +275,7 @@ body {
 		Opacity=0, FinishOpacity=100, Style=1, StartX=0, StartY=0, FinishX=0, FinishY=500
 	);
 }
+
 .notification {
 	margin-bottom: 10px;
 }
@@ -292,9 +296,11 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
+
 .button:hover {
 	text-decoration: underline;
 }
+
 div.button.disabled,
 div.button.disabled:hover {
 	cursor: default;
@@ -302,6 +308,7 @@ div.button.disabled:hover {
 	color: #b2b2b2;
 	text-decoration: none;
 }
+
 .button .cooldown {
 	position: absolute;
 	top: 0px;
@@ -356,6 +363,16 @@ div.button.disabled:hover {
 	display: none;
 }
 
+/* tooltip lines should not expand */
+.cat-icon .tooltip {
+	white-space: pre;
+}
+
+.problem-solve .tooltip {
+	white-space: pre;
+}
+
+/* event buttons still show tooltip greyed out, even if disabled */
 #event .button.disabled:hover > div.tooltip {
 	display: block;
 }
