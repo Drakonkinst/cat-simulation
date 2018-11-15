@@ -184,8 +184,9 @@ var Problems = {
             text: "you are alone",
             button: "solve",
             duration: 5000,
-            notification: "pale walls and dusty floors",
+            notification: {"pale walls and dusty floors": 1},
             onFinish: function() {
+                $SM.set("features.location.house", true);
                 House.Init();
                 Problems.setParent("house-panel");
                 Game.travelTo(House);
