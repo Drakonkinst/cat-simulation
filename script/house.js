@@ -398,8 +398,6 @@ var House = {
     },
 
     tick: function() {
-        //var start = Game.now();
-
         for(var k in House.rooms) {
             House.rooms[k].tick();
         }
@@ -412,9 +410,6 @@ var House = {
                 House.rooms[k].updateManageButtons();
             }
         }
-
-        //var end = Game.now();
-        //Logger.log("Update took " + (end - start) + "ms");
     },
 
     nextDay: function() {

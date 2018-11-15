@@ -26,7 +26,7 @@ var Game = {
         major:    1,  //increments for every major update
         minor:    0,  //increments for every minor update, resets on every major update
         release:  1,  //increments for every stable build pushed (successful bugfixes, etc.), resets on every minor update
-        build:    1,  //increments for every unstable build tested, resets on every release
+        build:    2,  //increments for every unstable build tested, resets on every release
     },
 
     //developer options

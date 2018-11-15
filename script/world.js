@@ -326,7 +326,7 @@ var World = {
                             "looks like it's up to you."
                         ],
                         input: "give the cat a name",
-                        maxinput: 20,
+                        maxinput: 16,
                         buttons: {
                             "name": {
                                 text: "name",
