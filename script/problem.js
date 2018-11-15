@@ -166,24 +166,21 @@ var Problems = {
             text: "you are sleeping",
             button: "wake up",
             duration: 10000,
-            causes: ["age0"]
+            causes: ["age0", "dream"]
         },
         "age0": {
             text: "you are waking up",
-            button: "open your eyes",
-            duration: 10000,
-            causes: ["age1"]
+            button: "open eyes",
+            duration: 7000,
+            awards: {"weariness": 1},
+            causes: ["age1"],
+            solves: ["dream"]
+            //notify: something about maybe it's better to have stayed in bed?
         },
         "age1": {
             text: "you are awake",
-            button: "solve",
-            duration: 1000,
-            causes: ["age2"]
-        },
-        "age2": {
-            text: "you are alone",
-            button: "solve",
-            duration: 5000,
+            button: "get up",
+            duration: 10000,
             notification: {"pale walls and dusty floors": 1},
             onFinish: function() {
                 $SM.set("features.location.house", true);
@@ -191,13 +188,78 @@ var Problems = {
                 Problems.setParent("house-panel");
                 Game.travelTo(House);
             },
-            causes: ["age3"]
+            causes: ["age2"]
+        },
+        "age2": {
+            text: "you are alone",
+            button: "solve",
+            duration: 3000,
+            
+            causes: ["age3", "makefriend"]
         },
         "age3": {
             text: "you are lonely",
             button: "mourn",
-            duration: 15000,
+            duration: 3000,
             solvable: false
+            //takes friends? requires friends? requires experiences
+        },
+        "age4": {
+            text: "you are troubled",
+            //requires experiences?
+        },
+        "age5": {
+            text: "you are bitter",
+        },
+        "age6": {
+            text: "you are starting to give up",
+            //costs hope?
+            onFinish: function() {
+                Events.startEvent({
+                    title: "A Strange Noise",
+                    scenes: {
+
+                    }
+                });
+            }
+        },
+
+        "dream": {
+            text: "you need to dream",
+            button: "dream",
+            duration: 4000,
+            solvable: false,
+            onFinish: function() {
+                World.dream();
+            }
+        },
+        "makefriend": {
+            text: "you need more friends",
+            button: "make a friend",
+            duration: 8000,
+            solvable: false,
+            causes: ["talkfriend"]
+        },
+        "talkfriend": {
+            text: "you need to talk to a friend",
+            button: "solve",
+            duration: 5000,
+            solvable: false,
+            causes: ["ignorefriend"]
+        },
+        "ignorefriend": {
+            text: "you need to be ignored",
+            button: "be let down",
+            duration: 3000,
+            notification: {"a friend that only stays when the sun is bright is no friend at all": 1},
+            causes: ["losefriend"],
+            
+        },
+        "losefriend": {
+            text: "you need to move on",
+            button: "accept",
+            duration: 15000,
+            awards: {"experience": 1}
         }
     },
 
