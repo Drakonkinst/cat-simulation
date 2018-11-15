@@ -459,5 +459,6 @@ var World = {
         World.nextDay();
 
         Game.setInterval(World.tick, 5000);
+        Events.Init();
     }
 };

@@ -431,7 +431,10 @@ var Game = {
             .appendTo("body");
 
         $("#wrapper").animate({opacity: 0}, 3000, "linear");
+    },
 
+    handleStateUpdates: function(e) {
+        Logger.log("Update fired! category: " + e.category + " state: " + e.stateName);
     },
     
     /* ====== Game Initialization ====== */
@@ -505,9 +508,10 @@ var Game = {
                 return true;
             }
         });
+
+        $.Dispatch("stateUpdate").subscribe(Game.handleStateUpdates);
         
         Notifications.Init();
-        Events.Init();
 
         if($SM.get("features.location.house")) {
             House.Init();
