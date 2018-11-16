@@ -254,6 +254,7 @@ var Problems = {
             duration: 5000,
             solvable: false,
             awards: {"memory": 1},
+            requires: {"friend": 1},
             causes: ["ignorefriend"]
         },
         "ignorefriend": {
@@ -262,7 +263,7 @@ var Problems = {
             duration: 3000,
             notification: "a friend that only stays when the sun is bright is no friend at all",
             awards: {"weariness": 1},
-            cost: {"friend": 1},
+            costs: {"friend": 1},
             causes: ["losefriend"],
             
         },
@@ -288,7 +289,7 @@ var Problems = {
 
     updateAll: function() {
         var activeProblems = $SM.get("problems.activeProblems");
-        for(var i = 0, problem; i < activeProblems; i++) {
+        for(var i = 0, problem; i < activeProblems.length; i++) {
             var problem = Problems.ProblemList[activeProblems[i]];
             for(var k in problem.requires) {
                 if(!$SM.hasItem(k, problem.requires[k])) {
