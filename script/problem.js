@@ -131,13 +131,13 @@ Problem.prototype = {
         this.onFinish();
 
         if(this.isSolvable) {
+            $("#" + this.id + "_text").find(".solving-text").remove();
             this.remove();
+        } else {
+            $("#" + this.id + "_text").find(".solving-text").animate({"opacity": 0}, 75, "linear", function() {
+                $(this).remove();
+            });    
         }
-
-        //fades out "solving..." text
-        $("#" + this.id + "_text").find(".solving-text").animate({"opacity": 0}, 75, "linear", function() {
-            $(this).remove();
-        });
 
         if(!isUndefined(this.notification)) {
             Notifications.notify(this.notification);
@@ -149,7 +149,7 @@ Problem.prototype = {
     remove: function() {
         var activeProblems = $SM.get("problems.activeProblems");
         activeProblems.splice(activeProblems.indexOf(this.id), 1);
-        this.element.remove();
+        this.element.detach();
         this.isSolving = false;
     },
 
