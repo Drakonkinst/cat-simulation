@@ -191,6 +191,12 @@ var Events = {
             $("<div>").attr("id", "input-result").css("opacity", 0).appendTo(desc);
 
             autoSelect("#description input");
+        } else if (!isUndefined(scene.textarea)) {
+            var ta = $("<textarea>").val(scene.textarea).appendTo(desc);
+            if(scene.readonly) {
+                ta.attr("readonly", true);
+            }
+            autoSelect("#description textarea");
         }
 
         //exit buttons let the player respond to the scene
