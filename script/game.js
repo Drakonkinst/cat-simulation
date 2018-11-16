@@ -423,6 +423,89 @@ var Game = {
     },
 
     /* ====== Import / Export ====== */
+    exportImport: function() {
+        if(!isUndefined(Events.activeEvent())) {
+            return;
+        }
+        Events.startEvent({
+            title: "Export / Import",
+            scenes: {
+                "start": {
+                    text: [
+                        "export or import save data, for backing up",
+                        "or migrating computers"
+                    ],
+                    buttons: {
+                        "export": {
+                            text: "export",
+                            nextScene: {"export": 1}
+                        },
+                        "import": {
+                            text: "import",
+                            nextScene: {"confirmImport": 1}
+                        },
+                        "cancel": {
+                            text: "cancel",
+                            nextScene: "end"
+                        }
+                    }
+                },
+                "export": {
+                    text: ["save this."],
+                    textarea: Game.export64(),
+                    readonly: true,
+                    buttons: {
+                        "done": {
+                            text: "got it",
+                            nextScene: "end",
+                            click: function() {
+                                Game.disableSelection();
+                            }
+                        }
+                    }
+                },
+                "confirmImport": {
+                    text: [
+                        "are you sure?",
+                        "if the code is invalid, all data will be lost.",
+                        "this is irreversible."
+                    ],
+                    buttons: {
+                        "yes": {
+                            text: "yes",
+                            nextScene: {"import": 1},
+                            click: function() {
+                                Game.enableSelection();
+                            }
+                        },
+                        "no": {
+                            text: "no",
+                            nextScene: {"start": 1}
+                        }
+                    }
+                },
+                "import": {
+                    text: ["paste the save code here."],
+                    textarea: "",
+                    buttons: {
+                        "import": {
+                            text: "import",
+                            nextScene: "end",
+                            click: function() {
+                                var saveStr = Events.eventPanel().find("textarea").val();
+                                Game.import64(saveStr);
+                            }
+                        },
+                        "cancel": {
+                            text: "cancel",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        });
+    },
+
     import64: function(str64) {
         Game.disableSelection();
         str64 = str64.replace(/[\s\.\n]/g, "");
@@ -511,6 +594,10 @@ var Game = {
                 .addClass("menu-btn")
                 .text("restart.")
                 .click(Game.confirmDelete))
+            .append($("<span>")
+                .addClass("menu-btn")
+                .text("save."))
+                .click(Game.exportImport)
             //.append($("<span>").addClass("menu-btn").text("share."))
         .appendTo("body");
             
