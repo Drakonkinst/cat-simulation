@@ -338,10 +338,7 @@ Cat.prototype = {
                         buttons: {
                             "put down": {
                                 text: "put down",
-                                click: function() {
-                                    self.isExamining = false;
-                                },
-                                nextScene: "end"
+                                nextScene: {"start": 1}
                             }
                         }
                     }
