@@ -4,7 +4,7 @@ function Problem(properties) {
     this.causes = properties.causes || [];  //problems that are caused (added) by solving this
     this.solves = properties.solves || [];  //problems that are solved (removed) by solving this
 
-    this.notification = properties.notification || {};  //weighted probability of possible notifications
+    this.notification = properties.notification || "";  //weighted probability of possible notifications
     this.awards = properties.awards || {};
     this.costs = properties.costs || {};
 
@@ -139,8 +139,8 @@ Problem.prototype = {
             $(this).remove();
         });
 
-        if(!isEmpty(this.notification)) {
-            Notifications.notify(chooseWeighted(this.notification));
+        if(!isUndefined(this.notification)) {
+            Notifications.notify(this.notification);
         }
 
         Game.saveGame();
