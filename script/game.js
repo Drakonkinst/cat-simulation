@@ -362,30 +362,35 @@ var Game = {
     },
 
     /* ====== Saving / Loading ===== */
+    //saves current game state to local storage
     saveGame: function() {
         if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+            //"saved." notification
             if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
                 $("#save-notify").css("opacity", 1).animate({opacity: 0}, 1000, "linear");
                 Game.lastSave = Game.now();
             }
+
             localStorage.gameState = JSON.stringify(Game.State);
         }
     },
     
+    //loads game state from local storage
     loadGame: function() {
         try {
             var savedState = JSON.parse(localStorage.gameState);
             if(!isUndefined(savedState)) {
                 Game.State = savedState;
-                Logger.log("Save loaded!");
+                Logger.log("Loaded save!");
             }
         } catch(e) {
+            //error found, revert to blank game state
             Game.State = {};
-            Logger.log($SM.State);
             $SM.setM("version", Game.version);
         }
     },
 
+    //event that asks if the player wants to delete their save
     confirmDelete: function() {
         if(!isUndefined(Events.activeEvent())) {
             return;
@@ -411,6 +416,7 @@ var Game = {
         });
     },
 
+    //clears local storage and starts a new game
     deleteSave: function(noReload) {
         Game.options.warn = false;
         if(!isUndefined(Storage) && !isUndefined(localStorage)) {
@@ -423,10 +429,13 @@ var Game = {
     },
 
     /* ====== Import / Export ====== */
+    //import/export event
     exportImport: function() {
+        //to prevent spam, will not do anything if there is already an event going on
         if(!isUndefined(Events.activeEvent())) {
             return;
         }
+
         Events.startEvent({
             title: "Export / Import",
             scenes: {
@@ -506,6 +515,7 @@ var Game = {
         });
     },
 
+    //imports game from encoded string
     import64: function(str64) {
         Game.disableSelection();
         str64 = str64.replace(/[\s\.\n]/g, "");
@@ -514,6 +524,7 @@ var Game = {
         location.reload();
     },
 
+    //returns encoded string of game state
     export64: function() {
         Game.saveGame();
         Game.enableSelection();
@@ -523,6 +534,7 @@ var Game = {
     },
 
     /* ====== Game End ====== */
+    //ends the game
     End: function() {
         $("<div>").attr("id", "end-overlay").css("opacity", 0)
             .append($("<div>").attr("id", "center-text")
