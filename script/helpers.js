@@ -26,6 +26,11 @@ function chance(chance) {
     return Math.random() < chance;
 }
 
+//focuses an element
+function autoSelect(selector) {
+    $(selector).focus().select();
+}
+
 /*
  * Returns an array of all the property names in an object.
  * 

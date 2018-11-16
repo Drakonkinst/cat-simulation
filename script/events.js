@@ -190,7 +190,7 @@ var Events = {
             //create result element for validity messages
             $("<div>").attr("id", "input-result").css("opacity", 0).appendTo(desc);
 
-            desc.find("input").focus().select();
+            autoSelect("#description input");
         }
 
         //exit buttons let the player respond to the scene
