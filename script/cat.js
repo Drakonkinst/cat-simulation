@@ -186,6 +186,23 @@ Cat.prototype = {
         this.action("sniffs around, " + message, true);
     },
 
+    //called when the owner returns to the house
+    onHouseArrival: function() {
+        if(this.morale == 0 && chance(0.9)) {
+            //cat runs away if morale is too low
+            this.runAway(false);
+        } else {
+            //notify critical needs if any
+            if(this.hunger > 15) {
+                this.action("is starving", true);
+            }
+
+            if(this.thirst > 15) {
+                this.action("is dehydrated", true);
+            }
+        }
+    },
+
     //called upon the start of a new day
     nextDay: function() {
         if(this.morale == 0 && chance(0.9)) {
