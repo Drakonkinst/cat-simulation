@@ -13,7 +13,7 @@ var House = {
     stores: {},         //house inventory
     electric: null,
 
-    //info table of all buildings
+    //lookup table of all buildings
     Buildings: {
         "food bowl": {
             //should space be based on single buildings or overall? maybe
@@ -204,7 +204,6 @@ var House = {
         var buildings = new Container("#buildings");
         var equipment = $("#equipment-container");
 
-        //TODO - needs to include items that exist in equipment but are not built in room yet
         //update all items in house.stores
         for(var item in $SM.get("house.stores")) {
             var location = stores;
@@ -263,8 +262,10 @@ var House = {
         }
     },
 
+    //subtracts from this.electric
     usePower: function(value) {
         if(this.electric - value <= 0 & this.electric > 0) {
+            //power too low, cause power outage
             this.electric = 0;
             this.powerOutage();
         } else {
@@ -272,12 +273,15 @@ var House = {
         }
     },
 
+    //power outage event, disables light switches and turns everything to darkness
     powerOutage: function() {
         for(var k in House.rooms) {
             var room = House.rooms[k];
             var lightButton = Buttons.getButton(room.id + "_light-toggle");
             var buttonExists = !isUndefined(lightButton);
 
+            //TODO - lights that were turned on previously should turn on again when power
+            //returns (do not reset?)
             if(room.lightsOn) {
                 room.lightsOn = false;
                 if(buttonExists) {
@@ -310,6 +314,7 @@ var House = {
         });
     },
 
+    //house lights turn on and enables light buttons
     powerReturn: function() {
         Notifications.notify("the power is back on");
         for(var k in House.rooms) {
@@ -386,6 +391,7 @@ var House = {
         slider.width((slider.children().length * 700) + "px");
     },
 
+    //called every 5 seconds
     tick: function() {
         for(var k in House.rooms) {
             House.rooms[k].tick();
@@ -401,6 +407,7 @@ var House = {
         }
     },
 
+    //called on a new day
     nextDay: function() {
         if(this.electric == 0) {
             this.powerReturn();
