@@ -106,7 +106,7 @@ Problem.prototype = {
 
     solved: function() {
         this.isSolving = false;
-
+        
         //adds awards
         for(var k in this.awards) {
             $SM.addItem(k, this.awards[k]);
@@ -182,7 +182,7 @@ var Problems = {
             text: "you are awake",
             button: "get up",
             duration: 10000,
-            notification: {"pale walls and dusty floors": 1},
+            notification: "pale walls and dusty floors",
             onFinish: function() {
                 $SM.set("features.location.house", true);
                 House.Init();
@@ -202,7 +202,10 @@ var Problems = {
             text: "you are lonely",
             button: "mourn",
             duration: 3000,
-            solvable: false
+            solvable: false,
+            awards: {"weariness": 1},
+            costs: {"memory": 10, "experience": 3},
+            solves: [""]
             //takes friends? requires friends? requires experiences
         },
         "age4": {
@@ -214,6 +217,7 @@ var Problems = {
         },
         "age6": {
             text: "you are starting to give up",
+            button: "accept",
             //costs hope?
             onFinish: function() {
                 Events.startEvent({
@@ -239,6 +243,7 @@ var Problems = {
             button: "make a friend",
             duration: 8000,
             solvable: false,
+            awards: {"friend": 1},
             causes: ["talkfriend"]
         },
         "talkfriend": {
@@ -246,19 +251,22 @@ var Problems = {
             button: "solve",
             duration: 5000,
             solvable: false,
+            awards: {"memory": 1},
             causes: ["ignorefriend"]
         },
         "ignorefriend": {
             text: "you need to be let down",
             button: "be ignored",
             duration: 3000,
-            notification: {"a friend that only stays when the sun is bright is no friend at all": 1},
+            notification: "a friend that only stays when the sun is bright is no friend at all",
+            awards: {"weariness": 1},
+            cost: {"friend": 1},
             causes: ["losefriend"],
             
         },
         "losefriend": {
             text: "you need to move on",
-            button: "accept",
+            button: "learn",
             duration: 15000,
             awards: {"experience": 1}
         }
