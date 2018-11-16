@@ -386,7 +386,33 @@ var Game = {
         }
     },
 
+    confirmDelete: function() {
+        if(!isUndefined(Events.activeEvent())) {
+            return;
+        }
+        Events.startEvent({
+            title: "Restart?",
+            scenes: {
+                "start": {
+                    text: ["restart simulation?"],
+                    buttons: {
+                        "yes": {
+                            text: "yes",
+                            nextScene: "end",
+                            click: Game.deleteSave
+                        },
+                        "no": {
+                            text: "no",
+                            nextScene: "end"
+                        }
+                    }
+                }
+            }
+        });
+    },
+
     deleteSave: function(noReload) {
+        Game.options.warn = false;
         if(!isUndefined(Storage) && !isUndefined(localStorage)) {
             Game.State = {};
             localStorage.clear();
@@ -465,35 +491,26 @@ var Game = {
         
         $("<div>")
             .attr("id", "footer")
-            .append($("<span>").addClass("version menu-btn").text(Game.getVersionString()))
-            .append($("<span>").addClass("github menu-btn").text("github.").click(function() { window.open("https://github.com/Drakonkinst/cat-simulation"); }))
-            .append($("<span>").addClass("menu-btn").text("discord.").click(function() { window.open("https://discord.gg/Wrp7Fre"); }))
-            //.append($("<span>").addClass("menu-btn").text("save."))
+            .append($("<span>")
+                .addClass("version menu-btn")
+                .text(Game.getVersionString()))
+            .append($("<span>")
+                .addClass("github menu-btn")
+                .text("github.")
+                .click(function() {
+                    window.open("https://github.com/Drakonkinst/cat-simulation");
+                }))
+            .append($("<span>")
+                .addClass("menu-btn")
+                .text("discord.")
+                .click(function() {
+                    window.open("https://discord.gg/Wrp7Fre");
+                }))
             //.append($("<span>").addClass("menu-btn").text("stats."))
-            .append($("<span>").addClass("menu-btn").text("restart.").click(function() {
-                Events.startEvent({
-                    title: "Restart?",
-                    scenes: {
-                        "start": {
-                            text: ["restart simulation?"],
-                            buttons: {
-                                "yes": {
-                                    text: "yes",
-                                    nextScene: "end",
-                                    click: function() {
-                                        Game.options.warn = false;
-                                        Game.deleteSave();
-                                    }
-                                },
-                                "no": {
-                                    text: "no",
-                                    nextScene: "end"
-                                }
-                            }
-                        }
-                    }
-                })
-            }))
+            .append($("<span>")
+                .addClass("menu-btn")
+                .text("restart.")
+                .click(Game.confirmDelete))
             //.append($("<span>").addClass("menu-btn").text("share."))
         .appendTo("body");
             
