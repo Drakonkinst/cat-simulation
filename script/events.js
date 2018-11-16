@@ -79,12 +79,14 @@ var Events = {
             event.context = event.getContext();
         }
 
+        //play notification in start scene when the event is added, rather than when it starts
         var startScene = Events.getScene("start", event);
         if(!isUndefined(startScene.notification)) {
             Notifications.notify(startScene.notification);
         }
 
         if(Events.eventStack.length <= 1) {
+            //event is the only one in the stack, start it!
             Events.initEvent();
         }
     },
@@ -174,7 +176,7 @@ var Events = {
             //scene has an input, so enable selection of input box
             Game.enableSelection();
 
-            //create input element using scene.input as a placeholder prompt
+            //draw input element using scene.input as a placeholder prompt
             var input = $("<input>").attr({
                 "type": "text",
                 "name": "input",
@@ -192,6 +194,7 @@ var Events = {
 
             autoSelect("#description input");
         } else if (!isUndefined(scene.textarea)) {
+            //draw textarea element using scene.textarea as the initial value
             var ta = $("<textarea>").val(scene.textarea).appendTo(desc);
             if(scene.readonly) {
                 ta.attr("readonly", true);
@@ -241,6 +244,7 @@ var Events = {
         Events.updateButtons();
     },
 
+    //disables buttons if they are no longer available
     updateButtons: function() {
         var btns = Events.getScene(Events.activeScene).buttons;
         
