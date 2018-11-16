@@ -7,6 +7,7 @@ function Problem(properties) {
     this.notification = properties.notification || "";  //weighted probability of possible notifications
     this.awards = properties.awards || {};
     this.costs = properties.costs || {};
+    this.requires = properties.requires || {};
 
     this.onClick = properties.onClick || function() {};
     this.onFinish = properties.onFinish || function() {};
@@ -143,6 +144,7 @@ Problem.prototype = {
             Notifications.notify(this.notification);
         }
 
+        Problems.updateAll();
         Game.saveGame();
     },
 
@@ -282,6 +284,19 @@ var Problems = {
         var element = $("#" + id);
         this.element.appendTo(element);
         $SM.set("problems.location", id);
+    },
+
+    updateAll: function() {
+        var activeProblems = $SM.get("problems.activeProblems");
+        for(var i = 0, problem; i < activeProblems; i++) {
+            var problem = Problems.ProblemList[activeProblems[i]];
+            for(var k in problem.requires) {
+                if(!$SM.hasItem(k, problem.requires[k])) {
+                    problem.remove();
+                    break;
+                }
+            }
+        }
     },
 
     Init: function() {
