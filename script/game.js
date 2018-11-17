@@ -636,14 +636,6 @@ var Game = {
 
         //World.Init();
         //Outside.Init();
-        
-    },
-
-    /* ====== Prepare For Launch! ===== */
-    Launch: function() {
-        var start = Game.now();
-        Game.Init();
-
         Problems.Init();
 
         var end = Game.now();
@@ -675,7 +667,7 @@ $.Dispatch = function(id) {
 $(document).ready(function() {
     console.log("> " + chooseRandom(["remember: hacked cats are bad luck", "oh, hello there!", "cheating in some kibble or just checking for bugs?", "whazzup?", "thanks for stopping by!", "we've been expecting you, mr. anderson"]));
     try {
-        Game.Launch();
+        Game.Init();
     } catch(err) {
         console.error("ERROR: " + err.message);
     }
