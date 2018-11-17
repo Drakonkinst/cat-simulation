@@ -327,6 +327,10 @@ div.button.disabled:hover {
 	position: absolute;
 	box-shadow: -1px 3px 2px #666;
 	background: white;
+	z-index: 11;
+}
+
+.event-panel .tooltip {
 	z-index: 999;
 }
 
