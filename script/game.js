@@ -18,7 +18,7 @@
   * */
 var Game = {
     /* ====== Variables and Presets ====== */
-    SAVE_INTERVAL: 30 * 1000,
+    SAVE_INTERVAL: 30 * 1000,   //interval before the "saved." text should display again
 
     version: {
         alpha: false, //alpha phase, mutually exclusive with beta
@@ -340,6 +340,23 @@ var Game = {
         (keys[e.which] || keys["default"])();
     },
 
+    /*
+    swipeLeft: function(e) {
+        Game.keyUp()
+    },
+
+    swipeRight: function(e) {
+
+    },
+
+    swipeUp: function(e) {
+
+    },
+
+    swipeDown: function(e) {
+
+    },*/
+
     /* ====== Document Modifiers ====== */
     //cancels all mouse clicks except for menu buttons
     disableSelection: function() {
@@ -365,7 +382,8 @@ var Game = {
     //saves current game state to local storage
     saveGame: function() {
         if(!isUndefined(Storage) && !isUndefined(localStorage)) {
-            //"saved." notification
+            //"saved." notification does not play on a set interval, every time saveGame()
+            //is called it attempts to show the message
             if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
                 $("#save-notify").css("opacity", 1).animate({opacity: 0}, 1000, "linear");
                 Game.lastSave = Game.now();
@@ -560,19 +578,24 @@ var Game = {
     
     /* ====== Game Initialization ====== */
     Init: function() {
+        var start = Game.now();
         Logger.log("Game initializing...");
         Game.loadGame();
         
         Logger.log("Version is " + Game.getVersionString());
 
-        /* Check Browser
+        /*
+        //check for HTML5(+?) support
         if(!Game.browserValid()) {
             //window.location = //set to browser warning window
         }
 
+        //check for mobile
         if(Game.isMobile()) {
             //window.location = //set to mobile warning window
         }//*/
+
+        Game.disableSelection();
 
         /* Layout */
         $("#main").empty();
@@ -584,8 +607,7 @@ var Game = {
         $("<div>").attr("id", "header").appendTo("#main");
         $("<div>").attr("id", "location-slider").appendTo("#main");
         
-        $("<div>")
-            .attr("id", "footer")
+        $("<div>").attr("id", "footer")
             .append($("<span>")
                 .addClass("version menu-btn")
                 .text(Game.getVersionString()))
@@ -612,12 +634,18 @@ var Game = {
                 .click(Game.exportImport)
             //.append($("<span>").addClass("menu-btn").text("share."))
         .appendTo("body");
-            
-        Game.disableSelection();
 
-        //register listeners
+        //register keypress handlers
         $("body").off("keydown").keydown(Game.keyDown);
         $("body").off("keyup").keyup(Game.keyUp);
+
+        /*//register swipe handlers
+        var swipeElement = $("#outer-slider");
+        swipeElement.on("swipeleft", Game.swipeLeft);
+        swipeElement.on("swiperight", Game.swipeRight);
+        swipeElement.on("swipeup", Game.swipeUp);
+        swipeElement.on("swipedown", Game.swipeDown);
+        */
 
         $(window).on("beforeunload", function() {
             if(Game.options.warn) {
