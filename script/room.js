@@ -124,13 +124,13 @@ Room.prototype = {
     },
 
     //places a building in this room
-    build: function(id) {
+    place: function(id) {
         var building = House.Buildings[id];
         var num = this.buildings[id] || 0;
 
         //building must be defined
         if(isUndefined(building)) {
-            Logger.warn("Tried to build \"" + id + "\" but that doesn't exist!");
+            Logger.warn("Tried to place \"" + id + "\" but that doesn't exist!");
             return;
         }
 
@@ -155,50 +155,50 @@ Room.prototype = {
         this.buildings[id]++;
 
         //update & initialize
-        Notifications.notify(building.buildMsg);
-        building.onBuild(this);
-        this.updateBuildButtons();
+        Notifications.notify(building.placeMsg);
+        building.onPlace(this);
+        this.updatePlaceButtons();
         House.updateHouse();
     },
 
-    //updates build section (left side)
-    updateBuildButtons: function() {
-        var location = this.panel.find(".build-buttons");
+    //updates place buildings section (left side)
+    updatePlaceButtons: function() {
+        var location = this.panel.find(".place-buttons");
         var needsAppend = false;
         
         for(var k in House.Buildings) {
-            var buildItem = House.Buildings[k];
+            var item = House.Buildings[k];
             var formattedName = k.replace(" ", "-");
-            var max = this.buildings.hasOwnProperty(k) && this.buildings[k] >= buildItem.maximum;
-            var buildButton = Buttons.getButton(this.id + "_build_" + formattedName);
+            var max = this.buildings.hasOwnProperty(k) && this.buildings[k] >= item.maximum;
+            var placeButton = Buttons.getButton(this.id + "_place_" + formattedName);
             
-            if(isUndefined(buildButton) && $SM.hasItem(k)) {
+            if(isUndefined(placeButton) && $SM.hasItem(k)) {
                 //create build button if one doesn't exist
                 //oh closure, I hate you
                 (function(roomName, building) {
-                    buildButton = new Button({
-                        id: roomName + "_build_" + building.replace(" ", "-"),
+                    placeButton = new Button({
+                        id: roomName + "_place_" + building.replace(" ", "-"),
                         text: building,
                         width: "80px",
                         onClick: function() {
-                            House.getCurrentRoom().build(building);
+                            House.getCurrentRoom().place(building);
                         }
                     });
                 })(this.id, k);
                 
-                var container = location.find("#" + this.id + "_build_" + formattedName + "_container");
-                buildButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+                var container = location.find("#" + this.id + "_place_" + formattedName + "_container");
+                placeButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
                 needsAppend = true;
             } else {
                 //notify if max buildings is reached
-                if(max && !buildButton.get().hasClass("disabled") && !isUndefined(buildItem.maxMsg)) {
-                    Notifications.notify(buildItem.maxMsg);
+                if(max && !placeButton.get().hasClass("disabled") && !isUndefined(item.maxMsg)) {
+                    Notifications.notify(item.maxMsg);
                 }
             }
 
             //update disabled state based on max
-            if(!isUndefined(buildButton)) {
-                buildButton.setDisabled(max);
+            if(!isUndefined(placeButton)) {
+                placeButton.setDisabled(max);
             }
         }
 

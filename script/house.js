@@ -19,10 +19,10 @@ var House = {
             //should space be based on single buildings or overall? maybe
             //assign weight to each structure and have each room cap..
             //for later.
-            buildMsg: "shiny bowls, needs food though",
+            placeMsg: "shiny bowls, needs food though",
             maxMsg: "no more space for more bowls",
             maximum: 5,
-            onBuild: function(room) {
+            onPlace: function(room) {
                 if(isUndefined(room.food)) {
                     room.food = {
                         level: 0,
@@ -34,10 +34,10 @@ var House = {
             }
         },
         "water bowl": {
-            buildMsg: "new water bowl, but it looks dry",
+            placeMsg: "new water bowl, but it looks dry",
             maxMsg: "that's enough water bowls for now",
             maximum: 5,
-            onBuild: function(room) {
+            onPlace: function(room) {
                 if(isUndefined(room.water)) {
                     room.water = {
                         level: 0,
@@ -49,9 +49,9 @@ var House = {
             }
         },
         "litter box": {
-            buildMsg: "litter box installed",
+            placeMsg: "litter box installed",
             maximum: 1,
-            onBuild: function(room) {
+            onPlace: function(room) {
                 if(isUndefined(room.litterBox)) {
                     room.litterBox = 0;
                     //should this have level/max?

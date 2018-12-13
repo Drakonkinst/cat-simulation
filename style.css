@@ -544,12 +544,12 @@ body {
 			white-space: pre;
 		}
 
-.build-buttons:before, .manage-buttons:before {
+.place-buttons:before, .manage-buttons:before {
 	content: attr(data-legend);
 	position: relative;
 	top: -5px;
 }
-	.build-buttons {
+	.place-buttons {
 		position: absolute;
 		top: 75px;
 		left: 0px;
