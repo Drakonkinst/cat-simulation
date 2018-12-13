@@ -433,7 +433,7 @@ Cat.prototype = {
     //constructs sound message given arguments
     makeSound: function(sound, loudness, softStr, loudStr, target) {
         //hisses/meows AT "you" or another cat, code later
-        const intensities = [" somewhat ", " ", " rather ", " very "];
+        var intensities = [" somewhat ", " ", " rather ", " very "];
         var suffix = loudStr;
         var targetStr = "";
 
@@ -668,7 +668,9 @@ var Cats = {
     uniqueName: function(catName) {
         var ordinal = 1;
         var uniqueName = catName;
-        var catList = House.cats.map(cat => cat.name);
+        var catList = House.cats.map(function(cat) {
+            return cat.name;
+        });
 
         while(itemInList(catList, uniqueName, true)) {
             ordinal++;
