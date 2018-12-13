@@ -74,8 +74,10 @@ Button.prototype = {
         }
 
         //avoids perma-disabled bug by treating cooldown as instant
-        if(cooldown <= 2 && !isUndefined(this.onFinish)) {
-            this.onFinish();
+        if(cooldown <= 2) {
+            if(!isUndefined(this.onFinish)) {
+                this.onFinish();
+            }
             return;
         }
 
@@ -91,6 +93,7 @@ Button.prototype = {
                 button.onFinish();
             }
         });
+        
         this.onCooldown = true;
         this.setDisabled(true);
     },
