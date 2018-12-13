@@ -12,7 +12,7 @@ function Cat(properties) {
     this.isFemale = properties.isFemale || chance(0.5);
 
     var namePool = (this.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
-    this.name = properties.name || chooseRandom(namePool);
+    this.name = properties.name.toLowerCase() || chooseRandom(namePool);
 
     if(!isUndefined(House.cats)) {
         //ensures that the cat has a unique name if House is active
