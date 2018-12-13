@@ -520,6 +520,7 @@ Cat.prototype = {
         this.isSleeping = false;
         this.energy = Cats.MAX_ENERGY;
         this.hunger += randInt(1, 6);
+        this.thirst += randInt(1, 6);
         this.action("wakes up");
         this.addMorale(20);
     },
