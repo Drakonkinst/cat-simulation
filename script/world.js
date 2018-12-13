@@ -341,7 +341,9 @@ var World = {
                                     if(name.replace(/[\-\'\s\_]/g, "_").indexOf("__") > -1 || !/^[a-z0-9\-\'\_\s]+$/i.test(name)) {
                                         return "cat doesn't seem to recognize that";
                                     }
-                                    if(itemInList(House.cats.map(cat => cat.name), name, true)) {
+                                    if(itemInList(House.cats.map(function(cat) {
+                                        return cat.name;
+                                    }), name, true)) {
                                         return "name is taken";
                                     }
 
@@ -400,7 +402,7 @@ var World = {
             $("#location-slider").css("left", "0px");
             $("#equipment-container").css({"top": "40px", "right": "0px"});
 
-            //set current to default\
+            //set current to default
             Game.activeModule = House;
             $(".header-button").removeClass("selected");
             House.tab.addClass("selected");
