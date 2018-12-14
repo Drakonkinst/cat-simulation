@@ -76,7 +76,7 @@ Problem.prototype = {
         var activeProblems = $SM.get("problems.activeProblems");
         activeProblems.splice(activeProblems.indexOf(prevElement.attr("id")) + 1, 0, this.id);
         $SM.set("problems.activeProblems", activeProblems);
-        this.element.insertAfter(prevElement)
+        this.element.insertAfter(prevElement);
     },
 
     attemptSolve: function() {
