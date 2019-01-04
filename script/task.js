@@ -17,9 +17,6 @@ function Task(name, task, minInterval, maxInterval) {
 }
 
 var Tasks = {
-    Task: function(name, task, minInterval, maxInterval) {
-        
-    },
     scheduleNext: function(t, scale) {
         var minUntilNextTask = randInt(t.minInterval, t.maxInterval);
 
