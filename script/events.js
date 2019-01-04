@@ -43,13 +43,13 @@ var Events = {
                 Events.startEvent(chooseRandom(possibleEvents));
             } else {
                 //no possible event found, sets shorter timeout for next check
-                Events.Task.scheduleNext(0.5);
+                Tasks.scheduleNext(Events.Task, 0.5);
                 return;
             }
         }
 
         //sets default timeout for next random event to trigger
-        Events.Task.scheduleNext();
+        Tasks.scheduleNext(Events.Task);
     },
 
     /*
@@ -367,6 +367,6 @@ var Events = {
 
         //start random event task
         Events.Task = new Task("random", Events.randomEvent, Events.RANDOM_EVENT_INTERVAL[0], Events.RANDOM_EVENT_INTERVAL[1]);
-        Events.Task.scheduleNext();
+        Tasks.scheduleNext(Events.Task);
     }
 };

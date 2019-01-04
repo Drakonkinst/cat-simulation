@@ -15,22 +15,31 @@ function Task(name, task, minInterval, maxInterval) {
     this.minInterval = minInterval;     //the minimum time before the task should run (in minutes)
     this.maxInterval = maxInterval;     //the maximum time before the task should run (in minutes)
 }
-Task.prototype = {
-    //schedules the next task, usually called at the end of the task function
-    scheduleNext: function(scale) {
-        var interval = randInt(this.minInterval, this.maxInterval);
-        if(scale > 0) {
-            interval *= scale;
-        }
-        if(Game.options.fastEvents) {
-            interval /= 8;
-        }
-        Logger.log("Next " + this.name + " event scheduled in " + interval + " minutes");
+
+var Tasks = {
+    Task: function(name, task, minInterval, maxInterval) {
         
-        if(this.eventTimeout) {
-            clearTimeout(this.eventTimeout);
+    },
+    scheduleNext: function(t, scale) {
+        var minUntilNextTask = randInt(t.minInterval, t.maxInterval);
+
+        //apply scale
+        if(scale > 0) {
+            minUntilNextTask *= scale;
         }
 
-        this.eventTimeout = Game.setTimeout(this.task, interval * 60 * 1000);
+        //speed up events with cheats
+        if(Game.options.fastEvents) {
+            minUntilNextTask /= 8;
+        }
+
+        Logger.log("Next " + t.name + " event scheduled in " + minUntilNextTask + " minutes");
+
+        //if event already exists, replace it
+        if(t.eventTimeout) {
+            clearTimeout(t.eventTimeout);
+        }
+
+        t.eventTimeout = Game.setTimeout(t.task, minUntilNextTask * 60 * 1000);
     }
 };
