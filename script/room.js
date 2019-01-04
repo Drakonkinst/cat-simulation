@@ -78,7 +78,7 @@ Room.prototype = {
 
         //update
         this.onLoad();
-        this.updateBuildButtons();
+        this.updatePlaceButtons();
         this.updateFood();
     },
 

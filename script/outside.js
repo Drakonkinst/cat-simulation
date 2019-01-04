@@ -184,7 +184,7 @@ var Outside = {
             //better way to do these loops? we're going to need a lot of them
             //should this be in addItem instead?
             for(var k in House.rooms) {
-                House.rooms[k].updateBuildButtons();
+                House.rooms[k].updatePlaceButtons();
             }
         }
 
