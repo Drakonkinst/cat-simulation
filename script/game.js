@@ -33,9 +33,9 @@ var Game = {
     options: {
         debug: true,            //print debug messages
         instantButtons: false,  //ignore button cooldowns completely
-        fastButtons: false,     //speed up button cooldowns greatly
+        fastButtons: true,     //speed up button cooldowns greatly
         fastEvents: false,      //scheduled tasks happen much more quickly
-        warn: true              //warn if user tries to close browser
+        warn: false              //warn if user tries to close browser
     },
 
     //game states
@@ -246,7 +246,7 @@ var Game = {
         }
 
         //adds tooltip
-        if(!isUndefined(tooltip)) {
+        if(exists(tooltip)) {
             tooltip.appendTo(row);
         }
     },
@@ -298,7 +298,7 @@ var Game = {
         /* Default keyUp Handler */
         function arrowUp() {
             if(Game.tabNavigation && Game.activeModule == House) {
-                if(!isUndefined(typeof House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) - 1])) {
+                if(exists(typeof House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) - 1])) {
                     var prevRoom = House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) - 1];
                     House.travelTo(prevRoom);
                 }
@@ -307,7 +307,7 @@ var Game = {
 
         function arrowDown() {
             if(Game.tabNavigation && Game.activeModule == House) {
-                if(!isUndefined(typeof House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) + 1])) {
+                if(exists(typeof House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) + 1])) {
                     var nextRoom = House.unlockedRooms[House.unlockedRooms.indexOf(House.currentRoom) + 1];
                     House.travelTo(nextRoom);
                 }
@@ -381,7 +381,7 @@ var Game = {
     /* ====== Saving / Loading ===== */
     //saves current game state to local storage
     saveGame: function() {
-        if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+        if(exists(Storage) && exists(localStorage)) {
             //"saved." notification does not play on a set interval, every time saveGame()
             //is called it attempts to show the message
             if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
@@ -397,7 +397,7 @@ var Game = {
     loadGame: function() {
         try {
             var savedState = JSON.parse(localStorage.gameState);
-            if(!isUndefined(savedState)) {
+            if(exists(savedState)) {
                 Game.State = savedState;
                 Logger.log("Loaded save!");
             }
@@ -410,7 +410,7 @@ var Game = {
 
     //event that asks if the player wants to delete their save
     confirmDelete: function() {
-        if(!isUndefined(Events.activeEvent())) {
+        if(exists(Events.activeEvent())) {
             return;
         }
         Events.startEvent({
@@ -437,7 +437,7 @@ var Game = {
     //clears local storage and starts a new game
     deleteSave: function(noReload) {
         Game.options.warn = false;
-        if(!isUndefined(Storage) && !isUndefined(localStorage)) {
+        if(exists(Storage) && exists(localStorage)) {
             Game.State = {};
             localStorage.clear();
         }
@@ -450,7 +450,7 @@ var Game = {
     //import/export event
     exportImport: function() {
         //to prevent spam, will not do anything if there is already an event going on
-        if(!isUndefined(Events.activeEvent())) {
+        if(exists(Events.activeEvent())) {
             return;
         }
 
@@ -665,6 +665,8 @@ var Game = {
         //World.Init();
         //Outside.Init();
         Problems.Init();
+
+        Game.updateEquipment();
 
         var end = Game.now();
         Logger.log("Game initialized! (took " + (end - start) + "ms)");

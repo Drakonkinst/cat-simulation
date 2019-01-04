@@ -67,7 +67,7 @@ function chooseWeighted(choiceMap, property) {
     
     for(var i in choiceMap) {
         if(choiceMap.hasOwnProperty(i)) {
-            if(!isUndefined(property)) {
+            if(exists(property)) {
                 totalWeight += parseFloat(choiceMap[i][property]);
             } else {
                 totalWeight += parseFloat(choiceMap[i]);
@@ -87,7 +87,7 @@ function chooseWeighted(choiceMap, property) {
 
     for(i in choiceMap) {
         if(choiceMap.hasOwnProperty(i)) {
-            if(!isUndefined(property)) {
+            if(exists(property)) {
                 weightSum += parseFloat(choiceMap[i][property]);
             } else {
                 weightSum += parseFloat(choiceMap[i]);
@@ -162,4 +162,8 @@ function isEmpty(object) {
  * */
 function isUndefined(variable) {
     return typeof variable === "undefined" || variable === null;
+}
+
+function exists(variable) {
+    return !isUndefined(variable);
 }

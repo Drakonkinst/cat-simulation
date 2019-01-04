@@ -81,7 +81,7 @@ var Events = {
 
         //play notification in start scene when the event is added, rather than when it starts
         var startScene = Events.getScene("start", event);
-        if(!isUndefined(startScene.notification)) {
+        if(exists(startScene.notification)) {
             Notifications.notify(startScene.notification);
         }
 
@@ -120,7 +120,7 @@ var Events = {
                 Logger.log(Events.eventStack.length + " events remaining");
             } else {
                 //clears event overlay state
-                if(!isUndefined(Events.blinkInterval)) {
+                if(exists(Events.blinkInterval)) {
                     Events.stopTitleBlink();
                 }
     
@@ -146,12 +146,12 @@ var Events = {
             scene.onLoad();
         }
 
-        if(!isUndefined(scene.notification) && !skipNotification) {
+        if(exists(scene.notification) && !skipNotification) {
             //notify scene change
             Notifications.notify(scene.notification);
         }
 
-        if(!isUndefined(scene.eventTitle)) {
+        if(exists(scene.eventTitle)) {
             //set title
             $(".event-title", Events.eventPanel()).text(scene.eventTitle);
         }
@@ -172,7 +172,7 @@ var Events = {
             desc.append($("<div>").text(scene.text[line]));
         }
 
-        if(!isUndefined(scene.input)) {
+        if(exists(scene.input)) {
             //scene has an input, so enable selection of input box
             Game.enableSelection();
 
@@ -184,7 +184,7 @@ var Events = {
                 "placeholder": scene.input
             }).appendTo(desc);
 
-            if(!isUndefined(scene.maxinput)) {
+            if(exists(scene.maxinput)) {
                 //sets max character input
                 input.attr("maxlength", scene.maxinput);
             }
@@ -193,7 +193,7 @@ var Events = {
             $("<div>").attr("id", "input-result").css("opacity", 0).appendTo(desc);
 
             autoSelect("#description input");
-        } else if (!isUndefined(scene.textarea)) {
+        } else if (exists(scene.textarea)) {
             //draw textarea element using scene.textarea as the initial value
             var ta = $("<textarea>").val(scene.textarea).appendTo(desc);
             if(scene.readonly) {
@@ -234,7 +234,7 @@ var Events = {
                 cooldown: info.cooldown     //sets initial cooldown, since cooldown after click is irrelevant
             }).appendTo(btns);
 
-            if(!isUndefined(info.cooldown)) {
+            if(exists(info.cooldown)) {
                 //button starts cooling down so player can not press it immediately
                 button.startCooldown();
             }
@@ -251,7 +251,7 @@ var Events = {
         for(var id in btns) {
             var button = Buttons.getButton(id);
             var info = btns[id];
-            if(!isUndefined(info.available) && !info.available()) {
+            if(exists(info.available) && !info.available()) {
                 button.setDisabled(true);
             }
         }
@@ -266,7 +266,7 @@ var Events = {
         if(!(isUndefined(info.click))) {
             var result = info.click();
 
-            if(!isUndefined(result) && (typeof result !== "boolean" || !result)) {
+            if(exists(result) && (typeof result !== "boolean" || !result)) {
                 //result is not valid
                 if(typeof result === "string") {
                     if(isUndefined(scene.input)) {
@@ -285,19 +285,19 @@ var Events = {
             }
 
             //TODO what if there are two input scenes in an event?
-            if(!isUndefined(scene.input) && info.nextScene == "end") {
+            if(exists(scene.input) && info.nextScene == "end") {
                 Game.disableSelection();
             }   
         }
 
         Events.updateButtons();
         
-        if(!isUndefined(info.notification)) {
+        if(exists(info.notification)) {
             //notify button click
             Notifications.notify(info.notification);
         }
 
-        if(!isUndefined(info.nextScene)) {
+        if(exists(info.nextScene)) {
             //change scene
             if(info.nextScene == "end") {
                 //special "end" case, end event
@@ -307,7 +307,7 @@ var Events = {
                 //usual case, choose next scene based on basic weighted probability
                 var nextScene = chooseWeighted(info.nextScene);
 
-                if(!isUndefined(nextScene)) {
+                if(exists(nextScene)) {
                     //change scene
                     Events.loadScene(nextScene);
                     return;
@@ -324,7 +324,7 @@ var Events = {
     blinkTitle: function() {
         var title = document.title;
 
-        if(!isUndefined(Events.blinkInterval)) {
+        if(exists(Events.blinkInterval)) {
             return;
         }
 

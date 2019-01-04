@@ -111,7 +111,7 @@ var StateManager = {
             var state = parentName + "[\"" + k + "\"]";
             var value = list[k];
 
-            if(!isUndefined(value) && typeof value === "object") {
+            if(exists(value) && typeof value === "object") {
                 $SM.setM(state, value, true);
             } else {
                 $SM.set(state, value, true);

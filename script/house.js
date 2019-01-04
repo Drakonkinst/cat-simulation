@@ -207,14 +207,14 @@ var House = {
         //update all items in house.stores
         for(var item in $SM.get("house.stores")) {
             var location = stores;
-            if(!isUndefined(House.Buildings[item])) {
+            if(exists(House.Buildings[item])) {
                 location = buildings;
             }
             
             //section could use some reworking
             var text = $SM.get("house.stores[" + item + "]");
             var maxValue = text + $SM.get("character.equipment[" + item + "]");
-            if(!isUndefined(maxValue)) {
+            if(exists(maxValue)) {
                 text += "/" + maxValue;
             }
 
@@ -278,7 +278,7 @@ var House = {
         for(var k in House.rooms) {
             var room = House.rooms[k];
             var lightButton = Buttons.getButton(room.id + "_light-toggle");
-            var buttonExists = !isUndefined(lightButton);
+            var buttonExists = exists(lightButton);
 
             //TODO - lights that were turned on previously should turn on again when power
             //returns (do not reset?)
@@ -321,7 +321,7 @@ var House = {
             var room = House.rooms[k];
             var lightButton = Buttons.getButton(room.id + "_light-toggle"); 
 
-            if(!isUndefined(lightButton)) {
+            if(exists(lightButton)) {
                 lightButton.setDisabled(false);
             }
         }

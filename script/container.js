@@ -25,7 +25,7 @@ function Container(selector, title, context) {
         }
 
         //adds title if any
-        if(!isUndefined(title)) {
+        if(exists(title)) {
             this.element.attr("data-legend", title);
         }
 

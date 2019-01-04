@@ -191,13 +191,13 @@ Room.prototype = {
                 needsAppend = true;
             } else {
                 //notify if max buildings is reached
-                if(max && !placeButton.get().hasClass("disabled") && !isUndefined(item.maxMsg)) {
+                if(max && !placeButton.get().hasClass("disabled") && exists(item.maxMsg)) {
                     Notifications.notify(item.maxMsg);
                 }
             }
 
             //update disabled state based on max
-            if(!isUndefined(placeButton)) {
+            if(exists(placeButton)) {
                 placeButton.setDisabled(max);
             }
         }
@@ -218,7 +218,7 @@ Room.prototype = {
         var needsAppend = false;
 
         //refill food
-        if(!isUndefined(this.food) && isUndefined(Buttons.getButton(this.id + "_refill-food"))) {
+        if(exists(this.food) && isUndefined(Buttons.getButton(this.id + "_refill-food"))) {
             needsAppend = true;
             var foodButton = new Button({
                 id: this.id + "_refill-food",
@@ -233,7 +233,7 @@ Room.prototype = {
         }
 
         //refill water
-        if(!isUndefined(this.water) && isUndefined(Buttons.getButton(this.id + "_refill-water"))) {
+        if(exists(this.water) && isUndefined(Buttons.getButton(this.id + "_refill-water"))) {
             needsAppend = true;
             var waterButton = new Button({
                 id: this.id + "_refill-water",
@@ -248,7 +248,7 @@ Room.prototype = {
         }
         
         //clear litter box
-        if(!isUndefined(this.litterBox) && isUndefined(Buttons.getButton(this.id + "_clean-litter-box"))) {
+        if(exists(this.litterBox) && isUndefined(Buttons.getButton(this.id + "_clean-litter-box"))) {
             needsAppend = true;
             var litterBoxButton = new Button({
                 id: this.id + "_clean-litter-box",

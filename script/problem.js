@@ -116,7 +116,7 @@ Problem.prototype = {
         //removes other solved problems
         for(var i = 0, problem; i < this.solves.length; i++) {
             problem = Problems.ProblemList[this.solves[i]];
-            if(!isUndefined(problem) && problem.isActive()) {
+            if(exists(problem) && problem.isActive()) {
                 problem.remove();
             }
         }
@@ -124,7 +124,7 @@ Problem.prototype = {
         //adds new caused problems
         for(var i = this.causes.length - 1, problem; i >= 0; i--) {
             problem = Problems.ProblemList[this.causes[i]];
-            if(!isUndefined(problem) && !problem.isActive()) {
+            if(exists(problem) && !problem.isActive()) {
                 problem.insertAfter(this.element);
             }
         }
@@ -140,7 +140,7 @@ Problem.prototype = {
             });    
         }
 
-        if(!isUndefined(this.notification)) {
+        if(exists(this.notification)) {
             Notifications.notify(this.notification);
         }
 

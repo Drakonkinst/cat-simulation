@@ -27,7 +27,7 @@ var Notifications = {
             message += ".";
         }
 
-        if(!isUndefined(module) && Game.activeModule != module) {
+        if(exists(module) && Game.activeModule != module) {
             if(!noQueue) {
 
                 //creates key in notifyQueue if it does not exist
@@ -65,7 +65,7 @@ var Notifications = {
 
     //empties notifyQueue in module and prints all of the messages to the active panel
     printQueue: function(module) {
-        if(!isUndefined(this.notifyQueue[module.name])) {
+        if(exists(this.notifyQueue[module.name])) {
             while(this.notifyQueue[module.name].length > 0) {
                 Notifications.printMessage(this.notifyQueue[module.name].shift());
             }

@@ -375,7 +375,7 @@ var World = {
         var notification = possibilities[nextWeather].notification;
 
         //play notification if the weather changes
-        if(!isUndefined(notification) && !hideAnnouncement) {
+        if(exists(notification) && !hideAnnouncement) {
             Logger.log("Changed weather to " + nextWeather);
             Notifications.notify(notification);
         }
@@ -443,7 +443,7 @@ var World = {
         World.day++;
         $SM.set("game.dailyWorked", 0);
         var workButton = Buttons.getButton("work");
-        if(!isUndefined(workButton) && !workButton.onCooldown) {
+        if(exists(workButton) && !workButton.onCooldown) {
             workButton.setDisabled(false);
         }
 

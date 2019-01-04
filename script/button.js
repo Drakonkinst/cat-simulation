@@ -43,12 +43,12 @@ function Button(properties) {
         .append($("<div>").addClass("cooldown"));
 
     //adds Tooltip if it exists
-    if(!isUndefined(properties.tooltip) && properties.tooltip.exists()) {
+    if(exists(properties.tooltip) && properties.tooltip.exists()) {
         properties.tooltip.appendTo(this.element);
     }
 
     //modifies width if custom width exists
-    if(!isUndefined(properties.width)) {
+    if(exists(properties.width)) {
         this.element.css("width", properties.width);
     }
 
@@ -75,7 +75,7 @@ Button.prototype = {
 
         //avoids perma-disabled bug by treating cooldown as instant
         if(cooldown <= 2) {
-            if(!isUndefined(this.onFinish)) {
+            if(exists(this.onFinish)) {
                 this.onFinish();
             }
             return;
@@ -89,7 +89,7 @@ Button.prototype = {
             //callbacks are fun
             var button = Buttons.getButton($(this).parent().attr("id"));
             button.clearCooldown();
-            if(!isUndefined(button.onFinish)) {
+            if(exists(button.onFinish)) {
                 button.onFinish();
             }
         });

@@ -14,7 +14,7 @@ function Cat(properties) {
     var namePool = (this.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
     this.name = properties.name.toLowerCase() || chooseRandom(namePool);
 
-    if(!isUndefined(House.cats)) {
+    if(exists(House.cats)) {
         //ensures that the cat has a unique name if House is active
         this.name = Cats.uniqueName(this.name);
     }
@@ -88,7 +88,7 @@ Cat.prototype = {
             this.addMorale(3 - Math.floor(this.hunger));
         }
 
-        if(!isUndefined(this.room.litterBox) && this.room.litterBox >= 6) {
+        if(exists(this.room.litterBox) && this.room.litterBox >= 6) {
             this.addMorale(5 - this.litterBox);
         }
 
@@ -108,7 +108,7 @@ Cat.prototype = {
         }
 
         //food
-        if(!isUndefined(this.room.food) && this.hunger >= 3) {
+        if(exists(this.room.food) && this.hunger >= 3) {
             if(this.room.food.level > 0) {
                 if(chance(0.35)) {
                     this.eatFood();
@@ -130,7 +130,7 @@ Cat.prototype = {
         }
 
         //water
-        if(!isUndefined(this.room.water) && this.thirst >= 3) {
+        if(exists(this.room.water) && this.thirst >= 3) {
             if(this.room.water.level > 0) {
                 if(chance(0.35)) {
                     this.drinkWater();
@@ -451,7 +451,7 @@ Cat.prototype = {
             suffix = softStr;
         }
 
-        if(!isUndefined(target)) {
+        if(exists(target)) {
             targetStr = " at " + target;
         }
 

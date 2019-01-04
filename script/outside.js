@@ -100,7 +100,7 @@ var Outside = {
 
             //determine whether item has hit max limit, if any
             var max = false;
-            if(!isUndefined(buyItem.maximum)) {
+            if(exists(buyItem.maximum)) {
                 max = $SM.hasItem(item, buyItem.maximum);
             }
 
@@ -129,7 +129,7 @@ var Outside = {
                     
                     buyItem.button.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(location);
 
-                    if(!isUndefined(buyItem.availableMsg)) {
+                    if(exists(buyItem.availableMsg)) {
                         Notifications.notify(buyItem.availableMsg);
                     }
                 }
@@ -139,7 +139,7 @@ var Outside = {
                     Notifications.notify(buyItem.maxMsg);
                 }
             }
-            if(!isUndefined(buyItem.button)) {
+            if(exists(buyItem.button)) {
                 buyItem.button.setDisabled(max);
             }
         }
