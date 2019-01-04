@@ -385,10 +385,10 @@ var World = {
         //schedule next update
         if(World.currentWeather == "lightning") {
             //shouldn't stay on lightning for very long
-            Tasks.scheduleNext(World.WeatherTask, 0.3);
+            World.WeatherTask.scheduleNext(0.3);
         } else {
             //use default interval
-            Tasks.scheduleNext(World.WeatherTask);
+            World.WeatherTask.scheduleNext();
         }
     },
 
@@ -457,7 +457,7 @@ var World = {
         World.WeatherTask = new Task("weather", World.nextWeather, World.WEATHER_INTERVAL[0], World.WEATHER_INTERVAL[1]);
         
         //World.currentWeather = chooseRandom(keysAsList(World.weather)); - move somewhere else
-        Tasks.scheduleNext(World.WeatherTask);
+        World.WeatherTask.scheduleNext();
         World.nextDay();
 
         Game.setInterval(World.tick, 5000);

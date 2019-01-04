@@ -16,9 +16,8 @@ function Task(name, task, minInterval, maxInterval) {
     this.maxInterval = maxInterval;     //the maximum time before the task should run (in minutes)
 }
 
-var Tasks = {
-    scheduleNext: function(t, scale) {
-        var minUntilNextTask = randInt(t.minInterval, t.maxInterval);
+Task.prototype.scheduleNext = function(scale) {
+    var minUntilNextTask = randInt(this.minInterval, this.maxInterval);
 
         //apply scale
         if(scale > 0) {
@@ -30,13 +29,12 @@ var Tasks = {
             minUntilNextTask /= 8;
         }
 
-        Logger.log("Next " + t.name + " event scheduled in " + minUntilNextTask + " minutes");
+        Logger.log("Next " + this.name + " event scheduled in " + minUntilNextTask + " minutes");
 
         //if event already exists, replace it
-        if(t.eventTimeout) {
-            clearTimeout(t.eventTimeout);
+        if(this.eventTimeout) {
+            clearTimeout(this.eventTimeout);
         }
 
-        t.eventTimeout = Game.setTimeout(t.task, minUntilNextTask * 60 * 1000);
-    }
-};
+        this.eventTimeout = Game.setTimeout(this.task, minUntilNextTask * 60 * 1000);
+}
