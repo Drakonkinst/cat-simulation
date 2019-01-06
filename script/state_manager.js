@@ -87,20 +87,6 @@ var StateManager = {
         }
     },
 
-    add: function(stateName, value, noUpdate) {
-        var old = $SM.get(stateName, true);
-
-        if(isNaN(old)) {
-            Logger.warn("State " + stateName + " was corrupted (NaN). Resetting to 0.");
-            old = 0;
-        } else if(typeof old != "number" || typeof value != "number") {
-            Logger.warn("Failed to do math with state " + stateName + " or value " + value + " because at least one is not a number");
-            return;
-        }
-
-        $SM.set(stateName, old + value, noUpdate);
-    },
-
     setM: function(parentName, list, noUpdate) {
         if(isUndefined($SM.get(parentName))) {
             $SM.set(parentName, {});
@@ -120,6 +106,20 @@ var StateManager = {
         if(!noUpdate) {
             $SM.fireUpdate(parentName, true);
         }
+    },
+
+    add: function(stateName, value, noUpdate) {
+        var old = $SM.get(stateName, true);
+
+        if(isNaN(old)) {
+            Logger.warn("State " + stateName + " was corrupted (NaN). Resetting to 0.");
+            old = 0;
+        } else if(typeof old != "number" || typeof value != "number") {
+            Logger.warn("Failed to do math with state " + stateName + " or value " + value + " because at least one is not a number");
+            return;
+        }
+
+        $SM.set(stateName, old + value, noUpdate);
     },
 
     remove: function(stateName, noUpdate) {
@@ -160,7 +160,6 @@ var StateManager = {
         return $SM.get("character.perks[\"" + name + "\"]");
     },
 
-    //
     addItem: function(name, value) {
         $SM.add("character.equipment[\"" + name + "\"]", value);
 
@@ -179,6 +178,10 @@ var StateManager = {
     hasItem: function(name, value) {
         value = value || 1;
         return $SM.get("character.equipment[\"" + name + "\"]", true) >= value;
+    },
+
+    getRoom: function(roomName) {
+        return $SM.get("house.rooms[" + roomName + "]");
     }
 };
 var $SM = StateManager;
