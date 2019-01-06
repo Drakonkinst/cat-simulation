@@ -83,8 +83,7 @@ var StateManager = {
         $SM.createState(stateName, value);
 
         if(!noUpdate) {
-            Game.saveGame();
-            $SM.fireUpdate(stateName);
+            $SM.fireUpdate(stateName, true);
         }
     },
 
@@ -119,8 +118,7 @@ var StateManager = {
         }
 
         if(!noUpdate) {
-            Game.saveGame();
-            $SM.fireUpdate(parentName);
+            $SM.fireUpdate(parentName, true);
         }
     },
 
@@ -134,8 +132,7 @@ var StateManager = {
         }
 
         if(!noUpdate) {
-            Game.saveGame();
-            $SM.fireUpdate(stateName);
+            $SM.fireUpdate(stateName, true);
         }
     },
 
