@@ -1,3 +1,19 @@
+/*
+ * Module for handling States
+ * 
+ * All states should be get and set through the StateManager ($SM).
+ *
+ * The manager is intended to handle all needed checks and error catching.
+ * This includes creating the parents of layered/deep states so undefined states
+ * do not need to be tested for and created beforehand.
+ *
+ * When a state is changed, an update event is sent out containing the name of the state
+ * changed or in the case of multiple changes (.setM) the parent class changed.
+ * Event: type: 'stateUpdate', category: <first item in path of state>, stateName: <path of state or parent state>
+ *
+ * Original file created by: Michael Galusha
+ */
+
 var StateManager = {
     //returns iterable array of the property path of input
     getPath: function(input) {
@@ -31,6 +47,7 @@ var StateManager = {
         //return obj;
     },
 
+    //fires a state update event
     fireUpdate: function(stateName, save) {
         var category = $SM.getCategory(stateName);
         $.Dispatch("stateUpdate").publish({
@@ -43,6 +60,7 @@ var StateManager = {
         }
     },
 
+    //finds first item of state path
     getCategory: function(stateName) {
         var firstBracket = stateName.indexOf("[");
         var firstDot = stateName.indexOf(".");
@@ -62,6 +80,7 @@ var StateManager = {
         return category;
     },
 
+    //gets a state or returns null (or 0 if requestZero flag)
     get: function(stateName, requestZero) {
         var path = $SM.getPath(stateName);
         var obj = Game.State;
@@ -78,6 +97,7 @@ var StateManager = {
         return obj;
     },
 
+    //sets a state
     set: function(stateName, value, noUpdate) {
         //space to check value validity
         $SM.createState(stateName, value);
@@ -87,6 +107,7 @@ var StateManager = {
         }
     },
 
+    //sets multiple states - only one update is called
     setM: function(parentName, list, noUpdate) {
         if(isUndefined($SM.get(parentName))) {
             $SM.set(parentName, {});
@@ -108,6 +129,7 @@ var StateManager = {
         }
     },
 
+    //adds a value to a (numerical) state
     add: function(stateName, value, noUpdate) {
         var old = $SM.get(stateName, true);
 
@@ -122,6 +144,7 @@ var StateManager = {
         $SM.set(stateName, old + value, noUpdate);
     },
 
+    //removes a state
     remove: function(stateName, noUpdate) {
         var path = $SM.getPath(stateName);
 
@@ -137,6 +160,7 @@ var StateManager = {
     },
 
     /* ====== Specific State Functions ====== */
+    //adds a character perk
     addPerk: function(name) {
         //perks must be defined in Game.Perks
         if(isUndefined(Game.Perks[name])) {
@@ -146,6 +170,7 @@ var StateManager = {
         
         //perks can only be added once
         if($SM.hasPerk(name)) {
+            Logger.warn("Attempted to add perk \"" + name + "\" but player already has it!");
             return;
         }
 
@@ -160,11 +185,12 @@ var StateManager = {
         return $SM.get("character.perks[\"" + name + "\"]");
     },
 
+    //adds item value to player's inventory
     addItem: function(name, value) {
         $SM.add("character.equipment[\"" + name + "\"]", value);
 
         if(House.Buildings.hasOwnProperty(name)) {
-            House.updateHouse();
+            House.updateHouseInv();
         } else {
             Game.updateEquipment(); 
         }
@@ -180,8 +206,10 @@ var StateManager = {
         return $SM.get("character.equipment[\"" + name + "\"]", true) >= value;
     },
 
+    //returns Room object in House
     getRoom: function(roomName) {
         return $SM.get("house.rooms[" + roomName + "]");
     }
 };
+//alias that will be used everywhere else
 var $SM = StateManager;
