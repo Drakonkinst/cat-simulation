@@ -2,16 +2,13 @@
  * Miscellaneous helper functions.
  * */
 
-/*
- * Returns a number between min and max, non-inclusive.
- * */
+//returns a number between min and max, non-inclusive.
 function randNum(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-/*
- * Returns an integer between min and max, not including max
- * */
+
+//returns an integer between min and max, not including max
 function randInt(min, max) {
     return Math.floor(randNum(min, max));
 }
@@ -158,6 +155,7 @@ function isUndefined(variable) {
     return typeof variable === "undefined" || variable === null;
 }
 
+//returns if a variable exists
 function exists(variable) {
     return !isUndefined(variable);
 }
