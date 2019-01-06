@@ -9,27 +9,40 @@
  * */
 function Cat(properties) {
     properties = properties || {};
-    this.isFemale = properties.isFemale || chance(0.5);
+    this.isFemale = properties.isFemale || chance(0.50);
 
-    var namePool = (this.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
-    this.name = properties.name.toLowerCase() || chooseRandom(namePool);
+    //set name
+    if(properties.name) {
+        this.name = properties.name.toLowerCase();
+    } else {
+        //construct pool of possible default names based on cat's gender
+        var namePool = Cats.DEFAULT_NEUTRAL_NAMES;
+        if(this.isFemale) {
+            namePool = namePool.concat(Cats.DEFAULT_MALE_NAMES);
+        } else {
+            namePool = namePool.concat(Cats.DEFAULT_MALE_NAMES);
+        }
+        this.name = chooseRandom(namePool)
+    }
 
+    //ensures cat has unique name if House is active
     if(exists(House.cats)) {
-        //ensures that the cat has a unique name if House is active
         this.name = Cats.uniqueName(this.name);
     }
 
+    //set breed
     this.breed = properties.breed || chooseRandom(keysAsList(Cats.BREEDS));
-    
-    //gets breed info
-    var breed = Cats.BREEDS[this.breed];
+    var breedInfo = Cats.BREEDS[this.breed];
 
-    //70% chance to retain each tendency
-    this.traits = properties.traits || [];
-    if(this.traits.length == 0) {
-        for(var i in breed.tendencies) {
-            if(chance(0.7)) {
-                this.traits.push(breed.tendencies[i]);
+    //set tendencies - 70% to retain each tendency from breed
+    if(properties.traits) {
+        this.traits = properties.traits;
+    } else {
+        this.traits = [];
+        var tendencies = breedInfo.tendencies;
+        for(var i in tendencies) {
+            if(chance(0.70)) {
+                this.traits.push(tendencies[i]);
             }
         }
     }
@@ -43,23 +56,28 @@ function Cat(properties) {
     this.coat = properties.coat || chooseRandom(breed.coats);
     this.eyeColor = properties.eyeColor || chooseRandom(breed.eyeColors);
 
-    //sets random hunger upon spawn
+
+    //set physical properties
+    this.color = properties.color || chooseRandom(breedInfo.colors);
+    this.coat = properties.coat || chooseRandom(breedInfo.coats);
+    this.eyeColor = properties.eyeColor || chooseRandom(breedInfo.eyeColors);
+
+    //sets status
     this.hunger = properties.hunger || randInt(0, 11);
     this.thirst = properties.thirst || randInt(0, 11);
-    this.morale = properties.morale || randInt(2, Cats.MoraleEnum.morales.length);
+    this.morale = properties.morale || randInt(2, Cats.Morale.MORALES.length)
     this.moralePoints = properties.moralePoints || 50;
-    this.energy = properties.energy || Cats.MAX_ENERGY;
+    this.energy = properties.energy || randInt(50, Cats.MAX_ENERGY);
 
-    this.isSleeping = isUndefined(properties.isSleeping) ? false : properties.isSleeping;
-    this.wantsToLeave = isUndefined(properties.wantsToLeave) ? false : properties.wantsToLeave;
-    this.consumedRecently = isUndefined(properties.consumedRecently) ? chance(1 - ((this.hunger + this.thirst) / 20)) : properties.consumedRecently;
+    //states
+    this.isActive = true;
+    this.isSleeping = exists(properties.isSleeping) ? properties.isSleeping : false;
+    this.movedRecently = exists(properties.movedRecently) ? properties.movedRecently : false;
+    this.consumedRecently = exists(properties.consumedRecently) ? properties.consumedRecently : chance(1 - ((this.hunger + this.thirst) / 2000));
     this.room = properties.room || null;
-
-    var cat = this;
-    this.wakeUpTask = new Task("[" + cat.name + " - wake up]", function() {
-        cat.wakeUp();
-    }, 1, 5);
+    this.save();
 }
+
 Cat.prototype = {
     //updates the cat
     tick: function() {
