@@ -31,21 +31,15 @@ function autoSelect(selector) {
     $(selector).focus().select();
 }
 
-/*
- * Returns an array of all the property names in an object.
- * 
- * Example:
- * keysAsList({a: 1, b: 1, c: 3, d: 1}) -> ["a", "b", "c", "d"]
- * 
- * */
-function keysAsList(object) {
-    var keys = [];
-    for(var key in object) {
-        if(object.hasOwnProperty(key)) {
-            keys.push(key);
-        }
-    }
-    return keys;
+//returns a random object key
+function randomKey(object) {
+    var keys = Object.keys(object);
+    return keys[keys.length * Math.random() << 0];
+}
+
+//returns a random object property (value)
+function randomProperty(object) {
+    return object[randomKey(object)];
 }
 
 /*
