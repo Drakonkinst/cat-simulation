@@ -57,36 +57,50 @@ function Room(roomName, properties) {
 }
 
 Room.prototype = {
-    init: function() {
-        //exit early if this room has already been unlocked
-        if(this.isUnlocked) {
-            Logger.warn("Room \"" + this.id + "\" is already unlocked!");
-            return;
-        }
-
-        //make elements visible
-        this.tab.appendTo("#house-header");
-        this.panel.appendTo("#room-slider");
-        this.isUnlocked = true;
-
-        //update
-        this.onLoad();
-        this.updatePlaceButtons();
-        this.updateFood();
+    handleStateUpdates: function(e) {
+        
     },
 
-    tick: function() {
-        for(var k in this.cats) {
-            this.cats[k].tick(this);
+    //updates left side buttons
+    updatePlaceButtons: function() {
+        var id = this.name.replace(" ", "-");
+        var location = this.panel.find(".place-buttons");
+        var needsAppend = false;
+        var placeButton = Buttons.getButton(id + "_place_" + formattedName);
+
+        for(var building in House.Buildings) {
+            //var buildingInfo = House.Buildings[building];
+            var formattedName = building.replace(" ", "-");
+            
+            if(isUndefined(placeButton) && $SM.hasItem(building)) {
+
+                (function(id, building, formattedName) {
+                    placeButton = new Button({
+                        id: id + "_place_" + formattedName,
+                        text: building,
+                        width: "80px",
+                        onClick: function() {
+                            House.getCurrentRoom().place(building);
+                        }
+                    });
+                })(id, building, formattedName);
+
+                var container = location.find("#" + id + "_place_" + formattedName + "_container");
+                placeButton.get().css("opacity", 0).animate({opacity: 1}, 200, "linear").appendTo(container);
+                needsAppend = true;
+            }
         }
-        if(this.lightsOn) {
-            House.usePower(0.01);
+
+        //initialize building container
+        if(needsAppend) {
+            location.animate({opacity: 1}, 200, "linear");
         }
+
+        //update manage buttons
     },
 
     addCat: function(cat) {
-        cat.room = this;
-        this.cats.push(cat);
+        cat.room = this.name;
         var catList = this.panel.find(".cat-list");
         var catListContainer = this.panel.find(".cat-list-container");
         var formattedName = cat.name.replace(" ", "-");
@@ -105,9 +119,9 @@ Room.prototype = {
 
     removeCat: function(cat) {
         cat.room = null;
-        this.cats.splice(this.cats.indexOf(cat), 1);
         var formattedName = cat.name.replace(" ", "-");
         var catIconContainer = this.panel.find($("#cat_" + formattedName));
+
         if(catIconContainer.length) {
             var pseudoIcon = $("<span>").addClass("cat-icon").text("@").css("opacity", 1);
             catIconContainer.replaceWith(pseudoIcon.animate({opacity: 0}, 200, "linear", function() {
