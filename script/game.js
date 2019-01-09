@@ -18,8 +18,10 @@
   * */
 var Game = {
     /* ====== Variables and Presets ====== */
-    SAVE_INTERVAL: 30 * 1000,   //interval before the "saved." text should display again
+    ANNOUNCE_SAVE_INTERVAL: 30 * 1000,   //interval before the "saved." text should display again
+    QUICK_RELOAD_WINDOW: 10 * 1000,      //window when reloading before the game does not act as if time has moved
 
+    //version info
     version: {
         alpha: false, //alpha phase, mutually exclusive with beta
         beta: true,   //beta phase, mutually exclusive with alpha
@@ -43,6 +45,9 @@ var Game = {
     keyLock: false,         //keys do not function
     tabNavigation: true,    //tab navigation does not function
     gameOver: false,
+
+    //flags
+    isReload: false,
 
     eventTopics: {},
 
@@ -384,10 +389,13 @@ var Game = {
         if(exists(Storage) && exists(localStorage)) {
             //"saved." notification does not play on a set interval, every time saveGame()
             //is called it attempts to show the message
-            if(isUndefined(Game.lastSave) || Game.now() - Game.lastSave > Game.SAVE_INTERVAL) {
+            if(isUndefined(Game.lastSaveAnnounce) || Game.now() - Game.lastSaveAnnounce > Game.ANNOUNCE_SAVE_INTERVAL) {
                 $("#save-notify").css("opacity", 1).animate({opacity: 0}, 1000, "linear");
-                Game.lastSave = Game.now();
+                Game.lastSaveAnnounce = Game.now();
             }
+
+            //no recursion today
+            $SM.set("game.lastSave", Game.now(), true);
 
             localStorage.gameState = JSON.stringify(Game.State);
         }
@@ -400,6 +408,10 @@ var Game = {
             if(exists(savedState)) {
                 Game.State = savedState;
                 Logger.log("Loaded save!");
+
+                if(Game.now() - savedState.game.lastSave < Game.QUICK_RELOAD_WINDOW) {
+                    Game.isReload = true;
+                }
             }
         } catch(e) {
             //error found, revert to blank game state
