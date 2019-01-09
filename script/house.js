@@ -1,19 +1,16 @@
-/*
- * House module that represents the player's house.
- * */
+/* 
+ * The player's house
+ */
+
 var House = {
-    name: "house",      //module id
-
-    cats: null,         //all cats in the house
-
+    
+    cats: [],           //all cats in house
+    rooms: {},          //keymap of all active room objects
     currentRoom: null,  //name of current room
-    unlockedRooms: [],  //ordered list of room names
-    rooms: {},          //keymap of Room ids and objects
 
-    stores: {},         //house inventory
-    electric: null,
 
-    //lookup table of all buildings
+
+
     Buildings: {
         "food bowl": {
             //should space be based on single buildings or overall? maybe
