@@ -3,6 +3,7 @@
  */
 function Cat(properties) {
     properties = properties || {};
+
     this.isFemale = properties.isFemale || chance(0.50);
 
     //set name
@@ -63,14 +64,6 @@ function Cat(properties) {
 }
 
 Cat.prototype = {
-
-    //this is pretty rough, it uploads the entire cat object into localStorage
-    //however, it works.
-    //next level - turning all cat variables into storage?
-    save: function() {
-        $SM.set("house.cats[" + this.name + "]", JSON.stringify(this), true);
-    },
-
     //updates cat
     tick: function() {
         var wantsToLeave = false;
@@ -96,22 +89,6 @@ Cat.prototype = {
         this.hunger += 5;
         this.thirst += 6;
 
-        //if cat has eaten recently, increase morale
-        if(this.hunger < 300) {
-            this.addMorale(300 - Math.floor(this.hunger));
-        }
-
-        //if cat has drank recently, increase morale
-        if(this.thirst < 300) {
-            this.addMorale(300 - Math.floor(this.thirst));
-        }
-
-        //lose morale if litter box is smelly
-        /*
-        if(exists(this.room.litterBox) && this.room.litterBox >= 6) {
-            this.addMorale(5 - this.room.litterBox);
-        }*/
-
         //if cat is out of energy, nap
         if(this.energy <= 0) {
             this.startNap();
@@ -128,12 +105,28 @@ Cat.prototype = {
             this.hiss();
         }
 
-        //food
         var roomPath = "house.rooms[" + this.room + "]";
         var food = $SM.get(roomPath + ".food");
         var water = $SM.get(roomPath + ".water");
         var litterBox = $SM.get(roomPath + "[litter box]");
 
+        /* Morale */
+        //if cat has eaten recently, increase morale
+        if(this.hunger < 300) {
+            this.addMorale(300 - Math.floor(this.hunger));
+        }
+
+        //if cat has drank recently, increase morale
+        if(this.thirst < 300) {
+            this.addMorale(300 - Math.floor(this.thirst));
+        }
+
+        //lose morale if litter box is smelly
+        if(litterBox && litterBox.level >= 6) {
+            this.addMorale(5 - this.room.litterBox);
+        }
+
+        //food
         if(food && this.hunger >= 300) {
             if(food.level > 0) {
                 if(chance(0.35)) {
@@ -179,7 +172,6 @@ Cat.prototype = {
         if(this.consumedRecently && chance(0.2)) {
             if(litterBox && chance(0.4)) {
                 this.useLitterBox();
-                this.consumedRecently = false;
             } else {
                 if(chance(0.30)) {
                     this.addMorale(-500);
@@ -197,6 +189,7 @@ Cat.prototype = {
         this.save();
     },
 
+    /* Event Actions */
     //called when the cat is added to the house
     greeting: function() {
         var message;
@@ -237,6 +230,7 @@ Cat.prototype = {
         this.addMorale(20);
     },
 
+    /* Room Actions */
     //attempts to eat food in current room
     eatFood: function() {
         var foodLevel = this.room.food.level;
@@ -288,6 +282,7 @@ Cat.prototype = {
     //attempts to use litter box
     useLitterBox: function() {
         this.room.litterBox++;
+        this.consumedRecently = false;
         this.room.updateLitterBox();
     },
 
@@ -314,6 +309,7 @@ Cat.prototype = {
 
     hiss: function() {},
 
+    /* Helper Methods */
     //constructs sound message
     makeSound: function(sound, loudness, softStr, loudStr, target) {
         var intensities = [ " somewhat ", " ", " rather ", " very " ];
@@ -389,15 +385,22 @@ Cat.prototype = {
     genderPronoun: function(maleObj, femaleObj) {
         return this.isFemale ? femaleObj : maleObj;
     },
+
+    //saves entire cat into localStorage
+    save: function() {
+        $SM.set(Cats.PATH + "[" + this.name + "]", JSON.stringify(this), true);
+    },
 }
 
 var Cats = {
+    PATH: "house.cats",     //path to cats collection
+
     //default names
     DEFAULT_MALE_NAMES: [ "garfield", "orpheus", "salem", "tom", "azrael", "whiskers", "felix", "oscar", "edgar", "sox", "ollie", "leo", "snickers", "charcoal", "prince", "toby", "mikesch", "buddy", "romeo", "loki", "gavin", "momo", "illia", "theodore", "eliot", "milo", "max", "monty", "zeke" ],
     DEFAULT_FEMALE_NAMES: [ "miso", "lola", "mcgonagall", "tara", "nala", "mistie", "misty", "coco", "tasha", "raven", "valencia", "princess", "cherry", "chloe", "felicia", "olivia", "emma", "belle", "luna", "minerva", "ellie", "athena", "artemis", "poppy", "venus", "calypso", "elise", "kathy", "elizabeth", "hope" ],
     DEFAULT_NEUTRAL_NAMES: [ "lolcat", "sesame", "unagi", "avocado", "mango", "oreo", "swirly", "striped", "alpha", "beta", "gamma", "lucky", "mittens", "angel", "dakota", "ginger", "tippy", "snickers", "fish", "smokey", "muffin", "fuzzy", "nibbles", "chaser" ],
     
-    MAX_ENERGY: 200,
+    MAX_ENERGY: 200,        //maximum energy a cat can have
 
     //breed info
     BREEDS: {
