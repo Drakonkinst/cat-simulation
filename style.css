@@ -415,7 +415,7 @@ body {
 	top: 40px;
 	right: 0px;
 }
-	#equipment::before, #perks::before, #house::before {
+	#equipment::before, #perks::before, #house-inventory::before {
 		position: absolute;
 		background: white;
 		content: attr(data-legend);
@@ -442,7 +442,7 @@ body {
 		padding: 5px 10px;
 		width: 200px;
 	}
-	#house {
+	#house-inventory {
 		position: absolute;
 		z-index: 10;
 		top: 0px;
