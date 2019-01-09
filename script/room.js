@@ -8,40 +8,23 @@
  * - String title: title of room, shown in the House navigation
  * - Function onLoad: runs when room is unlocked
  * */
-function Room(properties) {
-    this.id = properties.id || "unknown";   //room id
-    var title = properties.title || "Room";
-
-    this.isUnlocked = false;                //player has discovered this room
+function Room(roomName, properties) {
+    this.name = roomName;
+    var id = roomName.replace(" ", "-");
     
-    /*this.allowed = {
-        "food bowl": properties.hasFoodStorage || "false",
-    };*/
-    this.buildings = {};
-
-    this.cats = [];                 //section of House.cats that are currently in this room
-
-    //stores
-    this.food = null;
-    this.water = null;
-    this.litterBox = null;
-    this.lightsOn = true;
-
-    this.onLoad = properties.onLoad || function() {};
-
     //create location in header
-    var id = this.id;
-    this.tab = $("<div>").attr("id", "room-location_" + this.id)
-            .addClass("room-button")
-            .text(title).click(function() {
-                if(House.canTravel()) {
-                    House.travelTo(id);
-                }
-            });
-    
-    //create panel element
-    this.panel = $("<div>").attr("id", "room_" + this.id).addClass("room");
+    this.tab = $("<div>").attr("id", "room-location_" + id)
+        .addClass("room-button")
+        .text(properties.title)
+        .click(function() {
+            if(House.canTravel()) {
+                House.travelTo(id);
+            }
+        })
+        .appendTo("#house-header");
 
+    //create panel element
+    this.panel = $("<div>").attr("id", "room_" + id).addClass("room").appendTo("#room-slider");
     var roomStatus = $("<div>").addClass("room-status").appendTo(this.panel);
     var upperStatus = $("<div>").addClass("room-upper-status").appendTo(roomStatus);
     $("<div>").addClass("food-status").appendTo(upperStatus);
@@ -50,19 +33,29 @@ function Room(properties) {
     $("<div>").addClass("cat-list-container").append($("<span>").text("cats:")).append($("<span>").addClass("cat-list")).css("opacity", 0).appendTo(roomStatus);
 
     var roomButtons = $("<div>").addClass("room-buttons").appendTo(this.panel);
-    var buildButtons = $("<div>").addClass("build-buttons").attr("data-legend", "build:").css("opacity", 0).appendTo(roomButtons);
+    var placeButtons = $("<div>").addClass("place-buttons").attr("data-legend", "place:").css("opacity", 0).appendTo(roomButtons);
+
     for(var k in House.Buildings) {
         var formattedName = k.replace(" ", "-");
-        buildButtons.append($("<div>").attr("id", this.id + "_build_" + formattedName + "_container"));
+        placeButtons.append($("<div>").attr("id", id + "_place_" + formattedName + "_container"));
     }
 
     $("<div>").addClass("manage-buttons").attr("data-legend", "manage:").css("opacity", 0)
-        .append($("<div>").attr("id", this.id + "_refill-food_container"))
-        .append($("<div>").attr("id", this.id + "_refill-water_container"))
-        .append($("<div>").attr("id", this.id + "_clean-litter-box_container"))
-        .append($("<div>").attr("id", this.id + "_toggle-light_container")).appendTo(roomButtons);
+        .append($("<div>").attr("id", id + "_refill-food_container"))
+        .append($("<div>").attr("id", id + "_refill-water_container"))
+        .append($("<div>").attr("id", id + "_clean-litter-box_container"))
+        .append($("<div>").attr("id", id + "_toggle-light_container")).appendTo(roomButtons);
+
+    if(properties.onInit) {
+        properties.onInit();
+    }
+
+    $.Dispatch("stateUpdate").subscribe(this.handleStateUpdates);
     
+    //updates
+    this.updatePlaceButtons();
 }
+
 Room.prototype = {
     init: function() {
         //exit early if this room has already been unlocked

@@ -169,6 +169,10 @@ var House = {
                             nextScene: "end"
                         }
                     }
+                if(!$SM.get(litterBoxPath)) {
+                    $SM.set(litterBoxPath, {
+                        level: 0
+                    }, true);
                 }
             }
         }
@@ -186,6 +190,8 @@ var House = {
         //updates cats on house arrival
         for(var i = 0; i < House.cats.length; i++) {
             House.cats[i].onHouseArrival();
+                //room.updateLitterBox();
+            }
         }
         //moves main inventory to accomodate for house inventory display
         Game.moveEquipmentView($("#house"), transitionDiff);
