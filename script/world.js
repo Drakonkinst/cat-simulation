@@ -357,8 +357,8 @@ var World = {
                             "random": {
                                 text: "random",
                                 click: function() {
-                                    var namePool = (cat.isFemale ? Cats.DEFAULT_FEMALE_NAMES : Cats.DEFAULT_MALE_NAMES).concat(Cats.DEFAULT_NEUTRAL_NAMES);
-                                    Events.eventPanel().find("input").val(Cats.uniqueName(chooseRandom(namePool)));
+                                    var namePool = (cat.isFemale ? Cat.DEFAULT_FEMALE_NAMES : Cat.DEFAULT_MALE_NAMES).concat(Cat.DEFAULT_NEUTRAL_NAMES);
+                                    Events.eventPanel().find("input").val(Cat.uniqueName(chooseRandom(namePool)));
                                 }
                             }
                         }
@@ -409,7 +409,7 @@ var World = {
             //set room to bedroom?
 
             //animate onArrival before the screen fades in
-            Game.moveEquipmentView($("#house"), 0);
+            Game.moveEquipmentView($("#house-inventory"), 0);
             House.travelTo("bedroom");
 
             //come back after a time delay
@@ -456,7 +456,7 @@ var World = {
     Init: function() {
         World.WeatherTask = new Task("weather", World.nextWeather, World.WEATHER_INTERVAL[0], World.WEATHER_INTERVAL[1]);
         
-        //World.currentWeather = chooseRandom(keysAsList(World.weather)); - move somewhere else
+        //World.currentWeather = randomKey(World.weather); - move somewhere else
         World.WeatherTask.scheduleNext();
         World.nextDay();
 
