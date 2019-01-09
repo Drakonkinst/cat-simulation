@@ -11,52 +11,50 @@ var House = {
 
 
 
+    //building info
     Buildings: {
         "food bowl": {
-            //should space be based on single buildings or overall? maybe
-            //assign weight to each structure and have each room cap..
-            //for later.
-            placeMsg: "shiny bowls, needs food though",
-            maxMsg: "no more space for more bowls",
-            maximum: 5,
+            placeMsg: "shiny bowl, needs food though",
+            weight: 5,
             onPlace: function(room) {
-                if(isUndefined(room.food)) {
-                    room.food = {
+                var foodPath = "house.rooms[" + room.name + "].food";
+
+                if(!$SM.get(foodPath)) {
+                    $SM.set(foodPath, {
                         level: 0,
-                        maximum: 0
-                    };
+                        max: 0
+                    }, true);
                 }
-                room.food.maximum += 10;
-                room.updateFood();
+
+                $SM.add(foodPath + ".max", 10);
+  
+                //room.updateFood(); -> should happen automatically? pubsub
             }
         },
         "water bowl": {
             placeMsg: "new water bowl, but it looks dry",
-            maxMsg: "that's enough water bowls for now",
-            maximum: 5,
-            onPlace: function(room) {
-                if(isUndefined(room.water)) {
-                    room.water = {
+            weight: 5,
+            onPlace: function() {
+                var waterPath = "house.rooms[" + room.name + "].water";
+
+                if(!$SM.get(waterPath)) {
+                    $SM.set(waterPath, {
                         level: 0,
-                        maximum: 0
-                    };
+                        max: 0
+                    }, true);
                 }
-                room.water.maximum += 10;
-                room.updateWater();
+
+                $SM.add(waterPath + ".max", 10);
+  
+                //room.updateWater(); -> should happen automatically? pubsub
             }
         },
         "litter box": {
             placeMsg: "litter box installed",
+            weight: 6,
             maximum: 1,
             onPlace: function(room) {
-                if(isUndefined(room.litterBox)) {
-                    room.litterBox = 0;
-                    //should this have level/max?
-                }
-                room.updateLitterBox();
-            }
-        }
-    },
+                var litterBoxPath = "house.rooms[" + room.name + "].litterBox";
 
     //house-related events
     events: [
