@@ -1,13 +1,13 @@
 /**
  * Logger object that wraps the default console object so that
- * debug messages are only printed when a certain boolean is true.
+ * debug messages are only printed when a certain game option is true.
  */
 
 var Logger = {
 
     /**
      * Returns whether messages should be outputted to console, based on a
-     * certain boolean.
+     * certain game option.
      * 
      * @return {boolean} Whether log messages should be outputted.
      */
