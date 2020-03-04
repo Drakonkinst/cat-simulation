@@ -1,0 +1,27 @@
+/* Base */
+html, body {
+	height: 100%;
+}
+
+div {
+	display: block;
+}
+
+body {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 16px;
+	font-weight: normal;
+	line-height: normal;
+	letter-spacing: normal;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.wrapper {
+    position: relative;
+	margin: auto;
+	width: 700px;
+	padding: 20px 0 0 220px;
+}
+
