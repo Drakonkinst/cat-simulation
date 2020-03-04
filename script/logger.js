@@ -21,7 +21,7 @@ var Logger = {
      * @param {String} msg The string to output to console. 
      */
     log: function(msg) {
-        if(Logger.isDebug()) {
+        if(this.isDebug()) {
             console.log(msg);
         }
     },
@@ -36,7 +36,7 @@ var Logger = {
      */
     logIf: function(condition, msg) {
         if(condition) {
-            Logger.log(msg);
+            this.log(msg);
         }
         return condition;
     },
@@ -47,7 +47,7 @@ var Logger = {
      * @param {String} msg The string to output to console. 
      */
     warn: function(msg) {
-        if(Logger.isDebug()) {
+        if(this.isDebug()) {
             console.warn(msg);
         }
     },
@@ -62,7 +62,7 @@ var Logger = {
      */
     warnIf: function(condition, msg) {
         if(condition) {
-            Logger.warn(msg);
+            this.warn(msg);
         }
         return condition;
     }
