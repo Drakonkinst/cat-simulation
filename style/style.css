@@ -25,35 +25,3 @@ body {
 	padding: 20px 0 0 220px;
 }
 
-/* Notifications */
-.notifications {
-	height: 700px;
-	width: 200px;
-	position: absolute;
-	overflow: hidden;
-	top: 20px;
-	left: 0px;
-	margin-bottom: 10px;
-}
-
-.notify-gradient {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	height: 100%;
-	width: 100%;
-	background-color: white;
-	background: -webkit-linear-gradient(
-		rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%
-	);
-	background: linear-gradient(
-		rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%
-	);
-	filter: alpha(
-		Opacity=0, FinishOpacity=100, Style=1, StartX=0, StartY=0, FinishX=0, FinishY=500
-	);
-}
-
-.notification {
-	margin-bottom: 10px;
-}
