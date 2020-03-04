@@ -31,11 +31,14 @@ var Logger = {
      * Returns whether the condition is true or false.
      * 
      * @param {boolean} condition The condition to check.
-     * @param {String} msg The string to output to console. 
+     * @param {String} msg The string to output to console.
      * @return the condition
      */
     logIf: function(condition, msg) {
-        
+        if(condition) {
+            this.log(msg);
+        }
+        return condition;
     },
 
     /**
@@ -58,7 +61,10 @@ var Logger = {
      * @return the condition
      */
     warnIf: function(condition, msg) {
-
+        if(condition) {
+            this.warn(msg);
+        }
+        return condition;
     }
 
 }
