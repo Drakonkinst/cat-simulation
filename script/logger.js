@@ -2,7 +2,6 @@
  * Logger object that wraps the default console object so that
  * debug messages are only printed when a certain game option is true.
  */
-
 var Logger = {
 
     /**
